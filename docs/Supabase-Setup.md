@@ -12,7 +12,11 @@ npx supabase db push                     # spielt supabase/migrations/* ein
 
 ## Dashboard-Konfiguration (nicht in Migrationen abbildbar)
 
-- [ ] **Anonymous Sign-Ins aktivieren** (Authentication → Sign In / Up → Anonymous) — sonst schlägt `ensureSession()` (`src/lib/auth.ts`) zur Laufzeit fehl.
+- [x] **Anonymous Sign-Ins aktivieren** (Authentication → Sign In / Up → Anonymous) — sonst schlägt `ensureSession()` (`src/lib/auth.ts`) zur Laufzeit fehl. *(aktiviert, per verify.mjs bestätigt)*
+
+## Hinweis für Cloud-Umgebungen
+
+`supabase db push` braucht direkten Postgres-Zugang (TCP 5432/6543). In Umgebungen, die nur HTTPS erlauben, stattdessen die Management-API nutzen (`POST https://api.supabase.com/v1/projects/<ref>/database/query` mit `SUPABASE_ACCESS_TOKEN`) und die Historie in `supabase_migrations.schema_migrations` nachtragen.
 
 ## Verifikation (AP3-Akzeptanzkriterien)
 
