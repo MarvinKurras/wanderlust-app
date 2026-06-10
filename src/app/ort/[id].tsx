@@ -7,6 +7,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StockBadge } from '@/badges';
 import { ArtPanel } from '@/components/ArtPanel';
 import { usePlaces, useUnlocks } from '@/features/places/queries';
+import { PraegePop } from '@/features/unlock/PraegePop';
+import { PraegeRing } from '@/features/unlock/PraegeRing';
+import { UnlockSection } from '@/features/unlock/UnlockSection';
+import { useUnlock } from '@/features/unlock/useUnlock';
 import { de } from '@/i18n/de';
 import { formatCoords, formatDateDe } from '@/lib/format';
 import { colors, fonts, radius, spacing, textStyles } from '@/theme';
@@ -23,7 +27,9 @@ export default function OrtDetailScreen() {
     () => unlocks.data?.find((u) => u.place_id === id),
     [unlocks.data, id],
   );
-  const unlocked = Boolean(unlock);
+  const { state: unlockState, start: startUnlock } = useUnlock(typeof id === 'string' ? id : '');
+  const justUnlocked = unlockState.phase === 'unlocked';
+  const unlocked = Boolean(unlock) || justUnlocked;
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
@@ -47,16 +53,31 @@ export default function OrtDetailScreen() {
         <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}>
           <View style={styles.artWrap}>
             <ArtPanel>
-              <StockBadge
-                name={place.name}
-                region={place.region}
-                elevationM={place.elevation_m}
-                motif={place.badge_motif}
-                shape={place.badge_shape}
-                tone={place.badge_tone}
-                locked={!unlocked}
-                width={212}
-              />
+              {justUnlocked ? (
+                <PraegePop>
+                  <StockBadge
+                    name={place.name}
+                    region={place.region}
+                    elevationM={place.elevation_m}
+                    motif={place.badge_motif}
+                    shape={place.badge_shape}
+                    tone={place.badge_tone}
+                    width={212}
+                  />
+                </PraegePop>
+              ) : (
+                <StockBadge
+                  name={place.name}
+                  region={place.region}
+                  elevationM={place.elevation_m}
+                  motif={place.badge_motif}
+                  shape={place.badge_shape}
+                  tone={place.badge_tone}
+                  locked={!unlocked}
+                  width={212}
+                />
+              )}
+              {justUnlocked && <PraegeRing size={160} />}
             </ArtPanel>
           </View>
 
@@ -77,12 +98,13 @@ export default function OrtDetailScreen() {
               <Text style={[styles.status, unlocked && styles.statusDone]}>
                 {unlock
                   ? de.detail.erwandertAm(formatDateDe(unlock.unlocked_at))
-                  : de.detail.nochNichtErwandert}
+                  : justUnlocked
+                    ? de.detail.erwandertAm(formatDateDe(unlockState.unlockedAt))
+                    : de.detail.nochNichtErwandert}
               </Text>
             </View>
 
-            {/* Entfernung folgt mit der Standortprüfung (AP6) — A-AP4-1 */}
-            {!unlocked && <Text style={styles.distanceHint}>{de.detail.entfernungFolgt}</Text>}
+            {!unlocked && <UnlockSection state={unlockState} onStart={startUnlock} />}
 
             {/* Shop-Teaser: sichtbar, aber deaktiviert (verbindliche Entscheidung) */}
             <View style={styles.actions}>
@@ -196,13 +218,6 @@ const styles = StyleSheet.create({
   },
   statusDone: {
     color: colors.brassDeep,
-  },
-  distanceHint: {
-    fontFamily: fonts.mono,
-    fontSize: 10,
-    letterSpacing: 0.5,
-    color: colors.inkSoft,
-    marginTop: spacing.sm,
   },
   actions: {
     marginTop: spacing.lg,

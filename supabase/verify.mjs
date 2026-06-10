@@ -1,7 +1,8 @@
 /**
- * AP3-Abnahme: prüft Schema-Deploy und RLS-Wirkung aus Client-Sicht.
- * Nutzt ausschließlich URL + Anon-Key (wie die App). Aufruf:
+ * Backend-Abnahme (AP3 + AP6): prüft Schema, RLS-Wirkung und die Edge Function
+ * `unlock` aus Client-Sicht. Nutzt ausschließlich URL + Anon-Key (wie die App).
  *   node supabase/verify.mjs   (liest .env im Repo-Root oder Umgebungsvariablen)
+ * Hinweis: erzeugt einen echten Unlock für einen Wegwerf-Anon-Nutzer (A-AP6-4).
  */
 import { readFileSync } from 'node:fs';
 
@@ -69,12 +70,65 @@ if (session?.access_token) {
   check('unlocks-Insert als Client abgelehnt (RLS)', insUser.status === 401 || insUser.status === 403, `HTTP ${insUser.status}`);
 
   // 5) unlocks: eigene Liste lesbar und leer
-  // TODO (AP6): „Fremd-Unlocks nicht lesbar" als echter Cross-User-Test —
-  // erst möglich, sobald die Edge Function `unlock` Testdaten erzeugen kann.
   const own = await fetch(`${URL_}/rest/v1/unlocks?select=place_id`, { headers: userHeaders });
   const ownRows = own.ok ? await own.json() : null;
   check('eigene unlocks lesbar (leer)', own.ok && Array.isArray(ownRows) && ownRows.length === 0, `HTTP ${own.status}, rows: ${ownRows?.length ?? '—'}`);
+
+  // ---------- AP6: Edge Function `unlock` ----------
+  const callUnlock = async (body, token = session.access_token) =>
+    fetch(`${URL_}/functions/v1/unlock`, {
+      method: 'POST',
+      headers: { apikey: KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  const json = async (res) => (res.ok ? res.json() : null);
+
+  // 6) Ohne gültiges JWT → 401
+  const noAuth = await fetch(`${URL_}/functions/v1/unlock`, {
+    method: 'POST',
+    headers: { apikey: KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ placeId: 'zugspitze', lat: 0, lng: 0, accuracy: 5 }),
+  });
+  check('unlock ohne Auth abgelehnt', noAuth.status === 401, `HTTP ${noAuth.status}`);
+
+  // 7) Zu weit entfernt (Berlin → Zugspitze) → TOO_FAR mit Distanz
+  const far = await json(await callUnlock({ placeId: 'zugspitze', lat: 52.52, lng: 13.405, accuracy: 10 }));
+  check('unlock zu weit → TOO_FAR', far?.code === 'TOO_FAR' && far?.distanceM > 100000, `code: ${far?.code}, distanzM: ${far?.distanceM}`);
+
+  // 8) Genauigkeit > 100 m → ACCURACY_TOO_LOW
+  const coarse = await json(await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 150 }));
+  check('unlock ungenau → ACCURACY_TOO_LOW', coarse?.code === 'ACCURACY_TOO_LOW', `code: ${coarse?.code}`);
+
+  // 9) Mock-Flag → MOCK_LOCATION
+  const mock = await json(await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 10, isMocked: true }));
+  check('unlock mock → MOCK_LOCATION', mock?.code === 'MOCK_LOCATION', `code: ${mock?.code}`);
+
+  // 10) Innerhalb des Radius → UNLOCKED, danach idempotent ALREADY_UNLOCKED
+  const okRes = await json(await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 10 }));
+  check('unlock vor Ort → UNLOCKED', okRes?.code === 'UNLOCKED' && !!okRes?.unlockedAt, `code: ${okRes?.code}`);
+  const again = await json(await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 10 }));
+  check('unlock erneut → ALREADY_UNLOCKED', again?.code === 'ALREADY_UNLOCKED', `code: ${again?.code}`);
+
+  // 11) Eigener Unlock jetzt lesbar
+  const ownAfter = await json(await fetch(`${URL_}/rest/v1/unlocks?select=place_id`, { headers: userHeaders }));
+  check('eigener Unlock sichtbar', Array.isArray(ownAfter) && ownAfter.some((r) => r.place_id === 'zugspitze'), `rows: ${ownAfter?.length ?? '—'}`);
+
+  // 12) Cross-User (AP3-TODO eingelöst): Nutzer B sieht Unlocks von A nicht
+  const signB = await fetch(`${URL_}/auth/v1/signup`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  const sessionB = signB.ok ? await signB.json() : null;
+  if (sessionB?.access_token) {
+    const otherRows = await json(await fetch(`${URL_}/rest/v1/unlocks?select=place_id`, {
+      headers: { apikey: KEY, Authorization: `Bearer ${sessionB.access_token}` },
+    }));
+    check('Fremd-Unlocks nicht lesbar (Cross-User)', Array.isArray(otherRows) && otherRows.length === 0, `rows: ${otherRows?.length ?? '—'}`);
+  } else {
+    check('Fremd-Unlocks nicht lesbar (Cross-User)', false, 'zweite Anmeldung fehlgeschlagen');
+  }
 }
 
-console.log(failures === 0 ? '\nAlle AP3-Checks bestanden.' : `\n${failures} Check(s) fehlgeschlagen.`);
+console.log(failures === 0 ? '\nAlle Backend-Checks (AP3 + AP6) bestanden.' : `\n${failures} Check(s) fehlgeschlagen.`);
 process.exit(failures === 0 ? 0 : 1);
