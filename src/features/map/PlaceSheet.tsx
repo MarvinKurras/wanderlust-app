@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,16 +27,25 @@ export function PlaceSheet({ place, unlock, onClose }: Props) {
       <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
         <View style={styles.grabber} />
         <View style={styles.row}>
-          <StockBadge
-            name={place.name}
-            region={place.region}
-            elevationM={place.elevation_m}
-            motif={place.badge_motif}
-            shape={place.badge_shape}
-            tone={place.badge_tone}
-            locked={!unlocked}
-            width={96}
-          />
+          <View>
+            <StockBadge
+              name={place.name}
+              region={place.region}
+              elevationM={place.elevation_m}
+              motif={place.badge_motif}
+              shape={place.badge_shape}
+              tone={place.badge_tone}
+              locked={!unlocked}
+              width={96}
+            />
+            {/* Schloss-Overlay im Locked-Zustand (karte.html .sh-art.locked .foglabel) */}
+            {!unlocked && (
+              <View style={styles.fogLabel}>
+                <Feather name="lock" size={12} color={colors.inkSoft} />
+                <Text style={styles.fogLabelText}>{de.karte.chipVerschlossen}</Text>
+              </View>
+            )}
+          </View>
           <View style={styles.info}>
             <Text style={styles.eyebrow}>
               {place.region} · {formatCoords(place.lat, place.lng)}
@@ -51,7 +61,7 @@ export function PlaceSheet({ place, unlock, onClose }: Props) {
               <Text style={[styles.status, unlocked && styles.statusDone]} numberOfLines={2}>
                 {unlock
                   ? de.detail.erwandertAm(formatDateDe(unlock.unlocked_at))
-                  : de.orte.statusVerschlossen}
+                  : de.karte.sheetVerschlossen}
               </Text>
             </View>
           </View>
@@ -86,8 +96,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: colors.paper,
-    borderTopLeftRadius: radius.card,
-    borderTopRightRadius: radius.card,
+    borderTopLeftRadius: radius.sheet,
+    borderTopRightRadius: radius.sheet,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
   },
@@ -163,6 +173,25 @@ const styles = StyleSheet.create({
   },
   statusDone: {
     color: colors.brassDeep,
+  },
+  fogLabel: {
+    position: 'absolute',
+    top: '50%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.glass,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+  },
+  fogLabelText: {
+    fontFamily: fonts.mono,
+    fontSize: 9,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: colors.inkSoft,
   },
   cta: {
     marginTop: spacing.lg,

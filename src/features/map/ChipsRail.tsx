@@ -33,7 +33,7 @@ export function ChipsRail({ places, unlockedIds, selectedId, onSelect }: Props) 
             accessibilityLabel={unlocked ? place.name : de.karte.chipVerschlossen}
             style={[styles.chip, active && styles.chipActive]}
           >
-            <View style={styles.medal}>
+            <View style={[styles.medal, !unlocked && styles.medalLocked]}>
               {unlocked ? (
                 <StockBadge
                   name={place.name}
@@ -42,17 +42,17 @@ export function ChipsRail({ places, unlockedIds, selectedId, onSelect }: Props) 
                   motif={place.badge_motif}
                   shape={place.badge_shape}
                   tone={place.badge_tone}
-                  width={30}
+                  width={34}
                 />
               ) : (
                 <Feather name="lock" size={16} color={colors.inkSoft} />
               )}
             </View>
             <View>
-              <Text style={styles.chipName}>
+              <Text style={[styles.chipName, !unlocked && styles.chipNameLocked]}>
                 {unlocked ? place.name : de.karte.chipVerschlossen}
               </Text>
-              <Text style={styles.chipMeta}>
+              <Text style={[styles.chipMeta, !unlocked && styles.chipMetaLocked]}>
                 {unlocked
                   ? `${place.elevation_m} m · ${place.region.split('·')[0].trim()}`
                   : de.karte.chipNebel}
@@ -92,19 +92,29 @@ const styles = StyleSheet.create({
     borderColor: colors.brassDeep,
   },
   medal: {
-    width: 30,
+    width: 34,
     alignItems: 'center',
   },
+  medalLocked: {
+    backgroundColor: colors.lockedMedalBg,
+    borderRadius: 7,
+    paddingVertical: spacing.xs,
+  },
   chipName: {
-    fontFamily: fonts.displayMedium,
+    fontFamily: fonts.displaySemiBold,
     fontSize: 16,
     color: colors.ink,
+  },
+  chipNameLocked: {
+    color: colors.lockedTextStrong,
   },
   chipMeta: {
     fontFamily: fonts.mono,
     fontSize: 8.5,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.inkSoft,
+    letterSpacing: 0.4,
+    color: colors.brassDeep,
+  },
+  chipMetaLocked: {
+    color: colors.lockedTextSoft,
   },
 });

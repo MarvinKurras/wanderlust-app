@@ -35,6 +35,11 @@ export const colors = {
   stemDark: '#3c2a12',
   /** Modal-/Sheet-Scrim (Website: badges.js .bm-backdrop rgba(18,24,20,.62)) */
   scrim: 'rgba(18,24,20,0.62)',
+  /** Gedämpfte Locked-Texte in Karten-Chips (Website: karte.html .chip.locked .cn/.cm) */
+  lockedTextStrong: 'rgba(60,74,64,0.6)',
+  lockedTextSoft: 'rgba(60,74,64,0.5)',
+  /** Hintergrund des Schloss-Icons im Locked-Chip (Website: .chip.locked .cmedal) */
+  lockedMedalBg: 'rgba(60,74,64,0.14)',
 } as const;
 
 /** Metallton-Gradienten der Stockschilder (Website: badges.js TONES). */

@@ -5,7 +5,7 @@ import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-s
 import { StockBadge } from '@/badges';
 import { de } from '@/i18n/de';
 import type { Place } from '@/lib/places';
-import { colors, fonts, spacing } from '@/theme';
+import { badgeTones, colors, fonts, spacing } from '@/theme';
 
 type Props = {
   place: Place;
@@ -31,10 +31,9 @@ export function PlacePin({ place, unlocked }: Props) {
             </RadialGradient>
           </Defs>
           <Ellipse cx={46} cy={35} rx={46} ry={35} fill={`url(#fog_${place.id})`} />
-          <Circle cx={46} cy={35} r={13} fill={colors.paper} opacity={0.9} />
         </Svg>
         <View style={styles.lock}>
-          <Feather name="lock" size={13} color={colors.inkSoft} />
+          <Feather name="lock" size={16} color={colors.inkSoft} />
         </View>
         <Text style={styles.fogLabel}>{de.karte.fogLabel}</Text>
       </View>
@@ -53,7 +52,17 @@ export function PlacePin({ place, unlocked }: Props) {
         width={49}
       />
       <View style={styles.stem} />
-      <View style={styles.dot} />
+      {/* Brass-Punkt mit Radial-Verlauf (karte.html .pin .dot) */}
+      <Svg width={9} height={9} style={styles.dot}>
+        <Defs>
+          <RadialGradient id={`dot_${place.id}`} cx="35%" cy="30%" r="80%">
+            <Stop offset="0%" stopColor={badgeTones.brass.hi} />
+            <Stop offset="60%" stopColor={colors.brass} />
+            <Stop offset="100%" stopColor={colors.brassDeep} />
+          </RadialGradient>
+        </Defs>
+        <Circle cx={4.5} cy={4.5} r={4.5} fill={`url(#dot_${place.id})`} />
+      </Svg>
     </View>
   );
 }
@@ -71,13 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.stemDark,
   },
   dot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
     marginTop: -1,
-    backgroundColor: colors.brass,
-    borderWidth: 1,
-    borderColor: colors.brassDeep,
   },
   fogWrap: {
     alignItems: 'center',
@@ -91,7 +94,8 @@ const styles = StyleSheet.create({
     marginTop: -spacing.sm,
     fontFamily: fonts.mono,
     fontSize: 9,
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     color: colors.inkSoft,
+    opacity: 0.72,
   },
 });

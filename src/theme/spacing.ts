@@ -12,4 +12,6 @@ export const radius = {
   card: 14,
   chip: 8,
   pill: 40,
+  /** Bottom Sheet (Website: karte.html .sheet 26px) */
+  sheet: 26,
 } as const;

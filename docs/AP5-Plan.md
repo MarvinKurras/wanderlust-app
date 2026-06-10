@@ -32,3 +32,14 @@ Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP5)
 ## Explizit nicht in AP5
 
 Unlock-Flow/Distanzprüfung (AP6), Prägung-Animation (AP6), Sammlung (AP7), Onboarding/Permission-Priming (AP8), gemalte Karte (Ausbaustufe).
+
+## Manuelle Tests vor Release (aus dem Geolocation-Review)
+
+1. Erstanfrage erlauben → Standortpunkt erscheint, kein Crash.
+2. Erstanfrage ablehnen → Karte unverändert, kein Crash; erneuter Tap fragt ggf. erneut.
+3. „Nie erlauben"/„Nicht mehr fragen" → Tap bleibt still (AP5 ok; Settings-Hinweis kommt mit AP6/AP8), kein Dialog-Spam.
+4. Permission nachträglich in OS-Settings erteilen/entziehen → Verhalten konsistent, kein Crash.
+5. Logs/Storage beobachten: keine Koordinaten, nur der boolesche `showLocation`-State.
+6. Android-Dev-Build ohne Google-Maps-Key (A-AP5-2): Karte darf nicht leer bleiben — Key vor AP9 besorgen.
+
+Vorgemerkt für AP6/AP8: Feedback + Settings-Link bei `canAskAgain === false`; iOS-Permission-Text nach AP6 erneut gegen tatsächliches Verhalten abgleichen.

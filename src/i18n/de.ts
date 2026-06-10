@@ -31,6 +31,7 @@ export const de = {
     chipVerschlossen: 'Verschlossen',
     chipNebel: 'Noch im Nebel',
     sheetDetails: 'Details ansehen',
+    sheetVerschlossen: 'Noch nicht erwandert',
     locateLabel: 'Eigener Standort',
     laden: 'Die Karte wird entrollt …',
   },
