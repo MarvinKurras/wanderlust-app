@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Eyebrow } from '@/components/Eyebrow';
 import { PlaceCard } from '@/features/places/PlaceCard';
 import { usePlaces, useRefreshPlaces, useUnlocks } from '@/features/places/queries';
 import { de } from '@/i18n/de';
@@ -54,7 +55,7 @@ export default function OrteScreen() {
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + spacing.lg }]}>
-      <Text style={styles.eyebrow}>{de.orte.eyebrow}</Text>
+      <Eyebrow>{de.orte.eyebrow}</Eyebrow>
       <Text style={styles.title}>{de.orte.title}</Text>
 
       <View style={styles.filterRow}>
@@ -109,9 +110,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.paper,
     paddingHorizontal: spacing.lg,
-  },
-  eyebrow: {
-    ...textStyles.eyebrow,
   },
   title: {
     ...textStyles.title,

@@ -22,6 +22,11 @@ export const colors = {
   paperOnPineDim: 'rgba(243,234,215,0.45)',
   /** Fließtext auf Pine (Website: index.html .collection .lead) */
   leadOnPine: 'rgba(239,229,210,0.66)',
+  /** Pip „noch nicht erwandert" (Website: badges.js .bm-status.locked .bm-pip) */
+  lockedGray: '#9aa39c',
+  /** Art-Panel hinter dem Badge (Website: badges.js .bm-art radial-gradient) */
+  artPanelFrom: '#33453a',
+  artPanelTo: '#161e18',
 } as const;
 
 /** Metallton-Gradienten der Stockschilder (Website: badges.js TONES). */

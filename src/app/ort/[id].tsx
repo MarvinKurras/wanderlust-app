@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { StockBadge } from '@/badges';
+import { ArtPanel } from '@/components/ArtPanel';
 import { usePlaces, useUnlocks } from '@/features/places/queries';
 import { de } from '@/i18n/de';
 import { formatCoords, formatDateDe } from '@/lib/format';
@@ -44,17 +45,19 @@ export default function OrtDetailScreen() {
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}>
-          <View style={styles.art}>
-            <StockBadge
-              name={place.name}
-              region={place.region}
-              elevationM={place.elevation_m}
-              motif={place.badge_motif}
-              shape={place.badge_shape}
-              tone={place.badge_tone}
-              locked={!unlocked}
-              width={212}
-            />
+          <View style={styles.artWrap}>
+            <ArtPanel>
+              <StockBadge
+                name={place.name}
+                region={place.region}
+                elevationM={place.elevation_m}
+                motif={place.badge_motif}
+                shape={place.badge_shape}
+                tone={place.badge_tone}
+                locked={!unlocked}
+                width={212}
+              />
+            </ArtPanel>
           </View>
 
           <View style={styles.body}>
@@ -120,13 +123,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
   },
-  art: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.pineSoft,
-    paddingVertical: spacing.xl,
+  artWrap: {
     marginHorizontal: spacing.lg,
-    borderRadius: radius.card,
   },
   body: {
     paddingHorizontal: spacing.lg,
@@ -186,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brass,
   },
   pipLocked: {
-    backgroundColor: colors.paperLine,
+    backgroundColor: colors.lockedGray,
   },
   status: {
     flex: 1,

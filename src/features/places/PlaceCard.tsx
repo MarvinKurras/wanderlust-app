@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brass,
   },
   pipLocked: {
-    backgroundColor: colors.paperLine,
+    backgroundColor: colors.lockedGray,
   },
   status: {
     fontFamily: fonts.mono,
