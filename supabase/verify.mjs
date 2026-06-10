@@ -91,6 +91,12 @@ if (session?.access_token) {
   });
   check('unlock ohne Auth abgelehnt', noAuth.status === 401, `HTTP ${noAuth.status}`);
 
+  // 6b) Ungültige Eingaben → 400
+  const badInput = await callUnlock({ placeId: 'zugspitze', lat: 'foo', lng: 10, accuracy: 5 });
+  check('unlock ungültige Eingabe → 400', badInput.status === 400, `HTTP ${badInput.status}`);
+  const badPlace = await json(await callUnlock({ placeId: 'gibt-es-nicht', lat: 47.4211, lng: 10.9863, accuracy: 10 }));
+  check('unlock unbekannter Ort → UNKNOWN_PLACE', badPlace?.code === 'UNKNOWN_PLACE', `code: ${badPlace?.code}`);
+
   // 7) Zu weit entfernt (Berlin → Zugspitze) → TOO_FAR mit Distanz
   const far = await json(await callUnlock({ placeId: 'zugspitze', lat: 52.52, lng: 13.405, accuracy: 10 }));
   check('unlock zu weit → TOO_FAR', far?.code === 'TOO_FAR' && far?.distanceM > 100000, `code: ${far?.code}, distanzM: ${far?.distanceM}`);

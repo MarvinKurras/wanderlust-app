@@ -43,14 +43,26 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   });
 }
 
-/** Beste Messung: misst bis zu 3×, bricht ab sobald accuracy ≤ 50 m (§9). */
+/**
+ * Beste Messung: misst bis zu 3×, bricht ab sobald accuracy ≤ 50 m (§9).
+ * Ein Timeout einzelner Nachmessungen verwirft eine bereits vorhandene
+ * (ungenauere) Messung nicht — nur ohne jede Messung wird geworfen.
+ */
 async function measurePosition(): Promise<Location.LocationObject> {
   let best: Location.LocationObject | null = null;
   for (let attempt = 0; attempt < MAX_MEASUREMENTS; attempt += 1) {
-    const position = await withTimeout(
-      Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
-      LOCATION_TIMEOUT_MS,
-    );
+    let position: Location.LocationObject;
+    try {
+      position = await withTimeout(
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High }),
+        LOCATION_TIMEOUT_MS,
+      );
+    } catch (e) {
+      if (best) {
+        return best;
+      }
+      throw e;
+    }
     if (!best || (position.coords.accuracy ?? Infinity) < (best.coords.accuracy ?? Infinity)) {
       best = position;
     }

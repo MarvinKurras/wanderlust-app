@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated, Easing, StyleSheet } from 'react-native';
 
 import { colors } from '@/theme';
 
@@ -14,6 +14,7 @@ export function PraegeRing({ size }: { size: number }) {
     Animated.timing(progress, {
       toValue: 1,
       duration: 800,
+      easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start();
   }, [progress]);

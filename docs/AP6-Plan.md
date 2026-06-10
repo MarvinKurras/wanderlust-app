@@ -53,3 +53,9 @@ Serverseitige Fälle sind per `node supabase/verify.mjs` automatisiert belegt (T
 6. Offline am Ort (Flugmodus nach Messung) → „Keine Verbindung …", Retry.
 7. Bereits freigeschaltet → Button durch „Erwandert am …" ersetzt (kein erneuter Flow).
 8. Mock-Location (Android Developer-Option) → clientseitige Ablehnung; mit manipuliertem Client lehnt der Server ab (verify.mjs Check 9).
+
+## Vorgemerkt für AP9 (aus den Reviews)
+
+- Fehlerdifferenzierung im Client-catch: echte 401/4xx von Netzwerkfehlern trennen (aktuell pauschal „Keine Verbindung").
+- Edge Function: Body-Size-Limit, `isMocked`-Typvalidierung, `METHOD_NOT_ALLOWED`-Test.
+- iOS-Permission-Text gegen finales Verhalten abgleichen (aus AP5-Review).

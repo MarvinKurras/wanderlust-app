@@ -60,6 +60,8 @@ Deno.serve(async (req) => {
   const { placeId, lat, lng, accuracy, isMocked } = body;
   if (
     typeof placeId !== 'string' ||
+    placeId.length === 0 ||
+    placeId.length > 64 ||
     typeof lat !== 'number' ||
     typeof lng !== 'number' ||
     typeof accuracy !== 'number' ||
@@ -137,7 +139,13 @@ Deno.serve(async (req) => {
   if (insertError) {
     // Race: paralleler Unlock desselben Nutzers → idempotent behandeln
     if (insertError.code === '23505') {
-      return business('ALREADY_UNLOCKED');
+      const { data: raced } = await serviceClient
+        .from('unlocks')
+        .select('unlocked_at')
+        .eq('user_id', user.id)
+        .eq('place_id', place.id)
+        .maybeSingle();
+      return business('ALREADY_UNLOCKED', { unlockedAt: raced?.unlocked_at });
     }
     console.error('unlock: insert failed', insertError);
     return Response.json({ ok: false, code: 'INTERNAL' }, { status: 500 });
