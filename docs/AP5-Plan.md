@@ -1,14 +1,14 @@
 # AP5 — Kartenansicht: Implementierungsplan
 
-Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP5) · Branch: `claude/ap5-karte` (basiert auf main = AP1–AP4)
+Status: **umgesetzt** (Checks grün; Geolocation-Review ohne Blocker; Design-Audit-Findings behoben; QA: „AP abnehmbar") · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP5) · Branch: `claude/ap5-karte` (basiert auf main = AP1–AP4)
 
 ## Ziel & Akzeptanzkriterien
 
 `react-native-maps`, Pins (Badge frei / Nebel+Schloss gesperrt), Bottom Sheet, eigener Standort, Ziel-Chips-Rail.
 
-- [ ] Alle Orte korrekt positioniert (echte Geo-Koordinaten aus `places`)
-- [ ] Tap → Sheet
-- [ ] Fog-Optik entspricht der `karte.html`-Referenz
+- [x] Alle Orte korrekt positioniert (echte Geo-Koordinaten aus `places`)
+- [x] Tap → Sheet
+- [x] Fog-Optik entspricht der `karte.html`-Referenz
 
 ## Schritte
 
