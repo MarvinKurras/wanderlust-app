@@ -1,6 +1,6 @@
 # AP1 — Projekt-Setup: Implementierungsplan
 
-Status: **geplant, wartet auf Bestätigung** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP1)
+Status: **umgesetzt** (Typecheck/Lint grün, Export-Proxy iOS+Android erfolgreich, Design-Audit bestanden; QA-Abnahmebericht siehe Commit-Historie) · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP1)
 
 ## Ziel & Akzeptanzkriterien (aus dem Projektplan)
 

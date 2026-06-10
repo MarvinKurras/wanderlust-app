@@ -1,0 +1,18 @@
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+# Native Ordner (Managed Workflow — werden von Expo generiert)
+ios/
+android/
+# Env & Secrets
+.env
+.env.*
+!.env.example
+# Sonstiges
+npm-debug.*
+*.orig.*
+.DS_Store
+*.pem
+*.tsbuildinfo

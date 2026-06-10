@@ -1,0 +1,33 @@
+/**
+ * Farb-Tokens der Wanderlust-Marke.
+ * Quelle: Website-Repo `wanderlust/index.html` (:root) und `badges.js` (TONES).
+ * Werte nicht verändern — Design-Treue zur Website ist Akzeptanzkriterium.
+ */
+export const colors = {
+  ink: '#1d2620',
+  inkSoft: '#3c4a40',
+  paper: '#ece1cd',
+  paperDeep: '#e3d5bb',
+  paperLine: '#cdbf9f',
+  pine: '#1c2620',
+  pineSoft: '#27332b',
+  brass: '#bb8b4b',
+  brassLight: '#e9cd86',
+  brassDeep: '#7d5826',
+  /** Heller Text auf Pine-Flächen (Website: .collection / .cta) */
+  paperOnPine: '#f3ead7',
+  /** Glass-Chips auf der Karte (Website: karte.html --glass) */
+  glass: 'rgba(236,225,205,0.82)',
+  /** Gedimmter heller Text auf Pine (Website: index.html .badge-card.locked, Opacity .45) */
+  paperOnPineDim: 'rgba(243,234,215,0.45)',
+} as const;
+
+/** Metallton-Gradienten der Stockschilder (Website: badges.js TONES). */
+export const badgeTones = {
+  brass: { hi: '#f4dd9b', mid: '#c89c54', lo: '#7c531e', edge: '#5e3d12' },
+  silver: { hi: '#f4f6f4', mid: '#bfc7c2', lo: '#727d77', edge: '#4f5852' },
+  copper: { hi: '#f1c197', mid: '#c1774a', lo: '#723a1f', edge: '#522714' },
+  pewter: { hi: '#dfe4df', mid: '#9aa39c', lo: '#5a635c', edge: '#3c443e' },
+} as const;
+
+export type BadgeTone = keyof typeof badgeTones;
