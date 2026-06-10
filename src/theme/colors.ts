@@ -20,6 +20,8 @@ export const colors = {
   glass: 'rgba(236,225,205,0.82)',
   /** Gedimmter heller Text auf Pine (Website: index.html .badge-card.locked, Opacity .45) */
   paperOnPineDim: 'rgba(243,234,215,0.45)',
+  /** Fließtext auf Pine (Website: index.html .collection .lead) */
+  leadOnPine: 'rgba(239,229,210,0.66)',
 } as const;
 
 /** Metallton-Gradienten der Stockschilder (Website: badges.js TONES). */

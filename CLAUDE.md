@@ -49,11 +49,10 @@ Tonalität: Deutsch, warm, leicht poetisch („erwandert", „in Messing gepräg
 
 ## Befehle
 
-Werden mit AP1 eingerichtet (dann hier aktualisieren):
-
 ```sh
-npm run lint        # ESLint
+npm run lint        # ESLint (expo lint)
 npm run typecheck   # tsc --noEmit
-npm test            # sobald Tests existieren
-npx expo start      # Dev-Server
+npx expo start      # Dev-Server (Expo Go / Dev Client)
+npx expo export --platform ios|android  # Bundle-Proxy für "App startet" in Cloud-Umgebungen
+# npm test          # folgt mit dem ersten Test-Framework (spätestens AP2, Badge-Snapshots)
 ```

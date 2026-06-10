@@ -26,7 +26,7 @@ export function PlaceholderScreen({ eyebrow, title, body, variant = 'paper' }: P
     >
       <Text style={[styles.eyebrow, dark && { color: colors.brassLight }]}>{eyebrow}</Text>
       <Text style={[styles.title, dark && { color: colors.paperOnPine }]}>{title}</Text>
-      <Text style={[styles.body, dark && { color: 'rgba(239,229,210,0.66)' }]}>{body}</Text>
+      <Text style={[styles.body, dark && { color: colors.leadOnPine }]}>{body}</Text>
     </View>
   );
 }
