@@ -16,3 +16,5 @@ npm-debug.*
 .DS_Store
 *.pem
 *.tsbuildinfo
+# Supabase CLI (lokaler Link-Zustand)
+supabase/.temp/
