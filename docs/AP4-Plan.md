@@ -1,14 +1,14 @@
 # AP4 — Ortsliste & Detail: Implementierungsplan
 
-Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP4) · Branch: `claude/ap4-orte-detail` (basiert auf AP2)
+Status: **umgesetzt** (alle Checks grün; Architektur-Review konform; Design-Audit-Findings behoben; QA: „AP abnehmbar") · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP4) · Branch: `claude/ap4-orte-detail` (basiert auf AP2)
 
 ## Ziel & Akzeptanzkriterien
 
 Liste mit Badge, Status, Filter; Detail-Screen mit Beschreibung, Koordinaten, Entfernung, Status.
 
-- [ ] Beide Screens mit Live-Daten (Supabase `places` + eigene `unlocks`)
-- [ ] Locked/Unlocked korrekt (Badge-Optik + Statuszeile)
-- [ ] Pull-to-Refresh
+- [x] Beide Screens mit Live-Daten (Supabase `places` + eigene `unlocks`)
+- [x] Locked/Unlocked korrekt (Badge-Optik + Statuszeile)
+- [x] Pull-to-Refresh
 
 ## Schritte
 
