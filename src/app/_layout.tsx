@@ -13,6 +13,7 @@ import {
   SplineSansMono_400Regular,
   SplineSansMono_500Medium,
 } from '@expo-google-fonts/spline-sans-mono';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -22,6 +23,8 @@ import { StatusBar } from 'expo-status-bar';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -47,7 +50,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -56,7 +59,8 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="ort/[id]" />
       </Stack>
-    </>
+    </QueryClientProvider>
   );
 }

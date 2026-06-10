@@ -1,11 +1,12 @@
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { de } from '@/i18n/de';
 
 export default function KarteScreen() {
   return (
     <PlaceholderScreen
-      eyebrow="Die Gipfelkarte"
-      title="Karte"
-      body="Hier entsteht die Gipfelkarte — alle Orte, erwanderte Stockschilder und der Nebel über dem, was noch vor dir liegt."
+      eyebrow={de.platzhalter.karteEyebrow}
+      title={de.platzhalter.karteTitle}
+      body={de.platzhalter.karteBody}
     />
   );
 }

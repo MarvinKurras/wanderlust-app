@@ -1,12 +1,13 @@
 import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { de } from '@/i18n/de';
 
 export default function SammlungScreen() {
   return (
     <PlaceholderScreen
       variant="pine"
-      eyebrow="Dein Wanderstock"
-      title="Sammlung"
-      body="Hier versammeln sich deine geprägten Stockschilder — Gipfel um Gipfel."
+      eyebrow={de.platzhalter.sammlungEyebrow}
+      title={de.platzhalter.sammlungTitle}
+      body={de.platzhalter.sammlungBody}
     />
   );
 }
