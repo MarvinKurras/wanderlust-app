@@ -10,10 +10,14 @@
     "primaryColor": "#bb8b4b",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.wanderlust.mobile"
+      "bundleIdentifier": "app.wanderlust.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Wanderlust nutzt deinen Standort, um dich auf der Gipfelkarte zu zeigen und zu prüfen, ob du nah genug an einem Ort bist, um sein Stockschild zu prägen. Kein Tracking, keine Bewegungsprofile."
+      }
     },
     "android": {
       "package": "app.wanderlust.mobile",
+      "permissions": ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"],
       "adaptiveIcon": {
         "backgroundColor": "#1c2620",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

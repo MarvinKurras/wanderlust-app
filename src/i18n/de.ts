@@ -26,11 +26,15 @@ export const de = {
     shopTeaser: 'Als Stocknagel bestellen — bald verfügbar',
     nichtGefunden: 'Dieser Ort liegt noch im Nebel.',
   },
+  karte: {
+    fogLabel: '? ? ?',
+    chipVerschlossen: 'Verschlossen',
+    chipNebel: 'Noch im Nebel',
+    sheetDetails: 'Details ansehen',
+    locateLabel: 'Eigener Standort',
+    laden: 'Die Karte wird entrollt …',
+  },
   platzhalter: {
-    karteEyebrow: 'Die Gipfelkarte',
-    karteTitle: 'Karte',
-    karteBody:
-      'Hier entsteht die Gipfelkarte — alle Orte, erwanderte Stockschilder und der Nebel über dem, was noch vor dir liegt.',
     sammlungEyebrow: 'Dein Wanderstock',
     sammlungTitle: 'Sammlung',
     sammlungBody: 'Hier versammeln sich deine geprägten Stockschilder — Gipfel um Gipfel.',

@@ -27,6 +27,14 @@ export const colors = {
   /** Art-Panel hinter dem Badge (Website: badges.js .bm-art radial-gradient) */
   artPanelFrom: '#33453a',
   artPanelTo: '#161e18',
+  /** Fog-of-War-Schleier (Website: karte.html .fog .veil, Radial von innen nach außen) */
+  fogInner: '#f5f0e5',
+  fogMid: '#f0e9d8',
+  fogOuter: '#eee6d4',
+  /** Pin-Stiel (Website: karte.html .pin .stem, Gradient brass-deep → dunkel) */
+  stemDark: '#3c2a12',
+  /** Modal-/Sheet-Scrim (Website: badges.js .bm-backdrop rgba(18,24,20,.62)) */
+  scrim: 'rgba(18,24,20,0.62)',
 } as const;
 
 /** Metallton-Gradienten der Stockschilder (Website: badges.js TONES). */
