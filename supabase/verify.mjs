@@ -69,6 +69,8 @@ if (session?.access_token) {
   check('unlocks-Insert als Client abgelehnt (RLS)', insUser.status === 401 || insUser.status === 403, `HTTP ${insUser.status}`);
 
   // 5) unlocks: eigene Liste lesbar und leer
+  // TODO (AP6): „Fremd-Unlocks nicht lesbar" als echter Cross-User-Test —
+  // erst möglich, sobald die Edge Function `unlock` Testdaten erzeugen kann.
   const own = await fetch(`${URL_}/rest/v1/unlocks?select=place_id`, { headers: userHeaders });
   const ownRows = own.ok ? await own.json() : null;
   check('eigene unlocks lesbar (leer)', own.ok && Array.isArray(ownRows) && ownRows.length === 0, `HTTP ${own.status}, rows: ${ownRows?.length ?? '—'}`);
