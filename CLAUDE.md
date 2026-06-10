@@ -54,5 +54,5 @@ npm run lint        # ESLint (expo lint)
 npm run typecheck   # tsc --noEmit
 npx expo start      # Dev-Server (Expo Go / Dev Client)
 npx expo export --platform ios|android  # Bundle-Proxy für "App startet" in Cloud-Umgebungen
-# npm test          # folgt mit dem ersten Test-Framework (spätestens AP2, Badge-Snapshots)
+npm test            # Jest (jest-expo): Badge-Snapshots u. a.
 ```
