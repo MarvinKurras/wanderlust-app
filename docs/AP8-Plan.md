@@ -1,13 +1,13 @@
 # AP8 — Onboarding & Settings: Implementierungsplan
 
-Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP8) · Branch: `claude/ap8-onboarding` (basiert auf main = AP1–AP7)
+Status: **umgesetzt** (Checks + 19/19 Live-E2E grün; Security-Selbstcheck ohne Befund; QA: „AP abnehmbar") · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP8) · Branch: `claude/ap8-onboarding` (basiert auf main = AP1–AP7)
 
 ## Ziel & Akzeptanzkriterien
 
 3-Schritte-Intro (aus „So funktioniert's"), Permission-Priming, Konto-Upgrade, Konto-Löschung, Datenschutztext.
 
-- [ ] Erststart-Flow vollständig (Intro → Priming → App; wird nur einmal gezeigt)
-- [ ] Löschung entfernt Auth-User + Unlocks (FK-Cascade; per verify.mjs belegt)
+- [x] Erststart-Flow vollständig (Intro → Priming → App; wird nur einmal gezeigt)
+- [x] Löschung entfernt Auth-User + Unlocks (FK-Cascade; per verify.mjs belegt)
 
 ## Schritte
 
