@@ -1,15 +1,15 @@
 # AP-R — Regionen & Unterregionen (Ladenburg): Implementierungsplan
 
-Status: **in Arbeit** · Einschub zwischen AP8 und AP9 (AP9 pausiert) · Branch: `claude/regionen-ladenburg` (basiert auf main = AP1–AP8)
+Status: **umgesetzt** (Checks grün; deployt; verify.mjs inkl. 4 neuer Regionen-Checks alle PASS) · Einschub zwischen AP8 und AP9 (AP9 pausiert) · Branch: `claude/regionen-ladenburg` (basiert auf main = AP1–AP8)
 
 ## Ziel & Akzeptanzkriterien
 
 Orte können Regionen/Unterregionen zugeordnet werden; Fortschritt pro (Unter-)Region ist berechenbar; Ladenburg als erste Unterregion mit echten Hotspots.
 
-- [ ] Datenmodell: `regions` (selbstreferenzierend, beliebig tief erweiterbar) + `places.region_id`, RLS nach bestehendem Muster
-- [ ] Seed: Region Baden-Württemberg → Unterregion Ladenburg → 7 Hotspots mit echten Koordinaten
-- [ ] Fortschritt je Region/Unterregion berechenbar („3 von 8 Zielen in Ladenburg erledigt", `complete`-Flag) inkl. Roll-up auf die Elternregion — mit Unit-Tests
-- [ ] Bestehende Struktur unangetastet: Unlock-Flow, Screens und die 8 Alt-Orte funktionieren unverändert (`region_id` ist nullable)
+- [x] Datenmodell: `regions` (selbstreferenzierend, beliebig tief erweiterbar) + `places.region_id`, RLS nach bestehendem Muster
+- [x] Seed: Region Baden-Württemberg → Unterregion Ladenburg → 7 Hotspots mit echten Koordinaten
+- [x] Fortschritt je Region/Unterregion berechenbar („3 von 8 Zielen in Ladenburg erledigt", `complete`-Flag) inkl. Roll-up auf die Elternregion — mit Unit-Tests
+- [x] Bestehende Struktur unangetastet: Unlock-Flow, Screens und die 8 Alt-Orte funktionieren unverändert (`region_id` ist nullable)
 
 ## Entwurfsentscheidungen
 
