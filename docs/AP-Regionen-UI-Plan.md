@@ -1,14 +1,14 @@
 # AP-R2 — Regionen sichtbar: Gruppierung & Abschluss-Marke
 
-Status: **in Arbeit** · Folgeblock zu AP-R (AP9 weiter pausiert) · Branch: `claude/regionen-ui` (basiert auf main = AP1–AP8 + AP-R)
+Status: **umgesetzt** (Checks grün; QA: „AP abnehmbar") · Folgeblock zu AP-R (AP9 weiter pausiert) · Branch: `claude/regionen-ui` (basiert auf main = AP1–AP8 + AP-R)
 
 ## Ziel & Akzeptanzkriterien
 
 Regionen-Fortschritt wird in der App erlebbar; abgeschlossene Unterregionen erhalten eine Abschluss-Marke.
 
-- [ ] Orte-Tab gruppiert nach Unterregion mit Fortschrittszeile („3 von 7 Zielen in Ladenburg erledigt"); Alt-Orte ohne Zuordnung unter „Weitere Ziele"; Filter funktionieren weiter
-- [ ] Sammlung zeigt je Unterregion eine Abschluss-Marke: komplett = geprägt, sonst entsättigt mit Fortschritt
-- [ ] Keine Schema-Änderungen; bestehende Screens/Flows unverändert bis auf die zwei Integrationen
+- [x] Orte-Tab gruppiert nach Unterregion mit Fortschrittszeile („3 von 7 Zielen in Ladenburg erledigt"); Alt-Orte ohne Zuordnung unter „Weitere Ziele"; Filter funktionieren weiter
+- [x] Sammlung zeigt je Unterregion eine Abschluss-Marke: komplett = geprägt, sonst entsättigt mit Fortschritt
+- [x] Keine Schema-Änderungen; bestehende Screens/Flows unverändert bis auf die zwei Integrationen
 
 ## Schritte
 
