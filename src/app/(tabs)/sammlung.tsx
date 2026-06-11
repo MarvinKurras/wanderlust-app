@@ -6,6 +6,7 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,7 +16,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StockBadge } from '@/badges';
 import { Eyebrow } from '@/components/Eyebrow';
 import { progressLabel, progressSub } from '@/features/collection/progress';
-import { usePlaces, useRefreshPlaces, useUnlocks } from '@/features/places/queries';
+import { RegionBadge } from '@/features/collection/RegionBadge';
+import { regionProgress, regionProgressLabel } from '@/features/collection/regionProgress';
+import { usePlaces, useRefreshPlaces, useRegions, useUnlocks } from '@/features/places/queries';
 import { de } from '@/i18n/de';
 import { formatDateDe } from '@/lib/format';
 import type { Place } from '@/lib/places';
@@ -26,6 +29,7 @@ import { colors, fonts, spacing, textStyles } from '@/theme';
 export default function SammlungScreen() {
   const insets = useSafeAreaInsets();
   const places = usePlaces();
+  const regions = useRegions();
   const unlocks = useUnlocks();
   const refresh = useRefreshPlaces();
   const [refreshing, setRefreshing] = useState(false);
@@ -36,8 +40,16 @@ export default function SammlungScreen() {
     return map;
   }, [unlocks.data]);
 
-  const all = places.data ?? [];
+  const all = useMemo(() => places.data ?? [], [places.data]);
   const unlockedCount = all.filter((p) => unlockByPlace.has(p.id)).length;
+
+  // Abschluss-Marken: alle Unterregionen mit Zielen (AP-R2)
+  const regionRow = useMemo(() => {
+    const progress = regionProgress(regions.data ?? [], all, unlocks.data ?? []);
+    return [...progress.values()]
+      .filter((p) => p.parentId !== null && p.total > 0)
+      .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  }, [regions.data, all, unlocks.data]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -105,6 +117,22 @@ export default function SammlungScreen() {
           ]}
         />
       </View>
+
+      {regionRow.length > 0 && (
+        <View style={styles.regionBlock}>
+          <Text style={styles.regionEyebrow}>{de.regionen.sammlungEyebrow}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.regionRow}>
+            {regionRow.map((p) => (
+              <View key={p.regionId} style={styles.regionItem}>
+                <RegionBadge progress={p} width={86} />
+                <Text style={styles.regionLabel}>
+                  {p.complete ? de.regionen.komplett : regionProgressLabel(p)}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {places.isPending ? (
         <View style={styles.center}>
@@ -194,6 +222,34 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: colors.brass,
     borderRadius: 2,
+  },
+  regionBlock: {
+    marginBottom: spacing.md,
+  },
+  regionEyebrow: {
+    fontFamily: fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    color: colors.brassLight,
+    marginBottom: spacing.sm,
+  },
+  regionRow: {
+    flexGrow: 0,
+  },
+  regionItem: {
+    alignItems: 'center',
+    marginRight: spacing.lg,
+    maxWidth: 150,
+  },
+  regionLabel: {
+    marginTop: spacing.xs,
+    fontFamily: fonts.mono,
+    fontSize: 8.5,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    color: colors.paperOnPineDim,
+    textAlign: 'center',
   },
   grid: {
     paddingBottom: spacing.xl,

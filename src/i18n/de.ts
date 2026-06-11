@@ -108,6 +108,13 @@ export const de = {
     datenschutzText:
       'Wanderlust verarbeitet deinen Standort nur im Moment einer Prägung oder Kartenanzeige (Foreground, on demand). Pro Freischaltung wird genau ein Standort-Snapshot (Position, Genauigkeit, Distanz) zur Missbrauchsprüfung gespeichert. Es findet kein Tracking statt, es werden keine Bewegungsprofile erstellt. Anonyme Konten enthalten keine personenbezogenen Pflichtdaten; eine E-Mail-Adresse wird nur beim freiwilligen Konto-Upgrade verarbeitet. Konto und alle Daten können jederzeit in den Einstellungen gelöscht werden.',
   },
+  regionen: {
+    weitereZiele: 'Weitere Ziele',
+    komplett: 'Komplett — in Messing besiegelt',
+    siegelRegion: 'Unterregion',
+    siegelBand: 'Komplett',
+    sammlungEyebrow: 'Abschluss-Marken',
+  },
   sammlung: {
     eyebrow: 'Dein Wanderstock',
     title: 'Sammlung',

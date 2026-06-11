@@ -29,6 +29,8 @@ export type StockBadgeProps = {
   tone: BadgeTone;
   /** Noch nicht erwandert: entsättigt/abgedunkelt (Annahme A-AP2-2). */
   locked?: boolean;
+  /** Text im unteren Band; Default ist die Höhe („2962 m"). */
+  bandLabel?: string;
   /** Render-Breite in dp; Höhe folgt dem Seitenverhältnis 220:252. */
   width?: number;
 };
@@ -46,6 +48,7 @@ export function StockBadge({
   shape,
   tone,
   locked = false,
+  bandLabel,
   width = 184,
 }: StockBadgeProps) {
   const id = `b${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -59,7 +62,7 @@ export function StockBadge({
   // Schriftgrößen-Logik aus badges.js (Namenslänge)
   const nameFs = name.length > 9 ? 17 : name.length > 6 ? 19.5 : 23;
   const nameLs = name.length > 9 ? 0.6 : 1.1;
-  const elevation = `${elevationM} m`;
+  const elevation = bandLabel ?? `${elevationM} m`;
 
   return (
     <Svg
