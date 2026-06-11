@@ -15,6 +15,7 @@ const place = (id: string, lat: number, lng: number): Place => ({
   badge_motif: 'peak',
   badge_shape: 'shield',
   badge_tone: 'brass',
+  region_id: null,
   active: true,
 });
 

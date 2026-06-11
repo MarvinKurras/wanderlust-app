@@ -39,7 +39,22 @@ const headers = { apikey: KEY, Authorization: `Bearer ${KEY}` };
 const placesRes = await fetch(`${URL_}/rest/v1/places?select=id,name,lat,lng,unlock_radius_m,active`, { headers });
 const places = placesRes.ok ? await placesRes.json() : null;
 check('places lesbar (anon)', placesRes.ok, `HTTP ${placesRes.status}`);
-check('8 aktive Orte im Seed', Array.isArray(places) && places.length === 8, `gefunden: ${places?.length ?? '—'}`);
+check('15 aktive Orte im Seed (8 Gipfel + 7 Ladenburg)', Array.isArray(places) && places.length === 15, `gefunden: ${places?.length ?? '—'}`);
+
+// 1b) Regionen lesbar (anon), Ladenburg-Hierarchie + Zuordnung korrekt
+const regionsRes = await fetch(`${URL_}/rest/v1/regions?select=id,name,parent_id`, { headers });
+const regions = regionsRes.ok ? await regionsRes.json() : null;
+check('regions lesbar (anon)', regionsRes.ok, `HTTP ${regionsRes.status}`);
+check('Ladenburg unter Baden-Württemberg', Array.isArray(regions) && regions.some((r) => r.id === 'ladenburg' && r.parent_id === 'baden-wuerttemberg'), `regions: ${regions?.length ?? '—'}`);
+const ladenburgRes = await fetch(`${URL_}/rest/v1/places?select=id&region_id=eq.ladenburg`, { headers });
+const ladenburgRows = ladenburgRes.ok ? await ladenburgRes.json() : null;
+check('7 Ladenburg-Hotspots zugeordnet', Array.isArray(ladenburgRows) && ladenburgRows.length === 7, `gefunden: ${ladenburgRows?.length ?? '—'}`);
+const regIns = await fetch(`${URL_}/rest/v1/regions`, {
+  method: 'POST',
+  headers: { ...headers, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id: 'hack', name: 'Hack' }),
+});
+check('regions-Insert als Client abgelehnt (RLS)', regIns.status === 401 || regIns.status === 403, `HTTP ${regIns.status}`);
 
 // 2) unlocks: Insert ohne Login muss scheitern
 const insAnon = await fetch(`${URL_}/rest/v1/unlocks`, {

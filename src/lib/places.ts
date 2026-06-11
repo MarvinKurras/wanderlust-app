@@ -19,6 +19,8 @@ export type Place = {
   badge_motif: BadgeMotif;
   badge_shape: BadgeShape;
   badge_tone: BadgeTone;
+  /** Strukturelle Zuordnung zu einer (Unter-)Region; Alt-Orte: null. */
+  region_id: string | null;
   active: boolean;
 };
 
