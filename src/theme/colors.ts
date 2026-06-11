@@ -18,8 +18,8 @@ export const colors = {
   paperOnPine: '#f3ead7',
   /** Glass-Chips auf der Karte (Website: karte.html --glass) */
   glass: 'rgba(236,225,205,0.82)',
-  /** Gedimmter heller Text auf Pine (Website: index.html .badge-card.locked, Opacity .45) */
-  paperOnPineDim: 'rgba(243,234,215,0.45)',
+  /** Gedimmter heller Text auf Pine (Website: badges.js .bs / .badge-card.locked .bn) */
+  paperOnPineDim: 'rgba(239,229,210,0.5)',
   /** Fließtext auf Pine (Website: index.html .collection .lead) */
   leadOnPine: 'rgba(239,229,210,0.66)',
   /** Pip „noch nicht erwandert" (Website: badges.js .bm-status.locked .bm-pip) */
