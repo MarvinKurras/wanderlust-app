@@ -56,3 +56,5 @@ npx expo start      # Dev-Server (Expo Go / Dev Client)
 npx expo export --platform ios|android  # Bundle-Proxy für "App startet" in Cloud-Umgebungen
 npm test            # Jest (jest-expo): Badge-Snapshots u. a.
 ```
+
+Hinweis Typed Routes: `.expo/types` wird nur von `npx expo start` generiert. Meldet `tsc` nach Routen-Änderungen Fehler wie `'/ort/[id]' is not assignable …`, sind die generierten Typen veraltet — einmal den Dev-Server starten (oder `rm -rf .expo/types`).
