@@ -2,6 +2,19 @@
 
 Projekt: `eqkpnphfdopvnywkenyk` · Der Client kennt nur URL + Publishable/Anon-Key (`.env`, gitignored; Vorlage `.env.example`).
 
+## Lokale `.env` anlegen (Pflicht vor `expo start`)
+
+Ohne diese Datei wirft die App beim Start „EXPO_PUBLIC_SUPABASE_URL und EXPO_PUBLIC_SUPABASE_ANON_KEY müssen gesetzt sein". Beide Werte sind öffentliche Client-Werte (kein Secret — Zugriff ist durch RLS abgesichert):
+
+```sh
+cat > .env <<'ENV'
+EXPO_PUBLIC_SUPABASE_URL=https://eqkpnphfdopvnywkenyk.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_FOxYVB83wqsSmUKaNJt09Q_bCxNOeCD
+ENV
+```
+
+Danach den Dev-Server neu starten (`npx expo start -c`, damit Metro die Env neu einliest).
+
 ## Migrationen deployen
 
 ```sh

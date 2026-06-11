@@ -10,6 +10,8 @@ Mobile Wander-App (Expo / React Native / TypeScript): Nutzer schalten digitale *
 
 ```sh
 npm install
+# einmalig: .env mit den öffentlichen Supabase-Client-Werten anlegen
+# (Inhalt siehe docs/Supabase-Setup.md, Vorlage .env.example)
 npx expo start        # Dev-Server (Expo Go oder Dev Client)
 npm run lint          # ESLint
 npm run typecheck     # tsc --noEmit
