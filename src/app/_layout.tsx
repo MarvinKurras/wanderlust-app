@@ -13,7 +13,10 @@ import {
   SplineSansMono_400Regular,
   SplineSansMono_500Medium,
 } from '@expo-google-fonts/spline-sans-mono';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -24,7 +27,17 @@ import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient();
+// Offline-Lesbarkeit (Projektplan §3 / AP7): Query-Cache 7 Tage in AsyncStorage persistieren
+const CACHE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: CACHE_MAX_AGE_MS,
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
+const persister = createAsyncStoragePersister({ storage: AsyncStorage });
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -50,7 +63,10 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister, maxAge: CACHE_MAX_AGE_MS }}
+    >
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -61,6 +77,6 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="ort/[id]" />
       </Stack>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }

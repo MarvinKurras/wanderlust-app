@@ -49,9 +49,12 @@ export const de = {
     fehler: 'Die Prägung ist fehlgeschlagen. Versuch es gleich nochmal.',
     nochmal: 'Nochmal versuchen',
   },
-  platzhalter: {
-    sammlungEyebrow: 'Dein Wanderstock',
-    sammlungTitle: 'Sammlung',
-    sammlungBody: 'Hier versammeln sich deine geprägten Stockschilder — Gipfel um Gipfel.',
+  sammlung: {
+    eyebrow: 'Dein Wanderstock',
+    title: 'Sammlung',
+    verschlossen: 'Verschlossen',
+    nochNicht: 'Noch nicht erwandert',
+    laden: 'Der Wanderstock wird poliert …',
+    fehler: 'Die Sammlung konnte nicht geladen werden.',
   },
 } as const;
