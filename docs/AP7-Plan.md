@@ -1,13 +1,13 @@
 # AP7 — Sammlung: Implementierungsplan
 
-Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP7) · Branch: `claude/ap7-sammlung` (basiert auf main = AP1–AP6)
+Status: **umgesetzt** (Checks grün; Design-Audit-Finding behoben; QA: „AP abnehmbar") · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP7) · Branch: `claude/ap7-sammlung` (basiert auf main = AP1–AP6)
 
 ## Ziel & Akzeptanzkriterien
 
 Wanderstock-/Grid-Ansicht, Fortschritt n/8, Freischaltdatum, Offline-Lesbarkeit aus Cache.
 
-- [ ] Frisch freigeschalteter Badge erscheint sofort (Query-Invalidierung aus AP6 → gleiche `unlocks`-Query)
-- [ ] Im Flugmodus bleibt die Sammlung sichtbar (persistierter Query-Cache)
+- [x] Frisch freigeschalteter Badge erscheint sofort (Query-Invalidierung aus AP6 → gleiche `unlocks`-Query)
+- [x] Im Flugmodus bleibt die Sammlung sichtbar (persistierter Query-Cache)
 
 ## Schritte
 
