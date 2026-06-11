@@ -1,15 +1,15 @@
 # AP6 — Unlock-Flow: Implementierungsplan
 
-Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP6), §9 (Geolocation-Logik), §10 (Sicherheit) · Branch: `claude/ap6-unlock` (basiert auf main = AP1–AP5)
+Status: **umgesetzt** (Checks + 16/16 Live-E2E grün; Supabase-/Geolocation-/Security-Review ohne Blocker, Findings behoben; QA: „AP abnehmbar") · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP6), §9 (Geolocation-Logik), §10 (Sicherheit) · Branch: `claude/ap6-unlock` (basiert auf main = AP1–AP5)
 
 ## Ziel & Akzeptanzkriterien
 
 Permission-Handling, Standortmessung, Edge Function `unlock`, alle Fehlerfälle aus §9, Prägung-Animation.
 
-- [ ] Innerhalb Radius: Unlock + Animation
-- [ ] Außerhalb: Distanzmeldung
-- [ ] Alle 8 Edge Cases aus §9 behandelt (manueller Mock-Location-Testplan dokumentiert)
-- [ ] Unlock nur serverseitig möglich (Client kann nicht direkt schreiben — per verify.mjs belegt)
+- [x] Innerhalb Radius: Unlock + Animation
+- [x] Außerhalb: Distanzmeldung
+- [x] Alle 8 Edge Cases aus §9 behandelt (manueller Mock-Location-Testplan dokumentiert)
+- [x] Unlock nur serverseitig möglich (Client kann nicht direkt schreiben — per verify.mjs belegt)
 
 ## Schritte
 
