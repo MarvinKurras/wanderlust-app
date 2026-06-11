@@ -49,6 +49,65 @@ export const de = {
     fehler: 'Die Prägung ist fehlgeschlagen. Versuch es gleich nochmal.',
     nochmal: 'Nochmal versuchen',
   },
+  onboarding: {
+    kicker: 'Aus dem Wörterbuch des Wanderns',
+    titel: 'Wanderlust',
+    schritte: [
+      {
+        idx: '01 / Besuchen',
+        titel: 'Sei vor Ort',
+        text: 'Erreiche den Gipfel, das Kliff, den See. Wanderlust erkennt per GPS, wenn du wirklich dort warst — kein Schummeln vom Sofa.',
+      },
+      {
+        idx: '02 / Freischalten',
+        titel: 'Abzeichen wird geprägt',
+        text: 'Ein eigenes Emblem entsteht — mit Motiv, Höhe und dem Datum deines Besuchs. Jedes Stück ist an deine Wanderung gebunden.',
+      },
+      {
+        idx: '03 / Sammeln',
+        titel: 'Dein Stock wächst',
+        text: 'Alle Abzeichen versammeln sich auf deinem digitalen Wanderstock — Gipfel um Gipfel.',
+      },
+    ],
+    primingIdx: '04 / Dein Standort',
+    primingTitel: 'Nur im Moment der Prägung',
+    primingText:
+      'Wanderlust nutzt deinen Standort ausschließlich, wenn du ein Schild prägst oder dich auf der Karte zeigst. Kein Tracking, keine Bewegungsprofile.',
+    primingErlauben: 'Standort erlauben',
+    primingSpaeter: 'Später',
+    weiter: 'Weiter',
+    los: 'Loslegen',
+  },
+  einstellungen: {
+    titel: 'Einstellungen',
+    zurueck: 'Sammlung',
+    kontoEyebrow: 'Dein Konto',
+    kontoAnonym: 'Du wanderst anonym. Sichere deine Sammlung mit einer E-Mail-Adresse — sonst geht sie mit dem Gerät verloren.',
+    kontoMitEmail: (email: string) => `Deine Sammlung ist mit ${email} gesichert.`,
+    emailPlatzhalter: 'deine@email.de',
+    upgradeCta: 'Sammlung sichern',
+    upgradeGesendet: 'Bestätigungs-Mail ist unterwegs — bitte den Link darin öffnen.',
+    upgradeFehler: 'Das hat nicht geklappt. Prüfe die Adresse und versuch es nochmal.',
+    rechtlichesEyebrow: 'Rechtliches',
+    impressum: 'Impressum',
+    datenschutz: 'Datenschutz',
+    loeschenEyebrow: 'Gefahrenzone',
+    loeschenCta: 'Konto & Sammlung löschen',
+    loeschenTitel: 'Wirklich alles löschen?',
+    loeschenText:
+      'Dein Konto und alle geprägten Schilder werden endgültig entfernt. Das lässt sich nicht rückgängig machen.',
+    loeschenBestaetigen: 'Endgültig löschen',
+    abbrechen: 'Abbrechen',
+    loeschenFehler: 'Löschen fehlgeschlagen — versuch es gleich nochmal.',
+  },
+  rechtliches: {
+    platzhalterHinweis:
+      'PLATZHALTER — wird vor dem öffentlichen Release durch finale Rechtstexte ersetzt.',
+    impressumText:
+      'Wanderlust · Musterstraße 1 · 00000 Musterstadt · hallo@wanderlust.app',
+    datenschutzText:
+      'Wanderlust verarbeitet deinen Standort nur im Moment einer Prägung oder Kartenanzeige (Foreground, on demand). Pro Freischaltung wird genau ein Standort-Snapshot (Position, Genauigkeit, Distanz) zur Missbrauchsprüfung gespeichert. Es findet kein Tracking statt, es werden keine Bewegungsprofile erstellt. Anonyme Konten enthalten keine personenbezogenen Pflichtdaten; eine E-Mail-Adresse wird nur beim freiwilligen Konto-Upgrade verarbeitet. Konto und alle Daten können jederzeit in den Einstellungen gelöscht werden.',
+  },
   sammlung: {
     eyebrow: 'Dein Wanderstock',
     title: 'Sammlung',

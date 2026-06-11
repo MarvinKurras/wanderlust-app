@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
@@ -79,7 +80,17 @@ export default function SammlungScreen() {
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + spacing.lg }]}>
-      <Eyebrow onPine>{de.sammlung.eyebrow}</Eyebrow>
+      <View style={styles.headerRow}>
+        <Eyebrow onPine>{de.sammlung.eyebrow}</Eyebrow>
+        <Pressable
+          onPress={() => router.push('/einstellungen')}
+          accessibilityRole="button"
+          accessibilityLabel={de.einstellungen.titel}
+          style={styles.gear}
+        >
+          <Feather name="settings" size={18} color={colors.paperOnPineDim} />
+        </Pressable>
+      </View>
       <Text style={styles.title}>{de.sammlung.title}</Text>
 
       <View style={styles.progressRow}>
@@ -134,6 +145,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.pine,
     paddingHorizontal: spacing.lg,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  gear: {
+    padding: spacing.xs,
   },
   title: {
     ...textStyles.title,

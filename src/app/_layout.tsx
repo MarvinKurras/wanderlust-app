@@ -18,10 +18,12 @@ import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persi
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+
+import { hasSeenOnboarding } from '@/features/onboarding/onboardingFlag';
 
 import { colors } from '@/theme';
 
@@ -52,13 +54,24 @@ export default function RootLayout() {
     SplineSansMono_500Medium,
   });
 
+  // Erststart-Onboarding (AP8): Flag vor dem ersten Render prüfen
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   useEffect(() => {
-    if (fontsLoaded) {
+    hasSeenOnboarding().then((seen) => {
+      setOnboardingChecked(true);
+      if (!seen) {
+        router.replace('/onboarding');
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded && onboardingChecked) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, onboardingChecked]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !onboardingChecked) {
     return null;
   }
 
@@ -76,6 +89,9 @@ export default function RootLayout() {
       >
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="ort/[id]" />
+        <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="einstellungen" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="rechtliches" options={{ presentation: 'modal' }} />
       </Stack>
     </PersistQueryClientProvider>
   );

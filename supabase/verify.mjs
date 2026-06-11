@@ -134,6 +134,43 @@ if (session?.access_token) {
   } else {
     check('Fremd-Unlocks nicht lesbar (Cross-User)', false, 'zweite Anmeldung fehlgeschlagen');
   }
+
+  // ---------- AP8: Edge Function `delete-account` ----------
+  // Nutzer A hat einen Unlock (Check 10); Löschung muss User + Unlocks entfernen.
+  const delRes = await fetch(`${URL_}/functions/v1/delete-account`, {
+    method: 'POST',
+    headers: { apikey: KEY, Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+  const delBody = await json(delRes);
+  check('delete-account löscht eigenes Konto', delRes.ok && delBody?.ok === true, `HTTP ${delRes.status}`);
+
+  // Token des gelöschten Nutzers ist ungültig → kein Datenzugriff mehr
+  const afterDelete = await fetch(`${URL_}/auth/v1/user`, {
+    headers: { apikey: KEY, Authorization: `Bearer ${session.access_token}` },
+  });
+  check('Token nach Löschung ungültig', afterDelete.status === 401 || afterDelete.status === 403, `HTTP ${afterDelete.status}`);
+
+  // Unlocks des gelöschten Nutzers sind weg (FK-Cascade): Nutzer B sieht weiterhin nichts,
+  // und ein frischer Nutzer C kann denselben Ort erneut freischalten (kein Konflikt).
+  const signC = await fetch(`${URL_}/auth/v1/signup`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  const sessionC = signC.ok ? await signC.json() : null;
+  if (sessionC?.access_token) {
+    const cUnlock = await json(await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 10 }, sessionC.access_token));
+    check('Cascade: Ort nach Löschung erneut freischaltbar', cUnlock?.code === 'UNLOCKED', `code: ${cUnlock?.code}`);
+    // Aufräumen: Wegwerf-Nutzer C ebenfalls löschen
+    await fetch(`${URL_}/functions/v1/delete-account`, {
+      method: 'POST',
+      headers: { apikey: KEY, Authorization: `Bearer ${sessionC.access_token}`, 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+  } else {
+    check('Cascade: Ort nach Löschung erneut freischaltbar', false, 'dritte Anmeldung fehlgeschlagen');
+  }
 }
 
 console.log(failures === 0 ? '\nAlle Backend-Checks (AP3 + AP6) bestanden.' : `\n${failures} Check(s) fehlgeschlagen.`);
