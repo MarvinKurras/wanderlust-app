@@ -1,16 +1,16 @@
 # AP9 — Härtung & Release: Implementierungsplan
 
-Status: **in Arbeit** · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP9), §10 · Branch: `claude/ap9-haertung` (basiert auf main = AP1–AP8 + AP-R/R2)
+Status: **umgesetzt** (Checks grün; Live-Verify inkl. 429/405/400 PASS; QA: „AP abnehmbar") · Quelle: `docs/Wanderlust-App-Projektplan.md` §11 (AP9), §10 · Branch: `claude/ap9-haertung` (basiert auf main = AP1–AP8 + AP-R/R2)
 
 ## Ziel & Akzeptanzkriterien
 
 Rate Limit, isMocked, Plausibilitäts-Flagging, App-Icons/Splash, EAS-Builds, Store-Texte.
 
-- [ ] Rate Limit aktiv: max. 10 Unlock-Versuche/Stunde/Nutzer (§10) — live per verify.mjs belegt (429 RATE_LIMITED)
-- [ ] Plausibilitäts-Flagging: physikalisch unmögliche Folge-Unlocks (> 250 km/h) werden serverseitig geloggt/geflaggt
-- [ ] Review-Vormerkungen abgearbeitet: Client-Fehlerdifferenzierung (Netz vs. 4xx/429), Body-Size-Limit, isMocked-Typvalidierung, METHOD_NOT_ALLOWED-Test
-- [ ] Release-Artefakte: `eas.json` (Build-Profile), Store-Texte-Entwurf, Release-Checkliste mit §10-Security-Punkten
-- [ ] Beta-Build: in der Cloud nicht baubar (EAS-Account/Apple-Credentials nötig) — exakte Anleitung + Voraussetzungen dokumentiert (A-AP9-1)
+- [x] Rate Limit aktiv: max. 10 Unlock-Versuche/Stunde/Nutzer (§10) — live per verify.mjs belegt (429 RATE_LIMITED)
+- [x] Plausibilitäts-Flagging: physikalisch unmögliche Folge-Unlocks (> 250 km/h) werden serverseitig geloggt/geflaggt
+- [x] Review-Vormerkungen abgearbeitet: Client-Fehlerdifferenzierung (Netz vs. 4xx/429), Body-Size-Limit, isMocked-Typvalidierung, METHOD_NOT_ALLOWED-Test
+- [x] Release-Artefakte: `eas.json` (Build-Profile), Store-Texte-Entwurf, Release-Checkliste mit §10-Security-Punkten
+- [x] Beta-Build: in der Cloud nicht baubar (EAS-Account/Apple-Credentials nötig) — exakte Anleitung + Voraussetzungen dokumentiert (A-AP9-1)
 
 ## Schritte
 
