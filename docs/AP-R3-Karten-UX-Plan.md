@@ -20,6 +20,7 @@ Die Karte macht Regionen als zusammengehörige Gebiete sichtbar und hilft beim H
 - **Distanz clientseitig** über das vorhandene `haversineM` — reine Anzeige, die Unlock-Entscheidung bleibt serverseitig (Edge Function).
 - **Route über System-Karten-App** (Apple Maps / Google Maps Web-Intent, Fußweg): keine eigene Routing-Abhängigkeit im MVP.
 - **Karussell mit `snapToInterval`** statt Paging-Library: kein neues Package, deterministisches Verhalten.
+- **Sheet-Ortsname auf Cormorant SemiBold korrigiert** (Befund Design-Audit): Website-Referenz `karte.html .sh-name` ist `font-weight: 600`, das Sheet nutzte bisher Medium (500).
 
 ## Annahmen
 
