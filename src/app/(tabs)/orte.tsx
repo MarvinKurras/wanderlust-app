@@ -106,6 +106,9 @@ export default function OrteScreen() {
             const progress = section.regionId ? progressByRegion.get(section.regionId) : undefined;
             return (
               <View style={styles.sectionHeader}>
+                {section.parentTitle && (
+                  <Text style={styles.sectionParent}>{section.parentTitle}</Text>
+                )}
                 <Text style={styles.sectionTitle}>{section.title}</Text>
                 {progress && (
                   <Text style={[styles.sectionProgress, progress.complete && styles.sectionComplete]}>
@@ -175,6 +178,14 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
+  },
+  sectionParent: {
+    fontFamily: fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: colors.brassDeep,
+    marginBottom: 2,
   },
   sectionTitle: {
     fontFamily: fonts.displayMedium,

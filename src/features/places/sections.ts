@@ -5,6 +5,8 @@ export type PlaceSection = {
   /** regions.id oder 'weitere' für Orte ohne Zuordnung (A-R2-1). */
   key: string;
   title: string | null;
+  /** Name der Elternregion als Eyebrow („Baden-Württemberg" über „Ladenburg"). */
+  parentTitle: string | null;
   /** null bei der Fallback-Sektion (kein Regionen-Fortschritt). */
   regionId: string | null;
   data: Place[];
@@ -36,18 +38,24 @@ export function buildPlaceSections(
   }
 
   const sections: PlaceSection[] = [...byRegion.entries()]
-    .map(([regionId, data]) => ({
-      key: regionId,
-      title: regionById.get(regionId)!.name,
-      regionId,
-      data,
-    }))
+    .map(([regionId, data]) => {
+      const region = regionById.get(regionId)!;
+      const parent = region.parent_id ? regionById.get(region.parent_id) : undefined;
+      return {
+        key: regionId,
+        title: region.name,
+        parentTitle: parent?.name ?? null,
+        regionId,
+        data,
+      };
+    })
     .sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'de'));
 
   if (unassigned.length > 0) {
     sections.push({
       key: FALLBACK_SECTION_KEY,
       title: fallbackTitle,
+      parentTitle: null,
       regionId: null,
       data: unassigned,
     });

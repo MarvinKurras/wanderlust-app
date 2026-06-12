@@ -42,8 +42,10 @@ describe('buildPlaceSections', () => {
     );
     expect(sections.map((s) => s.key)).toEqual(['heidelberg', 'ladenburg', FALLBACK_SECTION_KEY]);
     expect(sections[1].title).toBe('Ladenburg');
+    expect(sections[1].parentTitle).toBe('Baden-Württemberg');
     expect(sections[2].data.map((p) => p.id)).toEqual(['alt']);
     expect(sections[2].regionId).toBeNull();
+    expect(sections[2].parentTitle).toBeNull();
   });
 
   it('lässt leere Sektionen weg', () => {

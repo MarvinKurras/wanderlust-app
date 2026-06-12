@@ -33,6 +33,12 @@ export const de = {
     sheetVerschlossen: 'Noch nicht erwandert',
     locateLabel: 'Eigener Standort',
     laden: 'Die Karte wird entrollt …',
+    regionAlle: 'Alle Ziele',
+    regionLabel: (name: string, count: number) => `${name}, ${count} Ziele`,
+    entfernt: (distanz: string) => `${distanz} entfernt`,
+    route: 'Route',
+    routeLabel: (name: string) => `Fußweg zu ${name} in der Karten-App öffnen`,
+    karussellZiel: (name: string) => `${name} auf der Karte zeigen`,
   },
   unlock: {
     cta: 'Stocknagel prägen',

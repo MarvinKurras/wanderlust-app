@@ -40,6 +40,8 @@ export const colors = {
   lockedTextSoft: 'rgba(60,74,64,0.5)',
   /** Hintergrund des Schloss-Icons im Locked-Chip (Website: .chip.locked .cmedal) */
   lockedMedalBg: 'rgba(60,74,64,0.14)',
+  /** Füllung des Präge-Zonen-Rings auf der Karte (brass mit 14 % Deckung) */
+  brassVeil: 'rgba(187,139,75,0.14)',
 } as const;
 
 /** Metallton-Gradienten der Stockschilder (Website: badges.js TONES). */

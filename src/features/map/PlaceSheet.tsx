@@ -4,8 +4,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { StockBadge } from '@/badges';
+import { openDirections } from '@/features/map/directions';
 import { de } from '@/i18n/de';
 import { formatCoords, formatDateDe } from '@/lib/format';
+import { formatDistance } from '@/lib/geo';
 import type { Place } from '@/lib/places';
 import type { Unlock } from '@/lib/unlocks';
 import { colors, fonts, radius, spacing, textStyles } from '@/theme';
@@ -13,11 +15,13 @@ import { colors, fonts, radius, spacing, textStyles } from '@/theme';
 type Props = {
   place: Place;
   unlock: Unlock | undefined;
+  /** Luftlinie vom eigenen Standort (m); null ohne Standortfreigabe. */
+  distanceM: number | null;
   onClose: () => void;
 };
 
 /** Bottom Sheet eines Ortes auf der Karte (karte.html `.sheet`). */
-export function PlaceSheet({ place, unlock, onClose }: Props) {
+export function PlaceSheet({ place, unlock, distanceM, onClose }: Props) {
   const insets = useSafeAreaInsets();
   const unlocked = Boolean(unlock);
 
@@ -55,6 +59,14 @@ export function PlaceSheet({ place, unlock, onClose }: Props) {
               <Text style={styles.meta}>{place.elevation_m} m</Text>
               <View style={styles.dot} />
               <Text style={styles.meta}>{place.type}</Text>
+              {distanceM != null && (
+                <>
+                  <View style={styles.dot} />
+                  <Text style={styles.metaDistance}>
+                    {de.karte.entfernt(formatDistance(distanceM))}
+                  </Text>
+                </>
+              )}
             </View>
             <View style={styles.statusRow}>
               <View style={[styles.pip, unlocked ? styles.pipDone : styles.pipLocked]} />
@@ -66,16 +78,27 @@ export function PlaceSheet({ place, unlock, onClose }: Props) {
             </View>
           </View>
         </View>
-        <Pressable
-          onPress={() => {
-            onClose();
-            router.push({ pathname: '/ort/[id]', params: { id: place.id } });
-          }}
-          accessibilityRole="button"
-          style={styles.cta}
-        >
-          <Text style={styles.ctaText}>{de.karte.sheetDetails}</Text>
-        </Pressable>
+        <View style={styles.ctaRow}>
+          <Pressable
+            onPress={() => void openDirections(place)}
+            accessibilityRole="button"
+            accessibilityLabel={de.karte.routeLabel(place.name)}
+            style={styles.route}
+          >
+            <Feather name="navigation" size={14} color={colors.ink} />
+            <Text style={styles.routeText}>{de.karte.route}</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              onClose();
+              router.push({ pathname: '/ort/[id]', params: { id: place.id } });
+            }}
+            accessibilityRole="button"
+            style={styles.cta}
+          >
+            <Text style={styles.ctaText}>{de.karte.sheetDetails}</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -123,7 +146,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
   name: {
-    fontFamily: fonts.displayMedium,
+    fontFamily: fonts.displaySemiBold,
     fontSize: 28,
     color: colors.ink,
     marginTop: spacing.xs,
@@ -193,8 +216,37 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: colors.inkSoft,
   },
-  cta: {
+  metaDistance: {
+    fontFamily: fonts.mono,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    color: colors.brassDeep,
+  },
+  ctaRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
     marginTop: spacing.lg,
+  },
+  route: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    borderRadius: radius.pill,
+    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+  },
+  routeText: {
+    fontFamily: fonts.mono,
+    fontSize: 12,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    color: colors.ink,
+  },
+  cta: {
+    flex: 1,
     backgroundColor: colors.ink,
     borderRadius: radius.pill,
     paddingVertical: 13,
