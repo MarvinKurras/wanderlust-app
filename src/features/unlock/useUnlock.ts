@@ -1,3 +1,4 @@
+import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useCallback, useState } from 'react';
@@ -158,9 +159,22 @@ export function useUnlock(placeId: string) {
           setState({ phase: 'error', message: de.unlock.fehler, canRetry: true });
           return;
       }
-    } catch {
-      // Netzwerkfehler / Function nicht erreichbar → Offline-Fall (§9)
-      setState({ phase: 'error', message: de.unlock.offline, canRetry: true });
+    } catch (e) {
+      // AP9: Fehler differenzieren — nur echte Netzwerkfehler sind „offline" (§9)
+      if (e instanceof FunctionsHttpError) {
+        const status = e.context?.status;
+        setState({
+          phase: 'error',
+          message: status === 429 ? de.unlock.rateLimit : de.unlock.fehler,
+          canRetry: status !== 429,
+        });
+        return;
+      }
+      if (e instanceof FunctionsFetchError) {
+        setState({ phase: 'error', message: de.unlock.offline, canRetry: true });
+        return;
+      }
+      setState({ phase: 'error', message: de.unlock.fehler, canRetry: true });
     }
   }, [placeId, queryClient]);
 

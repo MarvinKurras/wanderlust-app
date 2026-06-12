@@ -130,6 +130,22 @@ if (session?.access_token) {
   const again = await json(await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 10 }));
   check('unlock erneut → ALREADY_UNLOCKED', again?.code === 'ALREADY_UNLOCKED', `code: ${again?.code}`);
 
+  // 10b) AP9-Härtung: 405, isMocked-Typfehler, Rate Limit
+  const wrongMethod = await fetch(`${URL_}/functions/v1/unlock`, {
+    method: 'GET',
+    headers: { apikey: KEY, Authorization: `Bearer ${session.access_token}` },
+  });
+  check('unlock GET → 405', wrongMethod.status === 405, `HTTP ${wrongMethod.status}`);
+  const badMock = await callUnlock({ placeId: 'zugspitze', lat: 47.4211, lng: 10.9863, accuracy: 10, isMocked: 'ja' });
+  check('unlock isMocked-Typfehler → 400', badMock.status === 400, `HTTP ${badMock.status}`);
+  let rateLimited = false;
+  let rateTries = 0;
+  for (; rateTries < 12 && !rateLimited; rateTries += 1) {
+    const res = await callUnlock({ placeId: 'zugspitze', lat: 52.52, lng: 13.405, accuracy: 10 });
+    if (res.status === 429) rateLimited = true;
+  }
+  check('Rate Limit greift (429 innerhalb von 12 Versuchen)', rateLimited, `nach ${rateTries} Versuchen`);
+
   // 11) Eigener Unlock jetzt lesbar
   const ownAfter = await json(await fetch(`${URL_}/rest/v1/unlocks?select=place_id`, { headers: userHeaders }));
   check('eigener Unlock sichtbar', Array.isArray(ownAfter) && ownAfter.some((r) => r.place_id === 'zugspitze'), `rows: ${ownAfter?.length ?? '—'}`);

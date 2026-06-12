@@ -45,6 +45,7 @@ export const de = {
     zuUngenau: (m: number) => `Standort zu ungenau (±${m} m). Warte einen Moment im Freien.`,
     zuWeit: (distanz: string) => `Noch ${distanz} bis zum Ziel — der Gipfel wartet.`,
     offline: 'Keine Verbindung — die Freischaltung braucht Netz.',
+    rateLimit: 'Zu viele Versuche — gönn dir eine Rast, in einer Stunde geht es weiter.',
     mock: 'Dein Standort wirkt simuliert — echte Pfade zählen.',
     fehler: 'Die Prägung ist fehlgeschlagen. Versuch es gleich nochmal.',
     nochmal: 'Nochmal versuchen',
