@@ -2,7 +2,7 @@
 
 exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Brocken, 1141 m"
+  accessibilityLabel="Stockschild Brocken, 1141 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -261,8 +261,8 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -299,8 +299,8 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -612,6 +612,24 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               x={120}
               y={150}
             />
+            <RNSVGRect
+              fill={
+                {
+                  "payload": 4279114772,
+                  "type": 0,
+                }
+              }
+              height={14.2}
+              opacity={0.14}
+              propList={
+                [
+                  "fill",
+                ]
+              }
+              width={6}
+              x={120.4}
+              y={150.4}
+            />
             <RNSVGPath
               d="M117,151 L132,139 L147,151 Z"
               fill={
@@ -663,7 +681,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
                   "type": 0,
                 }
               }
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -671,7 +689,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               }
               width={16}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGRect
               fill={
@@ -680,7 +698,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
                   "type": 0,
                 }
               }
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -688,10 +706,10 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               }
               width={6.72}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGPath
-              d="M104.6,128.0 H119.4 M104.6,134.4 H119.4 M104.6,140.8 H119.4 M104.6,147.2 H119.4 M104.6,153.6 H119.4 M104.6,160.0 H119.4"
+              d="M104.6,133.0 H119.4 M104.6,139.4 H119.4 M104.6,145.8 H119.4 M104.6,152.2 H119.4 M104.6,158.6 H119.4 M104.6,165.0 H119.4"
               fill={
                 {
                   "payload": 4278190080,
@@ -730,7 +748,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               rx={1.5}
               width={3}
               x={110.5}
-              y={131}
+              y={136}
             />
             <RNSVGRect
               fill={
@@ -748,11 +766,11 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               rx={1.5}
               width={3}
               x={110.5}
-              y={146}
+              y={151}
             />
             <RNSVGRect
               fill={null}
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -773,7 +791,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               strokeWidth={0.85}
               width={16}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGRect
               fill={
@@ -803,10 +821,10 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               strokeWidth={0.85}
               width={20}
               x={102}
-              y={119}
+              y={124}
             />
             <RNSVGPath
-              d="M103,119 L112,97 L121,119 Z"
+              d="M103,124 L112,102 L121,124 Z"
               fill={
                 {
                   "payload": 4285175434,
@@ -833,7 +851,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               strokeWidth={0.85}
             />
             <RNSVGPath
-              d="M112,97 L112,119 L103,119 Z"
+              d="M112,102 L112,124 L103,124 Z"
               fill={
                 {
                   "payload": 4279114772,
@@ -848,7 +866,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               }
             />
             <RNSVGPath
-              d="M112,97 V91.5"
+              d="M112,102 V96.5"
               fill={
                 {
                   "payload": 4278190080,
@@ -873,7 +891,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
             />
             <RNSVGCircle
               cx={112}
-              cy={90.5}
+              cy={95.5}
               fill={
                 {
                   "payload": 4291404106,
@@ -888,7 +906,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
               r={1.4}
             />
             <RNSVGPath
-              d="M46,164 L42.2,174 Q46,172.6 49.8,174 Z M46,170 L40.4,179.6 Q46,178.2 51.6,179.6 Z M46,175.6 L38.4,183.6 Q46,182.2 53.6,183.6 Z M60,162 L57,170 Q60,168.9 63,170 Z M60,166.8 L55.5,174.5 Q60,173.4 64.5,174.5 Z M60,171.3 L53.9,177.7 Q60,176.6 66.1,177.7 Z M176,164 L172.6,173 Q176,171.7 179.4,173 Z M176,169.4 L171,178 Q176,176.8 181,178 Z M176,174.4 L169.2,181.6 Q176,180.4 182.8,181.6 Z"
+              d="M60,164 L56.2,174 Q60,172.6 63.8,174 Z M60,170 L54.4,179.6 Q60,178.2 65.6,179.6 Z M60,175.6 L52.4,183.6 Q60,182.2 67.6,183.6 Z M72,162 L69,170 Q72,168.9 75,170 Z M72,166.8 L67.5,174.5 Q72,173.4 76.5,174.5 Z M72,171.3 L65.9,177.7 Q72,176.6 78.1,177.7 Z M158,164 L154.6,173 Q158,171.7 161.4,173 Z M158,169.4 L153,178 Q158,176.8 163,178 Z M158,174.4 L151.2,181.6 Q158,180.4 164.8,181.6 Z"
               fill={
                 {
                   "payload": 4280500270,
@@ -1405,7 +1423,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
           </RNSVGText>
         </RNSVGGroup>
         <RNSVGPath
-          d="M77.8,218.6 L79.6,220.4 L77.8,222.20000000000002 L76,220.4 Z M142.2,218.6 L144,220.4 L142.2,222.20000000000002 L140.39999999999998,220.4 Z"
+          d="M78.7,218.6 L80.5,220.4 L78.7,222.20000000000002 L76.9,220.4 Z M141.3,218.6 L143.10000000000002,220.4 L141.3,222.20000000000002 L139.5,220.4 Z"
           fill={
             {
               "payload": 4282139710,
@@ -1719,7 +1737,7 @@ exports[`StockBadge rendert Brocken pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Feldberg pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Feldberg, 1493 m"
+  accessibilityLabel="Stockschild Feldberg, 1493 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -1978,8 +1996,8 @@ exports[`StockBadge rendert Feldberg pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -2016,8 +2034,8 @@ exports[`StockBadge rendert Feldberg pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -2936,7 +2954,7 @@ exports[`StockBadge rendert Feldberg pixel-stabil 1`] = `
           </RNSVGText>
         </RNSVGGroup>
         <RNSVGPath
-          d="M77.8,218.6 L79.6,220.4 L77.8,222.20000000000002 L76,220.4 Z M142.2,218.6 L144,220.4 L142.2,222.20000000000002 L140.39999999999998,220.4 Z"
+          d="M78.7,218.6 L80.5,220.4 L78.7,222.20000000000002 L76.9,220.4 Z M141.3,218.6 L143.10000000000002,220.4 L141.3,222.20000000000002 L139.5,220.4 Z"
           fill={
             {
               "payload": 4283574036,
@@ -3250,7 +3268,7 @@ exports[`StockBadge rendert Feldberg pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Gr. Arber, 1456 m"
+  accessibilityLabel="Stockschild Gr. Arber, 1456 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -3509,8 +3527,8 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -3547,8 +3565,8 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -3796,7 +3814,7 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
               }
               strokeLinecap={1}
               strokeLinejoin={1}
-              strokeWidth={1}
+              strokeWidth={0.75}
             >
               <RNSVGPath
                 d="M58,108 q4,-4.5 8,0 q4,-4.5 8,0"
@@ -4488,7 +4506,7 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
             }
             y={
               [
-                224.9,
+                219.9,
               ]
             }
           >
@@ -4539,7 +4557,7 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
             }
             y={
               [
-                224,
+                219,
               ]
             }
           >
@@ -4860,7 +4878,7 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Königssee pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Königssee, 603 m"
+  accessibilityLabel="Stockschild Königssee, 603 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -5119,8 +5137,8 @@ exports[`StockBadge rendert Königssee pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -5157,8 +5175,8 @@ exports[`StockBadge rendert Königssee pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -5745,6 +5763,24 @@ exports[`StockBadge rendert Königssee pixel-stabil 1`] = `
                 x={58}
                 y={168}
               />
+              <RNSVGRect
+                fill={
+                  {
+                    "payload": 4279114772,
+                    "type": 0,
+                  }
+                }
+                height={7.2}
+                opacity={0.14}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+                width={4}
+                x={58.4}
+                y={168.4}
+              />
               <RNSVGPath
                 d="M57,168 L65,163 L73,168 Z"
                 fill={
@@ -6319,7 +6355,7 @@ exports[`StockBadge rendert Königssee pixel-stabil 1`] = `
           </RNSVGText>
         </RNSVGGroup>
         <RNSVGPath
-          d="M82,218.6 L83.8,220.4 L82,222.20000000000002 L80.2,220.4 Z M138,218.6 L139.8,220.4 L138,222.20000000000002 L136.2,220.4 Z"
+          d="M82.9,218.6 L84.7,220.4 L82.9,222.20000000000002 L81.10000000000001,220.4 Z M137.1,218.6 L138.9,220.4 L137.1,222.20000000000002 L135.29999999999998,220.4 Z"
           fill={
             {
               "payload": 4284366098,
@@ -6633,7 +6669,7 @@ exports[`StockBadge rendert Königssee pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Königsstuhl, 118 m"
+  accessibilityLabel="Stockschild Königsstuhl, 118 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -6892,8 +6928,8 @@ exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -6930,8 +6966,8 @@ exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -7179,7 +7215,7 @@ exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
               }
               strokeLinecap={1}
               strokeLinejoin={1}
-              strokeWidth={1}
+              strokeWidth={0.75}
             >
               <RNSVGPath
                 d="M60,104 q4,-4.5 8,0 q4,-4.5 8,0"
@@ -7967,7 +8003,7 @@ exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
           </RNSVGText>
         </RNSVGGroup>
         <RNSVGPath
-          d="M82,218.6 L83.8,220.4 L82,222.20000000000002 L80.2,220.4 Z M138,218.6 L139.8,220.4 L138,222.20000000000002 L136.2,220.4 Z"
+          d="M82.9,218.6 L84.7,220.4 L82.9,222.20000000000002 L81.10000000000001,220.4 Z M137.1,218.6 L138.9,220.4 L137.1,222.20000000000002 L135.29999999999998,220.4 Z"
           fill={
             {
               "payload": 4283390034,
@@ -8281,7 +8317,7 @@ exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Watzmann, 2713 m"
+  accessibilityLabel="Stockschild Watzmann, 2713 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -8540,8 +8576,8 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -8578,8 +8614,8 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -8827,7 +8863,7 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
               }
               strokeLinecap={1}
               strokeLinejoin={1}
-              strokeWidth={1}
+              strokeWidth={0.75}
             >
               <RNSVGPath
                 d="M40,106 q4,-4.5 8,0 q4,-4.5 8,0"
@@ -9638,7 +9674,7 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
             }
             y={
               [
-                224.9,
+                219.9,
               ]
             }
           >
@@ -9689,7 +9725,7 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
             }
             y={
               [
-                224,
+                219,
               ]
             }
           >
@@ -10010,7 +10046,7 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Wendelstein, 1838 m"
+  accessibilityLabel="Stockschild Wendelstein, 1838 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -10269,8 +10305,8 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -10307,8 +10343,8 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -10620,6 +10656,24 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               x={120}
               y={150}
             />
+            <RNSVGRect
+              fill={
+                {
+                  "payload": 4279114772,
+                  "type": 0,
+                }
+              }
+              height={14.2}
+              opacity={0.14}
+              propList={
+                [
+                  "fill",
+                ]
+              }
+              width={6}
+              x={120.4}
+              y={150.4}
+            />
             <RNSVGPath
               d="M117,151 L132,139 L147,151 Z"
               fill={
@@ -10671,7 +10725,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
                   "type": 0,
                 }
               }
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -10679,7 +10733,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               }
               width={16}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGRect
               fill={
@@ -10688,7 +10742,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
                   "type": 0,
                 }
               }
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -10696,10 +10750,10 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               }
               width={6.72}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGPath
-              d="M104.6,128.0 H119.4 M104.6,134.4 H119.4 M104.6,140.8 H119.4 M104.6,147.2 H119.4 M104.6,153.6 H119.4 M104.6,160.0 H119.4"
+              d="M104.6,133.0 H119.4 M104.6,139.4 H119.4 M104.6,145.8 H119.4 M104.6,152.2 H119.4 M104.6,158.6 H119.4 M104.6,165.0 H119.4"
               fill={
                 {
                   "payload": 4278190080,
@@ -10738,7 +10792,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               rx={1.5}
               width={3}
               x={110.5}
-              y={131}
+              y={136}
             />
             <RNSVGRect
               fill={
@@ -10756,11 +10810,11 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               rx={1.5}
               width={3}
               x={110.5}
-              y={146}
+              y={151}
             />
             <RNSVGRect
               fill={null}
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -10781,7 +10835,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               strokeWidth={0.85}
               width={16}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGRect
               fill={
@@ -10811,10 +10865,10 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               strokeWidth={0.85}
               width={20}
               x={102}
-              y={119}
+              y={124}
             />
             <RNSVGPath
-              d="M103,119 L112,97 L121,119 Z"
+              d="M103,124 L112,102 L121,124 Z"
               fill={
                 {
                   "payload": 4285175434,
@@ -10841,7 +10895,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               strokeWidth={0.85}
             />
             <RNSVGPath
-              d="M112,97 L112,119 L103,119 Z"
+              d="M112,102 L112,124 L103,124 Z"
               fill={
                 {
                   "payload": 4279114772,
@@ -10856,7 +10910,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               }
             />
             <RNSVGPath
-              d="M112,97 V91.5"
+              d="M112,102 V96.5"
               fill={
                 {
                   "payload": 4278190080,
@@ -10881,7 +10935,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
             />
             <RNSVGCircle
               cx={112}
-              cy={90.5}
+              cy={95.5}
               fill={
                 {
                   "payload": 4291404106,
@@ -10896,7 +10950,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
               r={1.4}
             />
             <RNSVGPath
-              d="M46,164 L42.2,174 Q46,172.6 49.8,174 Z M46,170 L40.4,179.6 Q46,178.2 51.6,179.6 Z M46,175.6 L38.4,183.6 Q46,182.2 53.6,183.6 Z M60,162 L57,170 Q60,168.9 63,170 Z M60,166.8 L55.5,174.5 Q60,173.4 64.5,174.5 Z M60,171.3 L53.9,177.7 Q60,176.6 66.1,177.7 Z M176,164 L172.6,173 Q176,171.7 179.4,173 Z M176,169.4 L171,178 Q176,176.8 181,178 Z M176,174.4 L169.2,181.6 Q176,180.4 182.8,181.6 Z"
+              d="M60,164 L56.2,174 Q60,172.6 63.8,174 Z M60,170 L54.4,179.6 Q60,178.2 65.6,179.6 Z M60,175.6 L52.4,183.6 Q60,182.2 67.6,183.6 Z M72,162 L69,170 Q72,168.9 75,170 Z M72,166.8 L67.5,174.5 Q72,173.4 76.5,174.5 Z M72,171.3 L65.9,177.7 Q72,176.6 78.1,177.7 Z M158,164 L154.6,173 Q158,171.7 161.4,173 Z M158,169.4 L153,178 Q158,176.8 163,178 Z M158,174.4 L151.2,181.6 Q158,180.4 164.8,181.6 Z"
               fill={
                 {
                   "payload": 4280500270,
@@ -11340,7 +11394,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
             }
             y={
               [
-                224.9,
+                219.9,
               ]
             }
           >
@@ -11391,7 +11445,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
             }
             y={
               [
-                224,
+                219,
               ]
             }
           >
@@ -11712,7 +11766,7 @@ exports[`StockBadge rendert Wendelstein pixel-stabil 1`] = `
 
 exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Zugspitze, 2962 m"
+  accessibilityLabel="Stockschild Zugspitze, 2962 m, erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -11971,8 +12025,8 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -12009,8 +12063,8 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -12258,7 +12312,7 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
               }
               strokeLinecap={1}
               strokeLinejoin={1}
-              strokeWidth={1}
+              strokeWidth={0.75}
             >
               <RNSVGPath
                 d="M58,108 q4,-4.5 8,0 q4,-4.5 8,0"
@@ -12950,7 +13004,7 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
             }
             y={
               [
-                224.9,
+                219.9,
               ]
             }
           >
@@ -13001,7 +13055,7 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
             }
             y={
               [
-                224,
+                219,
               ]
             }
           >
@@ -13322,7 +13376,7 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
 
 exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] = `
 <RNSVGSvgView
-  accessibilityLabel="Stockschild Wendelstein, 1838 m"
+  accessibilityLabel="Stockschild Wendelstein, 1838 m, noch nicht erwandert"
   accessibilityRole="image"
   align="xMidYMid"
   bbHeight={210.76363636363635}
@@ -13581,8 +13635,8 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -13619,8 +13673,8 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
           }
           strokeDasharray={
             [
-              0.01,
-              5.4,
+              0.3,
+              5.1,
             ]
           }
           strokeLinecap={1}
@@ -13932,6 +13986,24 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               x={120}
               y={150}
             />
+            <RNSVGRect
+              fill={
+                {
+                  "payload": 4279111439,
+                  "type": 0,
+                }
+              }
+              height={14.2}
+              opacity={0.14}
+              propList={
+                [
+                  "fill",
+                ]
+              }
+              width={6}
+              x={120.4}
+              y={150.4}
+            />
             <RNSVGPath
               d="M117,151 L132,139 L147,151 Z"
               fill={
@@ -13983,7 +14055,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
                   "type": 0,
                 }
               }
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -13991,7 +14063,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               }
               width={16}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGRect
               fill={
@@ -14000,7 +14072,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
                   "type": 0,
                 }
               }
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -14008,10 +14080,10 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               }
               width={6.72}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGPath
-              d="M104.6,128.0 H119.4 M104.6,134.4 H119.4 M104.6,140.8 H119.4 M104.6,147.2 H119.4 M104.6,153.6 H119.4 M104.6,160.0 H119.4"
+              d="M104.6,133.0 H119.4 M104.6,139.4 H119.4 M104.6,145.8 H119.4 M104.6,152.2 H119.4 M104.6,158.6 H119.4 M104.6,165.0 H119.4"
               fill={
                 {
                   "payload": 4278190080,
@@ -14050,7 +14122,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               rx={1.5}
               width={3}
               x={110.5}
-              y={131}
+              y={136}
             />
             <RNSVGRect
               fill={
@@ -14068,11 +14140,11 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               rx={1.5}
               width={3}
               x={110.5}
-              y={146}
+              y={151}
             />
             <RNSVGRect
               fill={null}
-              height={44}
+              height={39}
               propList={
                 [
                   "fill",
@@ -14093,7 +14165,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               strokeWidth={0.85}
               width={16}
               x={104}
-              y={122}
+              y={127}
             />
             <RNSVGRect
               fill={
@@ -14123,10 +14195,10 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               strokeWidth={0.85}
               width={20}
               x={102}
-              y={119}
+              y={124}
             />
             <RNSVGPath
-              d="M103,119 L112,97 L121,119 Z"
+              d="M103,124 L112,102 L121,124 Z"
               fill={
                 {
                   "payload": 4283717718,
@@ -14153,10 +14225,10 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               strokeWidth={0.85}
             />
             <RNSVGPath
-              d="M112,97 L112,119 L103,119 Z"
+              d="M112,102 L112,124 L103,124 Z"
               fill={
                 {
-                  "payload": 4279114772,
+                  "payload": 4279111439,
                   "type": 0,
                 }
               }
@@ -14168,7 +14240,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               }
             />
             <RNSVGPath
-              d="M112,97 V91.5"
+              d="M112,102 V96.5"
               fill={
                 {
                   "payload": 4278190080,
@@ -14193,7 +14265,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
             />
             <RNSVGCircle
               cx={112}
-              cy={90.5}
+              cy={95.5}
               fill={
                 {
                   "payload": 4285097309,
@@ -14208,7 +14280,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
               r={1.4}
             />
             <RNSVGPath
-              d="M46,164 L42.2,174 Q46,172.6 49.8,174 Z M46,170 L40.4,179.6 Q46,178.2 51.6,179.6 Z M46,175.6 L38.4,183.6 Q46,182.2 53.6,183.6 Z M60,162 L57,170 Q60,168.9 63,170 Z M60,166.8 L55.5,174.5 Q60,173.4 64.5,174.5 Z M60,171.3 L53.9,177.7 Q60,176.6 66.1,177.7 Z M176,164 L172.6,173 Q176,171.7 179.4,173 Z M176,169.4 L171,178 Q176,176.8 181,178 Z M176,174.4 L169.2,181.6 Q176,180.4 182.8,181.6 Z"
+              d="M60,164 L56.2,174 Q60,172.6 63.8,174 Z M60,170 L54.4,179.6 Q60,178.2 65.6,179.6 Z M60,175.6 L52.4,183.6 Q60,182.2 67.6,183.6 Z M72,162 L69,170 Q72,168.9 75,170 Z M72,166.8 L67.5,174.5 Q72,173.4 76.5,174.5 Z M72,171.3 L65.9,177.7 Q72,176.6 78.1,177.7 Z M158,164 L154.6,173 Q158,171.7 161.4,173 Z M158,169.4 L153,178 Q158,176.8 163,178 Z M158,174.4 L151.2,181.6 Q158,180.4 164.8,181.6 Z"
               fill={
                 {
                   "payload": 4280362018,
@@ -14652,7 +14724,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
             }
             y={
               [
-                224.9,
+                219.9,
               ]
             }
           >
@@ -14703,7 +14775,7 @@ exports[`StockBadge rendert die Locked-Variante (entsättigt, Opacity 0.62) 1`] 
             }
             y={
               [
-                224,
+                219,
               ]
             }
           >

@@ -17,7 +17,7 @@ import type { BadgeShape } from '@/lib/places';
 import { useScreenActive } from '@/lib/screenActive';
 import { glass } from '@/theme';
 
-import { CENTER, SHAPES, VIEWBOX } from './geometry';
+import { CENTER, FIELD_SCALE, SHAPES, VIEWBOX } from './geometry';
 
 export type BrassSheenProps = {
   shape: BadgeShape;
@@ -34,7 +34,7 @@ const BAND_W = 70;
 const PAUSE_MS = 3200;
 
 /** Website `badges.js` glint: im eingelassenen, auf 0,88 skalierten Feld. */
-const INSET = `translate(${CENTER.x} ${CENTER.y}) scale(0.88) translate(${-CENTER.x} ${-CENTER.y})`;
+const INSET = `translate(${CENTER.x} ${CENTER.y}) scale(${FIELD_SCALE}) translate(${-CENTER.x} ${-CENTER.y})`;
 
 /**
  * Web-Fallback des Messingglanzes (nativ: Skia-Shader in `BrassSheen.native.tsx`):

@@ -45,7 +45,7 @@ const dropShadow: ViewStyle =
   }) ?? {};
 
 /**
- * Ein Stockschild mit Inszenierung (AP-D): das pixel-treue `StockBadge`,
+ * Ein Stockschild mit Inszenierung (AP-D): das `StockBadge` (AP-D2),
  * darüber Messingglanz (frei) oder Nebel (verschlossen), dazu der Schatten.
  */
 export function BadgeArt({

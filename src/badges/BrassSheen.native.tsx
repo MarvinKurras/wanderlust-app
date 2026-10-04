@@ -9,7 +9,7 @@ import { useTilt } from '@/lib/tilt';
 import { glass } from '@/theme';
 
 import type { BrassSheenProps } from './BrassSheen';
-import { CENTER, SHAPES, VIEWBOX } from './geometry';
+import { CENTER, FIELD_SCALE, SHAPES, VIEWBOX } from './geometry';
 
 /**
  * Messingglanz als Skia-Fragment-Shader (AP-D): ein weicher Lichtstreif mit
@@ -38,7 +38,7 @@ half4 main(float2 pos) {
 }
 `);
 
-const INSET = 0.88;
+const INSET = FIELD_SCALE;
 const COLOR = (() => {
   const c = Skia.Color(glass.sheen);
   return [c[0], c[1], c[2]];

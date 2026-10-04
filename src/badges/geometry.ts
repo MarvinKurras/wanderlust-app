@@ -6,6 +6,8 @@ import type { BadgeShape } from '@/lib/places';
  */
 export const VIEWBOX = { width: 220, height: 252 } as const;
 export const CENTER = { x: 110, y: 134 } as const;
+/** Eingelassenes Emaille-Feld: Schildform um CENTER auf 0,88 skaliert (badges.js). */
+export const FIELD_SCALE = 0.88;
 
 export const SHAPES: Record<BadgeShape, string> = {
   shield: 'M30,28 L190,28 L190,122 C190,182 152,218 110,240 C68,218 30,182 30,122 Z',

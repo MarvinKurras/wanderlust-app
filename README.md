@@ -27,7 +27,7 @@ Zielplattformen: iOS 16.4+ und Android 8+ (minSdk 26). Web ist kein Produktziel 
 src/app/         Screens (Expo Router): Tabs Karte · Orte · Sammlung, Ort-Detail, Onboarding, Einstellungen
 src/components/  Design-System: Glas, Buttons, Glyphen, Tab-Leiste, Kopfzeilen, Sheet, Dialog
 src/components/atmosphere/  Bergbühne der Website (Ketten, Himmel, Nebel, Korn)
-src/badges/      Stockschilder (pixel-treu zur Website) + Messingglanz und Nebel
+src/badges/      Stocknägel (Formen/Töne/Motive wie die Website, Ausführung AP-D2) + Glanz und Nebel
 src/features/    Feature-Logik und -UI (map, places, unlock, collection, onboarding, account)
 src/lib/         Supabase-Datenzugriff, Geo/Format, Bewegung, Haptik, Neigung, Web-Vorschau
 src/theme/       Design-Tokens (Farben, Typografie, Spacing, Glas, Karte, Bühne) — Quelle: Website

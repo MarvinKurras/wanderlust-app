@@ -1,6 +1,6 @@
 import type { BadgeShape } from '@/lib/places';
 
-import { CENTER, fieldHalfWidth, NAILS } from './geometry';
+import { CENTER, FIELD_SCALE as FIELD, fieldHalfWidth, NAILS } from './geometry';
 
 /**
  * Laufweiten von Cormorant 600 (Versalien, Ziffern, Satzzeichen) in em —
@@ -63,11 +63,10 @@ const TRACKING_EM = 0.05;
 const MAX_FS = 19.5;
 const MIN_FS_ONE_LINE = 15;
 const MAX_FS_TWO_LINES = 15.5;
-const MIN_FS = 10.5;
+/** Untergrenze nur für Extremfälle (lange Einzelwörter im Oval) — die 15 Seeds liegen darüber. */
+const MIN_FS = 8.5;
 /** Innenabstand zum Rand der Form (je Seite, viewBox-Einheiten). */
 const SIDE_PAD = 10;
-/** Das Feld ist um 0,88 eingelassen — Nieten liegen in äußeren Koordinaten. */
-const FIELD = 0.88;
 const NAIL_R = 4.5;
 const NAIL_GAP = 3;
 
@@ -182,18 +181,52 @@ export function fitName(name: string, shape: BadgeShape): NameLayout {
 
 const REGION_FS = 7.6;
 const REGION_LS = 1.5;
-const REGION_MIN_FS = 5.6;
+/** Kleiner wirkt die Mono-Zeile wie Kleingedrucktes — dann lieber kürzen. */
+const REGION_SHORTEN_BELOW = 6.2;
+
+function monoWidth(text: string, fs: number, ls: number) {
+  const n = [...text].length;
+  return n * fs * MONO_EM + Math.max(0, n - 1) * ls;
+}
+
+/** Breiteste Namenszeile in viewBox-Einheiten. */
+export function nameWidth(layout: NameLayout): number {
+  return Math.max(...layout.lines.map((l) => nameWidthEm(l) * layout.fontSize));
+}
 
 /**
  * Regionszeile (Spline Mono): Standardgröße, in schmalen Formen proportional
- * verkleinert — sie soll nie breiter wirken als der Name darüber.
+ * verkleinert und nie breiter als der Name darüber (Hierarchie Name > Region).
+ * Würde sie zu klein, bleibt nur der erste Teil („LADENBURG · KURPFALZ" → „LADENBURG").
  */
-export function fitRegion(region: string, shape: BadgeShape, baseline: number) {
-  const n = [...region].length;
-  const width = n * REGION_FS * MONO_EM + Math.max(0, n - 1) * REGION_LS;
-  const k = Math.min(1, budget(shape, baseline, REGION_FS) / width);
-  const fontSize = Math.max(REGION_MIN_FS, REGION_FS * k);
-  return { fontSize: round(fontSize), letterSpacing: round(REGION_LS * (fontSize / REGION_FS)) };
+export function fitRegion(region: string, shape: BadgeShape, layout: NameLayout) {
+  const limit = Math.min(budget(shape, layout.regionBaseline, REGION_FS), nameWidth(layout) * 1.05);
+  const fit = (text: string) => {
+    const k = Math.min(1, limit / monoWidth(text, REGION_FS, REGION_LS));
+    return { text, fontSize: round(REGION_FS * k), letterSpacing: round(REGION_LS * k) };
+  };
+  const full = fit(region);
+  if (full.fontSize >= REGION_SHORTEN_BELOW || !region.includes(' · ')) return full;
+  return fit(region.split(' · ')[0]);
+}
+
+const BAND = { fs: 11, ls: 1.8 } as const;
+/** Grundlinie im Höhenband — das Schild läuft unten spitz zu, dort etwas höher. */
+const BAND_BASELINE: Record<BadgeShape, number> = { shield: 219, arch: 224, oval: 224 };
+
+/** Satz des unteren Bands: Grundlinie und (falls Platz) Abstand der Rauten. */
+export function fitBand(text: string, shape: BadgeShape) {
+  const baseline = BAND_BASELINE[shape];
+  const half = monoWidth(text, BAND.fs, BAND.ls) / 2;
+  const ornamentX = half + 7;
+  const room = fieldHalfWidth(shape, baseline - 4) - 8;
+  return {
+    baseline,
+    fontSize: BAND.fs,
+    letterSpacing: BAND.ls,
+    halfWidth: half,
+    ornamentX: room > ornamentX ? ornamentX : null,
+  };
 }
 
 function round(v: number) {

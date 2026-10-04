@@ -4,6 +4,10 @@ export const de = {
     schliessen: 'Schließen',
     zurueck: 'Zurück',
   },
+  schild: {
+    label: (name: string, hoehe: string, erwandert: boolean) =>
+      `Stockschild ${name}, ${hoehe}, ${erwandert ? 'erwandert' : 'noch nicht erwandert'}`,
+  },
   tabs: {
     karte: 'Karte',
     orte: 'Orte',

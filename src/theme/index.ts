@@ -4,6 +4,7 @@ export { spacing, radius } from './spacing';
 export { landscape } from './landscape';
 export { glass, shadows } from './glass';
 export { mapPaint, androidMapStyle } from './mapStyle';
+export { badgeScene } from './badgeScene';
 
 /** Hängt einer #rrggbb-Farbe einen Alphawert an (0–1) → rgba(). */
 export function withAlpha(hex: string, alpha: number): string {

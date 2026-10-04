@@ -1,6 +1,7 @@
 import { Circle, G, Path, Rect } from 'react-native-svg';
 
 import type { BadgeMotif } from '@/lib/places';
+import { badgeScene as SCENE } from '@/theme';
 
 import {
   crownsAlong,
@@ -28,7 +29,8 @@ import {
  * Die sechs Landschaftsszenen der Stocknägel (AP-D2). Motive und Aufbau
  * folgen `wanderlust/badges.js`; die Ausführung ist veredelt: Emaille-Flächen
  * mit Konturstegen in der Metallfarbe, Licht- und Schattenflanken, Gravur-
- * Schraffur. `detail` (ab 100 dp) schaltet Feinheiten zu, die klein nur flimmern.
+ * Schraffur. `detail` (ab 100 dp) schaltet Feinheiten zu, die klein nur flimmern;
+ * `fine` (ab 140 dp) zusätzlich die Haarlinien (Schraffur, Himmel, Mauerwerk, Klüfte).
  */
 type Props = {
   kind: BadgeMotif;
@@ -38,49 +40,8 @@ type Props = {
   /** Konturfarbe — die (bereits transformierte) Kantenfarbe des Metalls. */
   ink: string;
   detail: boolean;
+  fine: boolean;
 };
-
-/** Emaille-Palette der Szenen (gedämpfter als die Website-Flächen). */
-export const SCENE = {
-  skyTop: '#b5c9cf',
-  skyMid: '#d6dfd9',
-  skyLow: '#edebdf',
-  skyLine: '#93abb3',
-  sun: '#f2dfa0',
-  sunGlow: '#f7ebc4',
-  sunLine: '#c4a258',
-  bird: '#4a616c',
-  far: '#a4b7bd',
-  mid: '#7b9a85',
-  rock: '#4d725d',
-  rockFront: '#44695a',
-  rockLake: '#557c69',
-  shade: '#0e1c14',
-  snow: '#f4f5ef',
-  gully: '#24392d',
-  trail: '#efe4c4',
-  cross: '#c9a14a',
-  meadow: '#3d6147',
-  hill: '#5c8166',
-  waterTop: '#8ab4c3',
-  waterBottom: '#4b849c',
-  waterLine: '#e4eef0',
-  chalk: '#f3efe4',
-  chalkShade: '#d6cdb8',
-  fissure: '#b5ab94',
-  beech: '#4a6e4c',
-  fir: '#23402e',
-  firBack: '#2f5240',
-  trunk: '#5a3d22',
-  stone: '#a29d92',
-  stoneShade: '#837e74',
-  masonry: '#6a665e',
-  patina: '#6a968a',
-  tile: '#9a4733',
-  wall: '#efe8d8',
-  window: '#2c332f',
-  sail: '#f6f2e6',
-} as const;
 
 type SunSpot = { cx: number; cy: number; r: number };
 const SUN: SunSpot = { cx: 156, cy: 112, r: 9.5 };
@@ -93,6 +54,7 @@ type Ctx = {
   cc: (hex: string) => string;
   ink: string;
   detail: boolean;
+  fine: boolean;
 };
 
 /** Konturstege: feine Linie in der Metallfarbe um jede Emaille-Fläche. */
@@ -109,7 +71,7 @@ function Sky({ ctx }: { ctx: Ctx }) {
   return (
     <G>
       <Rect x={-12} y={60} width={244} height={200} fill={`url(#sky_${ctx.id})`} />
-      {ctx.detail && (
+      {ctx.fine && (
         <G fill="none" stroke={ctx.cc(SCENE.skyLine)} strokeWidth={0.45} strokeLinecap="round">
           <Path
             d={skyHatch(95, 112, 3.4, { ...ctx.sun, r: ctx.sun.r + 11.5 })}
@@ -152,10 +114,11 @@ function Sun({ ctx }: { ctx: Ctx }) {
 }
 
 function Birds({ ctx, at = [58, 108] }: { ctx: Ctx; at?: Pt }) {
+  if (!ctx.detail) return null;
   return (
     <G
       stroke={ctx.cc(SCENE.bird)}
-      strokeWidth={1}
+      strokeWidth={0.75}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -187,14 +150,14 @@ function Peak({
   withTrail?: boolean;
   withCross?: boolean;
 }) {
-  const { cc, detail } = ctx;
+  const { cc, detail, fine } = ctx;
   const contour = contourOf(ctx.ink);
   return (
     <G>
       <Path d={poly(m.outline)} fill={cc(fill)} />
       {snow > 0 && <Path d={snowCap(m, snow)} fill={cc(SCENE.snow)} />}
-      <Path d={shadowFace(m)} fill={SCENE.shade} opacity={0.2} />
-      {detail && (
+      <Path d={shadowFace(m)} fill={cc(SCENE.shade)} opacity={0.2} />
+      {fine && (
         // Kupferstich: Schraffur der Schattenflanke parallel zur Flanke
         <Path
           d={hatch(shadowFacePts(m), slopeAngle(m), 2.3)}
@@ -263,8 +226,8 @@ function Meadow({ ctx, y = 200 }: { ctx: Ctx; y?: number }) {
   );
 }
 
-export function Scenery({ kind, id, cc, ink, detail }: Props) {
-  const ctx: Ctx = { id, cc, ink, detail, sun: kind === 'twin' ? SUN_TWIN : SUN };
+export function Scenery({ kind, id, cc, ink, detail, fine }: Props) {
+  const ctx: Ctx = { id, cc, ink, detail, fine, sun: kind === 'twin' ? SUN_TWIN : SUN };
   const contour = contourOf(ink);
 
   switch (kind) {
@@ -411,6 +374,7 @@ export function Scenery({ kind, id, cc, ink, detail }: Props) {
           {/* Kapelle am Ufer (St. Bartholomä): Mauer, Ziegeldach, zwei Zwiebeltürme */}
           <G>
             <Rect x={58} y={168} width={14} height={8} fill={cc(SCENE.wall)} {...contour} />
+            <Rect x={58.4} y={168.4} width={4} height={7.2} fill={cc(SCENE.shade)} opacity={0.14} />
             <Path d="M57,168 L65,163 L73,168 Z" fill={cc(SCENE.tile)} {...contour} />
             <Circle cx={60.5} cy={164} r={2.3} fill={cc(SCENE.tile)} {...contour} />
             <Circle cx={69.5} cy={163.2} r={2.6} fill={cc(SCENE.tile)} {...contour} />
@@ -501,7 +465,7 @@ export function Scenery({ kind, id, cc, ink, detail }: Props) {
             ])}
             fill={cc(SCENE.chalkShade)}
           />
-          {detail && (
+          {fine && (
             <Path
               d="M52,138 L49,176 M66,134 L67,186 M80,134 L78,170 M94,136 L97,190 M108,140 L111,184 M174,150 L172,182 M190,146 L192,190 M206,148 L204,178 M220,150 L222,186"
               stroke={cc(SCENE.fissure)}
@@ -585,7 +549,7 @@ export function Scenery({ kind, id, cc, ink, detail }: Props) {
       // Kirch-, Tor- oder Aussichtsturm auf einer Kuppe (A-D2-2) — vollständig unter dem Band
       const tx = 104;
       const tw = 16;
-      const top = 122;
+      const top = 127;
       const foot = 166;
       const hillPts: Pt[] = [
         [-12, 200],
@@ -625,12 +589,13 @@ export function Scenery({ kind, id, cc, ink, detail }: Props) {
           <Path d={poly(hillPts)} fill={cc(SCENE.hill)} {...contour} />
           {/* Haus neben dem Turm */}
           <Rect x={120} y={150} width={24} height={15} fill={cc(SCENE.wall)} {...contour} />
+          <Rect x={120.4} y={150.4} width={6} height={14.2} fill={cc(SCENE.shade)} opacity={0.14} />
           <Path d="M117,151 L132,139 L147,151 Z" fill={cc(SCENE.tile)} {...contour} />
           <Rect x={129.5} y={157} width={5} height={8} fill={cc(SCENE.window)} />
           {/* Turm mit Schattenseite, Gesims, Patina-Spitze und Knauf */}
           <Rect x={tx} y={top} width={tw} height={foot - top} fill={cc(SCENE.stone)} />
           <Rect x={tx} y={top} width={tw * 0.42} height={foot - top} fill={cc(SCENE.stoneShade)} />
-          {detail && (
+          {fine && (
             <Path d={masonry} stroke={cc(SCENE.masonry)} strokeWidth={0.45} strokeOpacity={0.7} />
           )}
           <Rect
@@ -665,7 +630,7 @@ export function Scenery({ kind, id, cc, ink, detail }: Props) {
           />
           <Path
             d={`M${tx + tw / 2},${top - 25} L${tx + tw / 2},${top - 3} L${tx - 1},${top - 3} Z`}
-            fill={SCENE.shade}
+            fill={cc(SCENE.shade)}
             opacity={0.18}
           />
           <Path
@@ -677,7 +642,7 @@ export function Scenery({ kind, id, cc, ink, detail }: Props) {
           <Circle cx={tx + tw / 2} cy={top - 31.5} r={1.4} fill={cc(SCENE.cross)} />
           {/* Tannen am Hang */}
           <Path
-            d={`${fir(46, 184, 20)} ${fir(60, 178, 16)} ${fir(176, 182, 18)}`}
+            d={`${fir(60, 184, 20)} ${fir(72, 178, 16)} ${fir(158, 182, 18)}`}
             fill={cc(SCENE.fir)}
             {...contour}
             strokeOpacity={0.4}

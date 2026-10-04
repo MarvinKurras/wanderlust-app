@@ -1,5 +1,18 @@
 import { fieldHalfWidth } from '../geometry';
-import { hatch, mountain, poly, snowCap, trail, xAt } from '../sceneryKit';
+import {
+  crownsAlong,
+  fir,
+  hatch,
+  mirror,
+  mountain,
+  poly,
+  skyHatch,
+  snowCap,
+  sunRays,
+  trail,
+  treeline,
+  xAt,
+} from '../sceneryKit';
 
 /** Alle Koordinaten eines Pfads (für Bereichsprüfungen). */
 function coords(d: string): [number, number][] {
@@ -70,5 +83,47 @@ describe('sceneryKit', () => {
     expect(fieldHalfWidth('shield', 60)).toBe(80);
     expect(fieldHalfWidth('oval', 134)).toBeCloseTo(80, 0);
     expect(fieldHalfWidth('oval', 40)).toBeLessThan(40);
+  });
+
+  it('Strahlen liegen im Ring um die Sonne', () => {
+    coords(sunRays(100, 100, 12, 18)).forEach(([x, y]) => {
+      const r = Math.hypot(x - 100, y - 100);
+      expect(r).toBeGreaterThan(11.9);
+      expect(r).toBeLessThan(18.1);
+    });
+  });
+
+  it('Himmelsschraffur spart die Sonne aus', () => {
+    const d = skyHatch(100, 120, 4, { cx: 110, cy: 108, r: 8 });
+    // Die Linie auf Sonnenhöhe ist geteilt: endet links vor und beginnt rechts nach der Sonne
+    expect(d).toContain('M-12,108 H102');
+    expect(d).toContain('M118,108 H232');
+  });
+
+  it('Tanne, Waldkante und Kronen bleiben in ihrem Rahmen', () => {
+    coords(fir(50, 200, 30)).forEach(([x, y]) => {
+      expect(Math.abs(x - 50)).toBeLessThanOrEqual(30 * 0.38 + 0.1);
+      expect(y).toBeGreaterThanOrEqual(170 - 0.1);
+      expect(y).toBeLessThanOrEqual(200.1);
+    });
+    coords(treeline(0, 60, 150, 6, 8, 200)).forEach(([x, y]) => {
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(66);
+      expect(y).toBeGreaterThanOrEqual(150 - 8 * 1.15 - 0.1);
+    });
+    const crowns = crownsAlong(
+      [
+        [0, 100],
+        [40, 96],
+      ],
+      4,
+      5,
+    );
+    expect(crowns.startsWith('M0,100')).toBe(true);
+    expect(crowns.endsWith('Z')).toBe(true);
+  });
+
+  it('Spiegelung liegt unter der Wasserlinie', () => {
+    mirror(m.outline, 216).forEach(([, y]) => expect(y).toBeGreaterThanOrEqual(216));
   });
 });

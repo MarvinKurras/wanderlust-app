@@ -12,13 +12,14 @@ import Svg, {
   Text,
 } from 'react-native-svg';
 
+import { de } from '@/i18n/de';
 import type { BadgeMotif, BadgeShape } from '@/lib/places';
-import { badgeTones, fonts, type BadgeTone } from '@/theme';
+import { badgeScene as SCENE, badgeTones, fonts, type BadgeTone } from '@/theme';
 
-import { fitName, fitRegion, MONO_EM } from './fitName';
-import { CENTER, fieldHalfWidth, NAILS, SHAPES, VIEWBOX } from './geometry';
+import { fitBand, fitName, fitRegion } from './fitName';
+import { CENTER, FIELD_SCALE, fieldHalfWidth, NAILS, SHAPES, VIEWBOX } from './geometry';
 import { identityColor, lockedColor } from './lockedColor';
-import { SCENE, Scenery } from './Scenery';
+import { Scenery } from './Scenery';
 
 export type StockBadgeProps = {
   name: string;
@@ -38,16 +39,12 @@ export type StockBadgeProps = {
 
 /** Unter dieser Breite (dp) entfallen Feinheiten, die nur flimmern würden (A-D2-4). */
 export const DETAIL_MIN_WIDTH = 100;
+/** Haarlinien (Schraffur, Himmel, Mauerwerk, Klüfte) erst ab hier — sonst unter 1 px (A-D2-4). */
+export const FINE_MIN_WIDTH = 140;
 
 /** Skalierung um den Schild-Mittelpunkt (für Rand, Perlrand und Feld). */
 const inset = (s: number) =>
   `translate(${CENTER.x} ${CENTER.y}) scale(${s}) translate(${-CENTER.x} ${-CENTER.y})`;
-
-/** Eingelassenes Emaille-Feld (wie badges.js: 0,88). */
-const FIELD = 0.88;
-const ELEVATION_Y = 224;
-const ELEVATION_FS = 11;
-const ELEVATION_LS = 1.8;
 
 /** Kleine Raute (Trenner/Ornament). */
 const diamond = (x: number, y: number, r: number) =>
@@ -72,6 +69,7 @@ export function StockBadge({
 }: StockBadgeProps) {
   const id = `b${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const detail = width >= DETAIL_MIN_WIDTH;
+  const fine = width >= FINE_MIN_WIDTH;
   const cc = locked ? lockedColor : identityColor;
   const t = badgeTones[tone];
   const c = { hi: cc(t.hi), mid: cc(t.mid), lo: cc(t.lo), edge: cc(t.edge) };
@@ -79,9 +77,10 @@ export function StockBadge({
   const nails = NAILS[shape];
 
   const layout = fitName(name, shape);
-  const regionText = region.toUpperCase();
-  const regionFit = fitRegion(regionText, shape, layout.regionBaseline);
-  const elevation = bandLabel ?? `${elevationM} m`;
+  const regionFit = fitRegion(region.toUpperCase(), shape, layout);
+  // Mono-Labels in Versalien; die Höheneinheit bleibt klein („2962 m")
+  const elevation = bandLabel?.toUpperCase() ?? `${elevationM} m`;
+  const band = fitBand(elevation, shape);
 
   // Trennlinie unter einzeiligem Namen, so breit wie die Form dort erlaubt
   const divider =
@@ -89,16 +88,16 @@ export function StockBadge({
       ? null
       : { y: layout.dividerY, w: Math.min(30, fieldHalfWidth(shape, layout.dividerY) - 16) };
   // Rauten neben der Höhe, nur wenn das schmale Schildende Platz lässt
-  const elevationHalf =
-    (elevation.length * ELEVATION_FS * MONO_EM + elevation.length * ELEVATION_LS) / 2;
-  const ornamentX = elevationHalf + 7;
-  const showOrnaments = detail && fieldHalfWidth(shape, ELEVATION_Y - 4) - 8 > ornamentX;
+  const ornamentX = detail ? band.ornamentX : null;
 
+  // Gravur: Lichtkante unter der Schrift — klein nicht sichtbar, also weglassen
   const engraved = (text: string, x: number, y: number, props: Record<string, unknown>) => (
     <G>
-      <Text x={x} y={y + 0.9} textAnchor="middle" fill={c.hi} opacity={0.55} {...props}>
-        {text}
-      </Text>
+      {detail && (
+        <Text x={x} y={y + 0.9} textAnchor="middle" fill={c.hi} opacity={0.55} {...props}>
+          {text}
+        </Text>
+      )}
       <Text x={x} y={y} textAnchor="middle" fill={c.edge} {...props}>
         {text}
       </Text>
@@ -111,7 +110,7 @@ export function StockBadge({
       height={(width * VIEWBOX.height) / VIEWBOX.width}
       viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`}
       accessibilityRole="image"
-      accessibilityLabel={`Stockschild ${name}, ${elevation}`}
+      accessibilityLabel={de.schild.label(name, elevation, !locked)}
     >
       <Defs>
         {/* Gebürstetes Metall: Licht von links oben, Spiegelung in der Mitte */}
@@ -173,7 +172,7 @@ export function StockBadge({
               fill="none"
               stroke={c.lo}
               strokeWidth={2.3}
-              strokeDasharray={[0.01, 5.4]}
+              strokeDasharray={[0.3, 5.1]}
               strokeLinecap="round"
               transform={inset(0.94)}
             />
@@ -183,7 +182,7 @@ export function StockBadge({
               stroke={c.hi}
               strokeWidth={0.9}
               strokeOpacity={0.8}
-              strokeDasharray={[0.01, 5.4]}
+              strokeDasharray={[0.3, 5.1]}
               strokeLinecap="round"
               transform={`translate(-0.35 -0.4) ${inset(0.94)}`}
             />
@@ -200,9 +199,9 @@ export function StockBadge({
           transform={inset(0.905)}
         />
 
-        <G transform={inset(FIELD)}>
+        <G transform={inset(FIELD_SCALE)}>
           <G clipPath={`url(#clip_${id})`}>
-            <Scenery kind={motif} id={id} cc={cc} ink={c.edge} detail={detail} />
+            <Scenery kind={motif} id={id} cc={cc} ink={c.edge} detail={detail} fine={fine} />
 
             {/* Namensband als Kartusche: Lichtlippe unten, Schlagschatten aufs Bild */}
             <Rect x={-12} y={0} width={244} height={87} fill={`url(#band_${id})`} />
@@ -246,28 +245,31 @@ export function StockBadge({
               <Path d={diamond(CENTER.x, divider.y, 2.2)} fill={c.edge} opacity={0.8} />
             </G>
           )}
-          <Text
-            x={CENTER.x}
-            y={layout.regionBaseline}
-            textAnchor="middle"
-            fontFamily={fonts.mono}
-            fontSize={regionFit.fontSize}
-            letterSpacing={regionFit.letterSpacing}
-            fill={c.edge}
-            opacity={0.85}
-          >
-            {regionText}
-          </Text>
+          {/* Region — klein (< 100 dp) ohnehin unlesbar, dann weggelassen */}
+          {detail && (
+            <Text
+              x={CENTER.x}
+              y={layout.regionBaseline}
+              textAnchor="middle"
+              fontFamily={fonts.mono}
+              fontSize={regionFit.fontSize}
+              letterSpacing={regionFit.letterSpacing}
+              fill={c.edge}
+              opacity={0.85}
+            >
+              {regionFit.text}
+            </Text>
+          )}
 
           {/* Höhe */}
-          {engraved(elevation, CENTER.x, ELEVATION_Y, {
+          {engraved(elevation, CENTER.x, band.baseline, {
             fontFamily: fonts.monoMedium,
-            fontSize: ELEVATION_FS,
-            letterSpacing: ELEVATION_LS,
+            fontSize: band.fontSize,
+            letterSpacing: band.letterSpacing,
           })}
-          {showOrnaments && (
+          {ornamentX != null && (
             <Path
-              d={`${diamond(CENTER.x - ornamentX, ELEVATION_Y - 3.6, 1.8)} ${diamond(CENTER.x + ornamentX, ELEVATION_Y - 3.6, 1.8)}`}
+              d={`${diamond(CENTER.x - ornamentX, band.baseline - 3.6, 1.8)} ${diamond(CENTER.x + ornamentX, band.baseline - 3.6, 1.8)}`}
               fill={c.edge}
               opacity={0.75}
             />
@@ -296,7 +298,7 @@ export function StockBadge({
                 strokeOpacity={0.6}
               />
             )}
-            <Circle cx={nx - 1.3} cy={ny - 1.4} r={1.1} fill={cc('#ffffff')} opacity={0.6} />
+            <Circle cx={nx - 1.3} cy={ny - 1.4} r={1.1} fill={cc(SCENE.glint)} opacity={0.6} />
           </G>
         ))}
       </G>
