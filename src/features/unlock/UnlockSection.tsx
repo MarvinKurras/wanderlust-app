@@ -25,8 +25,10 @@ export function UnlockSection({ state, onStart, radiusM }: Props) {
     state.phase === 'locating'
       ? de.unlock.locating
       : state.phase === 'submitting'
-        ? de.unlock.submitting
+        ? de.unlock.pruefen
         : de.unlock.cta;
+  // Der Radius-Hinweis bleibt auch nach einem Fehlversuch stehen („wie nah muss ich ran?").
+  const showHint = state.phase === 'idle' || state.phase === 'error';
 
   return (
     <View style={styles.wrap}>
@@ -43,7 +45,9 @@ export function UnlockSection({ state, onStart, radiusM }: Props) {
               <Button
                 label={de.unlock.settingsOeffnen}
                 variant="ghost"
-                onPress={() => Linking.openSettings()}
+                onPress={() => {
+                  Linking.openSettings().catch(() => undefined);
+                }}
                 style={styles.errorAction}
               />
             ) : null}
@@ -60,7 +64,7 @@ export function UnlockSection({ state, onStart, radiusM }: Props) {
         disabled={state.phase === 'error' && !state.canRetry && !state.settingsLink}
         onPress={onStart}
       />
-      {state.phase === 'idle' && (
+      {showHint && (
         <Animated.Text entering={FadeIn.delay(300)} style={styles.hint}>
           {de.unlock.hinweis(radiusM)}
         </Animated.Text>

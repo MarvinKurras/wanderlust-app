@@ -9,10 +9,12 @@ type Props = {
   label: string;
   tone?: 'paper' | 'pine';
   size?: 'sm' | 'md';
+  /** Zeilen für längere Sätze (Ort-Detail); Listen und Karten bleiben einzeilig. */
+  lines?: number;
 };
 
 /** Zustand eines Ortes als Zeichen + kurzes Wort: Messing-Haken oder Schloss im Nebel. */
-export function StatusMark({ unlocked, label, tone = 'paper', size = 'md' }: Props) {
+export function StatusMark({ unlocked, label, tone = 'paper', size = 'md', lines = 1 }: Props) {
   const pine = tone === 'pine';
   const color = unlocked
     ? pine
@@ -30,7 +32,7 @@ export function StatusMark({ unlocked, label, tone = 'paper', size = 'md' }: Pro
         color={color}
         strokeWidth={unlocked ? 2.2 : 1.8}
       />
-      <Text style={[styles.label, small && styles.small, { color }]} numberOfLines={1}>
+      <Text style={[styles.label, small && styles.small, { color }]} numberOfLines={lines}>
         {label}
       </Text>
     </View>
@@ -44,6 +46,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs + 1,
   },
   label: {
+    flexShrink: 1,
     fontFamily: fonts.monoMedium,
     fontSize: 10,
     letterSpacing: 1.1,

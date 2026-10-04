@@ -2,7 +2,14 @@ import { BlurView } from 'expo-blur';
 import { GlassView, isGlassEffectAPIAvailable, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
-import { Platform, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
+import {
+  type LayoutChangeEvent,
+  Platform,
+  type StyleProp,
+  StyleSheet,
+  View,
+  type ViewStyle,
+} from 'react-native';
 
 import { glass } from '@/theme';
 
@@ -30,6 +37,7 @@ type Props = {
   interactive?: boolean;
   /** Blur-Stärke für den Fallback. */
   intensity?: number;
+  onLayout?: (e: LayoutChangeEvent) => void;
 };
 
 /**
@@ -44,6 +52,7 @@ export function GlassSurface({
   tone = 'paper',
   interactive = false,
   intensity = 32,
+  onLayout,
 }: Props) {
   const pine = tone === 'pine';
 
@@ -51,7 +60,7 @@ export function GlassSurface({
     // Kinder *in* der GlassView sind auf iOS 26 nicht antippbar — darum liegt
     // das native Glas nur als Hintergrund-Ebene unter den Inhalten.
     return (
-      <View style={[{ borderRadius: radius, overflow: 'hidden' }, style]}>
+      <View style={[{ borderRadius: radius, overflow: 'hidden' }, style]} onLayout={onLayout}>
         <GlassView
           pointerEvents="none"
           glassEffectStyle="regular"
@@ -72,6 +81,7 @@ export function GlassSurface({
         { borderRadius: radius, borderColor: pine ? glass.pineBorder : glass.paperBorder },
         style,
       ]}
+      onLayout={onLayout}
     >
       {canBlur && (
         <BlurView

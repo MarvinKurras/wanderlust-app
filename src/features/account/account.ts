@@ -1,8 +1,10 @@
 import { ensureSession } from '@/lib/auth';
+import { isPreview } from '@/lib/preview';
 import { supabase } from '@/lib/supabase';
 
 /** E-Mail-Upgrade des anonymen Kontos (A-AP8-2): Supabase verschickt eine Bestätigungs-Mail. */
 export async function upgradeWithEmail(email: string): Promise<void> {
+  if (isPreview) return; // Web-Vorschau: kein Backend
   await ensureSession();
   const { error } = await supabase.auth.updateUser({ email });
   if (error) {
@@ -12,6 +14,7 @@ export async function upgradeWithEmail(email: string): Promise<void> {
 
 /** Löscht Konto + Unlocks serverseitig (Edge Function) und meldet lokal ab. */
 export async function deleteAccount(): Promise<void> {
+  if (isPreview) return; // Web-Vorschau: kein Backend
   await ensureSession();
   const { data, error } = await supabase.functions.invoke<{ ok: boolean }>('delete-account', {
     body: {},

@@ -1,44 +1,31 @@
-import { Platform } from 'react-native';
-
 import type { Place } from './places';
-import { previewPlaces, previewRegions, previewUnlocks } from './previewData';
 import type { Region } from './regions';
 import type { Unlock } from './unlocks';
 
 /**
- * Web-Vorschau mit lokalen Daten (AP-D). Gilt ausschließlich im Browser und nur,
- * wenn der Build mit `EXPO_PUBLIC_PREVIEW=1` erzeugt wurde. Native Builds (iOS,
- * Android) erreichen keinen dieser Pfade — dort entscheidet weiterhin allein die
- * Edge Function `unlock` über Freischaltungen.
+ * Web-Vorschau (AP-D) — native Fassung: Auf iOS/Android ist der Vorschau-Modus
+ * physisch nicht vorhanden. Die echte Implementierung samt Seed-Kopien liegt in
+ * `preview.web.ts` und landet nur im Web-Bundle; hier bleiben Stubs, die nie
+ * aufgerufen werden (alle Aufrufer prüfen `isPreview`).
  */
-export const isPreview = Platform.OS === 'web' && process.env.EXPO_PUBLIC_PREVIEW === '1';
+export const isPreview: boolean = false;
 
-// Vorschau-Zustand lebt nur im Speicher des Browser-Tabs.
-const unlocks: Unlock[] = [...previewUnlocks];
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+function unavailable(): never {
+  throw new Error('Vorschau-Modus ist nur in der Web-Vorschau verfügbar.');
+}
 
 export async function previewFetchPlaces(): Promise<Place[]> {
-  await wait(250);
-  return [...previewPlaces].sort((a, b) => b.elevation_m - a.elevation_m);
+  return unavailable();
 }
 
 export async function previewFetchRegions(): Promise<Region[]> {
-  return [...previewRegions].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  return unavailable();
 }
 
 export async function previewFetchUnlocks(): Promise<Unlock[]> {
-  return [...unlocks];
+  return unavailable();
 }
 
-/** Spielt den Präge-Ablauf ohne Netz nach, damit die Inszenierung sichtbar wird. */
-export async function previewUnlock(placeId: string): Promise<{ unlockedAt: string }> {
-  await wait(900);
-  const existing = unlocks.find((u) => u.place_id === placeId);
-  if (existing) {
-    return { unlockedAt: existing.unlocked_at };
-  }
-  const unlockedAt = new Date().toISOString();
-  unlocks.push({ place_id: placeId, unlocked_at: unlockedAt });
-  return { unlockedAt };
+export async function previewUnlock(_placeId: string): Promise<{ unlockedAt: string }> {
+  return unavailable();
 }

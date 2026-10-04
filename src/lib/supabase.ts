@@ -3,9 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 
 import { isPreview } from './preview';
 
-// Die Web-Vorschau läuft ohne Backend; ihr Client wird nie angesprochen.
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? (isPreview ? 'http://localhost' : '');
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? (isPreview ? 'preview' : '');
+// Die Web-Vorschau läuft ohne Backend: Alle Datenzugriffe sind dort umgeleitet
+// (Orte, Regionen, Unlocks, Session, Konto); der Platzhalter-Client bleibt unbenutzt.
+// Nativ ist `isPreview` immer false — fehlende Werte werfen weiterhin.
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || (isPreview ? 'http://localhost' : '');
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || (isPreview ? 'preview' : '');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(

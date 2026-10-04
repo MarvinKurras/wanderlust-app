@@ -53,10 +53,15 @@ export default function OrtDetailScreen() {
   const justUnlocked = unlockState.phase === 'unlocked';
   const unlocked = Boolean(unlock) || justUnlocked;
   const unlockedAt = unlock?.unlocked_at ?? (justUnlocked ? unlockState.unlockedAt : null);
-
-  // Die Inszenierung startet erst nach der Server-Bestätigung (phase 'unlocked').
+  // Die Inszenierung startet erst nach der Server-Bestätigung — und nur für eine neue
+  // Prägung; meldet der Server „schon erwandert", wechselt nur der Status.
+  const freshUnlock = justUnlocked && unlockState.fresh;
   const [momentDismissed, setMomentDismissed] = useState(false);
-  const momentOpen = justUnlocked && !momentDismissed;
+  const momentOpen = freshUnlock && !momentDismissed;
+  // Der Prägeknopf erscheint erst, wenn feststeht, ob der Ort schon erwandert ist —
+  // sonst blitzt er bei bereits geprägten Schildern kurz auf.
+  const showFooter = !unlocked && !unlocks.isPending;
+  const [footerH, setFooterH] = useState(0);
 
   const stageH = Math.min(460, height * 0.52);
   const badgeWidth = Math.min(210, width * 0.52);
@@ -104,7 +109,7 @@ export default function OrtDetailScreen() {
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{
-          paddingBottom: unlocked ? insets.bottom + spacing.xl : insets.bottom + 150,
+          paddingBottom: showFooter ? footerH + spacing.lg : insets.bottom + spacing.xl,
         }}
       >
         {/* Bühne: Nacht-Panel der Website (badges.js .bm-art) mit Bergkette und Sternen */}
@@ -161,10 +166,13 @@ export default function OrtDetailScreen() {
           <View style={styles.statusRow}>
             <StatusMark
               unlocked={unlocked}
+              lines={2}
               label={
                 unlockedAt
-                  ? de.detail.erwandertKurz(formatDateDe(unlockedAt))
-                  : de.karte.sheetVerschlossen
+                  ? de.detail.erwandertAm(formatDateDe(unlockedAt))
+                  : unlocked
+                    ? de.detail.erwandertOhneDatum
+                    : de.karte.sheetVerschlossen
               }
             />
           </View>
@@ -185,11 +193,12 @@ export default function OrtDetailScreen() {
         </View>
       </Animated.ScrollView>
 
-      {!unlocked && (
+      {showFooter && (
         <GlassSurface
           radius={0}
           style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}
           intensity={45}
+          onLayout={(e) => setFooterH(e.nativeEvent.layout.height)}
         >
           <UnlockSection
             state={unlockState}
@@ -201,10 +210,10 @@ export default function OrtDetailScreen() {
 
       <CompactHeader title={place.name} scrollY={scrollY} left={back} threshold={stageH - 90} />
 
-      {justUnlocked && (
+      {freshUnlock && (
         <PraegeMoment
           place={place}
-          unlockedAt={unlockState.unlockedAt}
+          unlockedAt={unlockedAt}
           visible={momentOpen}
           onDone={() => setMomentDismissed(true)}
         />

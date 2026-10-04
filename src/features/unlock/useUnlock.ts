@@ -1,57 +1,39 @@
-import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Location from 'expo-location';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 
 import { unlocksQueryKey } from '@/features/places/queries';
 import { de } from '@/i18n/de';
+import { withTimeout } from '@/lib/async';
 import { ensureSession } from '@/lib/auth';
-import { formatDistance } from '@/lib/geo';
 import { isPreview, previewUnlock } from '@/lib/preview';
 import { supabase } from '@/lib/supabase';
+
+import {
+  type EdgeResponse,
+  stateFromError,
+  stateFromResponse,
+  type UnlockState,
+} from './unlockOutcome';
+
+export type { UnlockState } from './unlockOutcome';
 
 const LOCATION_TIMEOUT_MS = 15_000;
 const REMEASURE_THRESHOLD_M = 50; // §9: bei accuracy > 50 m bis zu 2× nachmessen
 const MAX_MEASUREMENTS = 3;
 
-export type UnlockState =
-  | { phase: 'idle' }
-  | { phase: 'locating' }
-  | { phase: 'submitting' }
-  | { phase: 'unlocked'; unlockedAt: string }
-  | { phase: 'error'; message: string; canRetry: boolean; settingsLink?: boolean };
-
-type EdgeResponse = {
-  ok: boolean;
-  code: string;
-  distanceM?: number;
-  accuracyM?: number;
-  unlockedAt?: string;
-};
-
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('timeout')), ms);
-    promise.then(
-      (v) => {
-        clearTimeout(timer);
-        resolve(v);
-      },
-      (e) => {
-        clearTimeout(timer);
-        reject(e);
-      },
-    );
-  });
-}
+type Measurement = { best: Location.LocationObject; anyMocked: boolean };
 
 /**
  * Beste Messung: misst bis zu 3×, bricht ab sobald accuracy ≤ 50 m (§9).
  * Ein Timeout einzelner Nachmessungen verwirft eine bereits vorhandene
  * (ungenauere) Messung nicht — nur ohne jede Messung wird geworfen.
+ * `anyMocked` merkt sich, ob irgendeine Messung simuliert war (Android).
  */
-async function measurePosition(): Promise<Location.LocationObject> {
+async function measurePosition(): Promise<Measurement> {
   let best: Location.LocationObject | null = null;
+  let anyMocked = false;
   for (let attempt = 0; attempt < MAX_MEASUREMENTS; attempt += 1) {
     let position: Location.LocationObject;
     try {
@@ -61,10 +43,11 @@ async function measurePosition(): Promise<Location.LocationObject> {
       );
     } catch (e) {
       if (best) {
-        return best;
+        return { best, anyMocked };
       }
       throw e;
     }
+    anyMocked = anyMocked || position.mocked === true;
     if (!best || (position.coords.accuracy ?? Infinity) < (best.coords.accuracy ?? Infinity)) {
       best = position;
     }
@@ -72,123 +55,124 @@ async function measurePosition(): Promise<Location.LocationObject> {
       break;
     }
   }
-  return best!;
+  return { best: best!, anyMocked };
+}
+
+/** iOS „Genauer Standort" aus bzw. Android „Ungefähr": Permission erteilt, aber zu grob. */
+function isApproximate(permission: Location.LocationPermissionResponse): boolean {
+  return permission.ios?.accuracy === 'reduced' || permission.android?.accuracy === 'coarse';
 }
 
 /**
  * Unlock-Flow nach Projektplan §9: Permission → Messung → Edge Function.
  * Die Entscheidung fällt serverseitig; dieser Hook mappt nur die Ergebnisse
- * auf deutsche Statusmeldungen.
+ * auf deutsche Statusmeldungen. Ein Lauf zur Zeit (Doppeltipp-Schutz); wird
+ * der Screen verlassen, geht keine Anfrage mehr an den Server.
  */
 export function useUnlock(placeId: string) {
   const [state, setState] = useState<UnlockState>({ phase: 'idle' });
   const queryClient = useQueryClient();
+  const mounted = useRef(true);
+  const inFlight = useRef(false);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const start = useCallback(async () => {
-    // Web-Vorschau (nur Browser + EXPO_PUBLIC_PREVIEW=1): Ablauf ohne Standort und
-    // ohne Netz nachspielen, damit die Prägung sichtbar wird. Native Builds
-    // erreichen diesen Pfad nie (Plattform-Gate in `isPreview`).
-    if (isPreview) {
-      setState({ phase: 'locating' });
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      setState({ phase: 'submitting' });
-      const { unlockedAt } = await previewUnlock(placeId);
-      await queryClient.invalidateQueries({ queryKey: unlocksQueryKey });
-      setState({ phase: 'unlocked', unlockedAt });
-      return;
-    }
+    if (inFlight.current) return;
+    inFlight.current = true;
+    const show = (next: UnlockState) => {
+      if (mounted.current) setState(next);
+    };
 
-    // 1) Permission
-    const permission = await Location.requestForegroundPermissionsAsync();
-    if (permission.status !== Location.PermissionStatus.GRANTED) {
-      setState({
-        phase: 'error',
-        message: de.unlock.permissionVerweigert,
-        canRetry: permission.canAskAgain,
-        settingsLink: !permission.canAskAgain,
-      });
-      return;
-    }
-
-    // 2) Messung
-    setState({ phase: 'locating' });
-    let position: Location.LocationObject;
     try {
-      position = await measurePosition();
-    } catch {
-      setState({ phase: 'error', message: de.unlock.gpsTimeout, canRetry: true });
-      return;
-    }
+      show({ phase: 'locating' });
 
-    const { latitude, longitude, accuracy } = position.coords;
-    const accuracyM = accuracy ?? 9999;
-    // Mock-Location clientseitig blockieren (Android; A-AP6-2) — der Server prüft das Flag zusätzlich
-    const mocked = position.mocked === true;
-    if (mocked) {
-      setState({ phase: 'error', message: de.unlock.mock, canRetry: false });
-      return;
-    }
-
-    // 3) Serverseitige Entscheidung
-    setState({ phase: 'submitting' });
-    try {
-      await ensureSession();
-      const { data, error } = await supabase.functions.invoke<EdgeResponse>('unlock', {
-        body: {
-          placeId,
-          lat: latitude,
-          lng: longitude,
-          accuracy: accuracyM,
-          isMocked: mocked,
-        },
-      });
-      if (error || !data) {
-        throw error ?? new Error('empty response');
+      // Web-Vorschau (nur Browser + EXPO_PUBLIC_PREVIEW=1): Ablauf ohne Standort und
+      // ohne Netz nachspielen, damit die Prägung sichtbar wird. Native Builds
+      // enthalten diesen Pfad nicht (`preview.ts` ist dort ein Stub).
+      if (isPreview) {
+        await new Promise((resolve) => setTimeout(resolve, 900));
+        show({ phase: 'submitting' });
+        const { unlockedAt } = await previewUnlock(placeId);
+        await queryClient.invalidateQueries({ queryKey: unlocksQueryKey });
+        show({ phase: 'unlocked', unlockedAt, fresh: true });
+        return;
+      }
+      // Ein echter Web-Build wäre ein zusätzlicher, leicht fälschbarer Kanal — Prägen nur in der App.
+      if (Platform.OS === 'web') {
+        show({ phase: 'error', message: de.unlock.nurApp, canRetry: false });
+        return;
       }
 
-      switch (data.code) {
-        case 'UNLOCKED':
-        case 'ALREADY_UNLOCKED':
-          await queryClient.invalidateQueries({ queryKey: unlocksQueryKey });
-          setState({ phase: 'unlocked', unlockedAt: data.unlockedAt ?? new Date().toISOString() });
-          return;
-        case 'TOO_FAR':
-          setState({
-            phase: 'error',
-            message: de.unlock.zuWeit(formatDistance(data.distanceM ?? 0)),
-            canRetry: true,
-          });
-          return;
-        case 'ACCURACY_TOO_LOW':
-          setState({
-            phase: 'error',
-            message: de.unlock.zuUngenau(data.accuracyM ?? Math.round(accuracyM)),
-            canRetry: true,
-          });
-          return;
-        case 'MOCK_LOCATION':
-          setState({ phase: 'error', message: de.unlock.mock, canRetry: false });
-          return;
-        default:
-          setState({ phase: 'error', message: de.unlock.fehler, canRetry: true });
-          return;
-      }
-    } catch (e) {
-      // AP9: Fehler differenzieren — nur echte Netzwerkfehler sind „offline" (§9)
-      if (e instanceof FunctionsHttpError) {
-        const status = e.context?.status;
-        setState({
+      // 1) Permission
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== Location.PermissionStatus.GRANTED) {
+        show({
           phase: 'error',
-          message: status === 429 ? de.unlock.rateLimit : de.unlock.fehler,
-          canRetry: status !== 429,
+          message: de.unlock.permissionVerweigert,
+          canRetry: permission.canAskAgain,
+          settingsLink: !permission.canAskAgain,
         });
         return;
       }
-      if (e instanceof FunctionsFetchError) {
-        setState({ phase: 'error', message: de.unlock.offline, canRetry: true });
+      if (isApproximate(permission)) {
+        show({ phase: 'error', message: de.unlock.ungefaehr, canRetry: true, settingsLink: true });
         return;
       }
-      setState({ phase: 'error', message: de.unlock.fehler, canRetry: true });
+      if (!(await Location.hasServicesEnabledAsync())) {
+        show({ phase: 'error', message: de.unlock.dienstAus, canRetry: true, settingsLink: true });
+        return;
+      }
+
+      // 2) Messung
+      let measurement: Measurement;
+      try {
+        measurement = await measurePosition();
+      } catch {
+        show({ phase: 'error', message: de.unlock.gpsTimeout, canRetry: true });
+        return;
+      }
+      if (!mounted.current) return; // Screen verlassen: nichts mehr absenden
+
+      const { latitude, longitude, accuracy } = measurement.best.coords;
+      if (accuracy == null) {
+        show({ phase: 'error', message: de.unlock.zuUngenauOhneWert, canRetry: true });
+        return;
+      }
+
+      // 3) Serverseitige Entscheidung
+      show({ phase: 'submitting' });
+      await ensureSession();
+      const request = supabase.functions.invoke<EdgeResponse>('unlock', {
+        body: { placeId, lat: latitude, lng: longitude, accuracy, isMocked: measurement.anyMocked },
+      });
+
+      // Mock-Standort (Android, A-AP6-2): Flag geht an den Server (Protokoll),
+      // der Client zeigt in jedem Fall die Ablehnung.
+      if (measurement.anyMocked) {
+        await request.catch(() => undefined);
+        show({ phase: 'error', message: de.unlock.mock, canRetry: true });
+        return;
+      }
+
+      const { data, error } = await request;
+      if (error || !data) {
+        throw error ?? new Error('empty response');
+      }
+      const next = stateFromResponse(data);
+      if (next.phase === 'unlocked') {
+        await queryClient.invalidateQueries({ queryKey: unlocksQueryKey });
+      }
+      show(next);
+    } catch (e) {
+      show(stateFromError(e));
+    } finally {
+      inFlight.current = false;
     }
   }, [placeId, queryClient]);
 

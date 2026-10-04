@@ -28,7 +28,8 @@ import { SparkBurst } from './SparkBurst';
 
 type Props = {
   place: Place;
-  unlockedAt: string;
+  /** Datum der Prägung laut Server; fehlt es (noch), entfällt nur die Datumszeile. */
+  unlockedAt: string | null;
   visible: boolean;
   onDone: () => void;
 };
@@ -143,9 +144,11 @@ export function PraegeMoment({ place, unlockedAt, visible, onDone }: Props) {
             <Animated.Text entering={FadeInDown.delay(140).springify()} style={styles.name}>
               {place.name}
             </Animated.Text>
-            <Animated.Text entering={FadeInDown.delay(230).springify()} style={styles.verse}>
-              {de.praegung.zeile(formatDateDe(unlockedAt))}
-            </Animated.Text>
+            {unlockedAt ? (
+              <Animated.Text entering={FadeInDown.delay(230).springify()} style={styles.verse}>
+                {de.praegung.zeile(formatDateDe(unlockedAt))}
+              </Animated.Text>
+            ) : null}
             <Animated.View entering={FadeInDown.delay(380).springify()} style={styles.actions}>
               <Button
                 label={de.praegung.weiter}
