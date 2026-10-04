@@ -15,9 +15,10 @@ import Svg, {
 import type { BadgeMotif, BadgeShape } from '@/lib/places';
 import { badgeTones, fonts, type BadgeTone } from '@/theme';
 
-import { CENTER, NAILS, SHAPES, VIEWBOX } from './geometry';
+import { fitName, fitRegion, MONO_EM } from './fitName';
+import { CENTER, fieldHalfWidth, NAILS, SHAPES, VIEWBOX } from './geometry';
 import { identityColor, lockedColor } from './lockedColor';
-import { Scenery } from './Scenery';
+import { SCENE, Scenery } from './Scenery';
 
 export type StockBadgeProps = {
   name: string;
@@ -35,10 +36,28 @@ export type StockBadgeProps = {
   width?: number;
 };
 
+/** Unter dieser Breite (dp) entfallen Feinheiten, die nur flimmern würden (A-D2-4). */
+export const DETAIL_MIN_WIDTH = 100;
+
+/** Skalierung um den Schild-Mittelpunkt (für Rand, Perlrand und Feld). */
+const inset = (s: number) =>
+  `translate(${CENTER.x} ${CENTER.y}) scale(${s}) translate(${-CENTER.x} ${-CENTER.y})`;
+
+/** Eingelassenes Emaille-Feld (wie badges.js: 0,88). */
+const FIELD = 0.88;
+const ELEVATION_Y = 224;
+const ELEVATION_FS = 11;
+const ELEVATION_LS = 1.8;
+
+/** Kleine Raute (Trenner/Ornament). */
+const diamond = (x: number, y: number, r: number) =>
+  `M${x},${y - r} L${x + r},${y} L${x},${y + r} L${x - r},${y} Z`;
+
 /**
- * Ein Stockschild — Portierung von `badge()` aus `wanderlust/badges.js`
- * nach react-native-svg. Geometrie, Farben und Schriftgrößen 1:1;
- * Abweichungen sind in docs/AP2-Plan.md unter „Annahmen" dokumentiert.
+ * Ein Stocknagel (AP-D2): gestanzte Metallplakette mit erhabenem Rand,
+ * Perlrand, eingelassenem Emaille-Feld und gravierter Schrift — veredelte
+ * Weiterentwicklung von `badge()` aus `wanderlust/badges.js` (A-D2-1).
+ * Formen, Metalltöne und Motive sind dieselben wie auf der Website.
  */
 export function StockBadge({
   name,
@@ -52,17 +71,39 @@ export function StockBadge({
   width = 184,
 }: StockBadgeProps) {
   const id = `b${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const detail = width >= DETAIL_MIN_WIDTH;
   const cc = locked ? lockedColor : identityColor;
   const t = badgeTones[tone];
   const c = { hi: cc(t.hi), mid: cc(t.mid), lo: cc(t.lo), edge: cc(t.edge) };
   const shapeD = SHAPES[shape];
   const nails = NAILS[shape];
-  const { x: cx, y: cy } = CENTER;
 
-  // Schriftgrößen-Logik aus badges.js (Namenslänge)
-  const nameFs = name.length > 9 ? 17 : name.length > 6 ? 19.5 : 23;
-  const nameLs = name.length > 9 ? 0.6 : 1.1;
+  const layout = fitName(name, shape);
+  const regionText = region.toUpperCase();
+  const regionFit = fitRegion(regionText, shape, layout.regionBaseline);
   const elevation = bandLabel ?? `${elevationM} m`;
+
+  // Trennlinie unter einzeiligem Namen, so breit wie die Form dort erlaubt
+  const divider =
+    layout.dividerY == null
+      ? null
+      : { y: layout.dividerY, w: Math.min(30, fieldHalfWidth(shape, layout.dividerY) - 16) };
+  // Rauten neben der Höhe, nur wenn das schmale Schildende Platz lässt
+  const elevationHalf =
+    (elevation.length * ELEVATION_FS * MONO_EM + elevation.length * ELEVATION_LS) / 2;
+  const ornamentX = elevationHalf + 7;
+  const showOrnaments = detail && fieldHalfWidth(shape, ELEVATION_Y - 4) - 8 > ornamentX;
+
+  const engraved = (text: string, x: number, y: number, props: Record<string, unknown>) => (
+    <G>
+      <Text x={x} y={y + 0.9} textAnchor="middle" fill={c.hi} opacity={0.55} {...props}>
+        {text}
+      </Text>
+      <Text x={x} y={y} textAnchor="middle" fill={c.edge} {...props}>
+        {text}
+      </Text>
+    </G>
+  );
 
   return (
     <Svg
@@ -73,134 +114,189 @@ export function StockBadge({
       accessibilityLabel={`Stockschild ${name}, ${elevation}`}
     >
       <Defs>
-        <RadialGradient id={`frame_${id}`} cx="38%" cy="30%" r="80%">
-          <Stop offset="0%" stopColor={c.hi} />
-          <Stop offset="48%" stopColor={c.mid} />
-          <Stop offset="100%" stopColor={c.lo} />
-        </RadialGradient>
-        <LinearGradient id={`band_${id}`} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0%" stopColor={c.hi} />
-          <Stop offset="40%" stopColor={c.mid} />
-          <Stop offset="100%" stopColor={c.lo} />
+        {/* Gebürstetes Metall: Licht von links oben, Spiegelung in der Mitte */}
+        <LinearGradient id={`frame_${id}`} x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor={c.hi} />
+          <Stop offset="0.38" stopColor={c.mid} />
+          <Stop offset="0.55" stopColor={c.hi} stopOpacity={0.9} />
+          <Stop offset="0.72" stopColor={c.mid} />
+          <Stop offset="1" stopColor={c.lo} />
         </LinearGradient>
+        <LinearGradient id={`band_${id}`} x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={c.hi} />
+          <Stop offset="0.45" stopColor={c.mid} />
+          <Stop offset="1" stopColor={c.lo} />
+        </LinearGradient>
+        <RadialGradient id={`nail_${id}`} cx="35%" cy="30%" r="75%">
+          <Stop offset="0" stopColor={c.hi} />
+          <Stop offset="0.55" stopColor={c.mid} />
+          <Stop offset="1" stopColor={c.lo} />
+        </RadialGradient>
         <LinearGradient id={`sky_${id}`} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0%" stopColor={cc('#c4dbe4')} />
-          <Stop offset="60%" stopColor={cc('#dce7e0')} />
-          <Stop offset="100%" stopColor={cc('#eef0e6')} />
+          <Stop offset="0" stopColor={cc(SCENE.skyTop)} />
+          <Stop offset="0.55" stopColor={cc(SCENE.skyMid)} />
+          <Stop offset="1" stopColor={cc(SCENE.skyLow)} />
         </LinearGradient>
         <LinearGradient id={`water_${id}`} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0%" stopColor={cc('#7fb1c6')} />
-          <Stop offset="100%" stopColor={cc('#4d8aa6')} />
+          <Stop offset="0" stopColor={cc(SCENE.waterTop)} />
+          <Stop offset="1" stopColor={cc(SCENE.waterBottom)} />
         </LinearGradient>
         <ClipPath id={`clip_${id}`}>
           <Path d={shapeD} />
         </ClipPath>
       </Defs>
 
-      {/* Drop-Shadow der Website (feDropShadow) liefert der umgebende View — A-AP2-1 */}
+      {/* Drop-Shadow liefert der umgebende View (BadgeArt) — A-AP2-1 */}
       <G opacity={locked ? 0.62 : 1}>
-        {/* Metallrahmen */}
+        {/* Plakette mit erhabenem Rand: dunkle Außenkante, Lichtkante innen */}
         <Path
           d={shapeD}
           fill={`url(#frame_${id})`}
           stroke={c.edge}
-          strokeWidth={2}
+          strokeWidth={1.6}
           strokeLinejoin="round"
         />
+        <Path
+          d={shapeD}
+          fill="none"
+          stroke={c.hi}
+          strokeWidth={0.9}
+          strokeOpacity={0.75}
+          strokeLinejoin="round"
+          transform={inset(0.975)}
+        />
+        {detail && (
+          <G>
+            {/* Perlrand: gestrichelte Kontur mit runden Kappen, Glanzpunkt versetzt */}
+            <Path
+              d={shapeD}
+              fill="none"
+              stroke={c.lo}
+              strokeWidth={2.3}
+              strokeDasharray={[0.01, 5.4]}
+              strokeLinecap="round"
+              transform={inset(0.94)}
+            />
+            <Path
+              d={shapeD}
+              fill="none"
+              stroke={c.hi}
+              strokeWidth={0.9}
+              strokeOpacity={0.8}
+              strokeDasharray={[0.01, 5.4]}
+              strokeLinecap="round"
+              transform={`translate(-0.35 -0.4) ${inset(0.94)}`}
+            />
+          </G>
+        )}
+        {/* Stufe ins eingelassene Feld */}
+        <Path
+          d={shapeD}
+          fill="none"
+          stroke={c.edge}
+          strokeWidth={1.3}
+          strokeOpacity={0.7}
+          strokeLinejoin="round"
+          transform={inset(0.905)}
+        />
 
-        {/* Eingelassener Inhalt (zentriert skaliert wie im Web) */}
-        <G transform={`translate(${cx} ${cy}) scale(0.88) translate(${-cx} ${-cy})`}>
+        <G transform={inset(FIELD)}>
           <G clipPath={`url(#clip_${id})`}>
-            <Scenery kind={motif} id={id} cc={cc} />
-            {/* Namensband oben */}
-            <Rect x={-12} y={0} width={244} height={92} fill={`url(#band_${id})`} />
-            <Rect x={-12} y={86} width={244} height={6} fill={c.edge} opacity={0.5} />
-            {/* Höhenband unten */}
-            <Rect x={-12} y={206} width={244} height={26} fill={`url(#band_${id})`} />
-            <Rect x={-12} y={205} width={244} height={2.5} fill={c.hi} opacity={0.6} />
+            <Scenery kind={motif} id={id} cc={cc} ink={c.edge} detail={detail} />
+
+            {/* Namensband als Kartusche: Lichtlippe unten, Schlagschatten aufs Bild */}
+            <Rect x={-12} y={0} width={244} height={87} fill={`url(#band_${id})`} />
+            <Rect x={-12} y={85.6} width={244} height={0.9} fill={c.hi} opacity={0.55} />
+            <Rect x={-12} y={86.5} width={244} height={2.2} fill={c.edge} opacity={0.55} />
+
+            {/* Höhenband bis zur Spitze: Schatten darüber, Lichtlippe oben */}
+            <Rect x={-12} y={204} width={244} height={1.6} fill={c.edge} opacity={0.4} />
+            <Rect x={-12} y={205.6} width={244} height={60} fill={`url(#band_${id})`} />
+            <Rect x={-12} y={205.6} width={244} height={0.9} fill={c.hi} opacity={0.7} />
           </G>
 
-          {/* Innere Haarlinien-Rahmen */}
-          <Path
-            d={shapeD}
-            fill="none"
-            stroke={c.hi}
-            strokeWidth={1.4}
-            opacity={0.55}
-            strokeLinejoin="round"
-          />
+          {/* Kante des Emaille-Feldes */}
           <Path
             d={shapeD}
             fill="none"
             stroke={c.edge}
             strokeWidth={1}
-            opacity={0.5}
+            strokeOpacity={0.8}
             strokeLinejoin="round"
-            transform={`translate(${cx} ${cy}) scale(0.93) translate(${-cx} ${-cy})`}
           />
 
-          {/* Name (zweilagige Gravur) */}
+          {/* Name (graviert, bis zwei Zeilen) */}
+          {layout.lines.map((text, i) => (
+            <G key={text}>
+              {engraved(text, CENTER.x, layout.baselines[i], {
+                fontFamily: fonts.displaySemiBold,
+                fontSize: layout.fontSize,
+                letterSpacing: layout.letterSpacing,
+              })}
+            </G>
+          ))}
+          {divider && divider.w > 6 && (
+            <G>
+              <Path
+                d={`M${CENTER.x - divider.w},${divider.y} H${CENTER.x - 5} M${CENTER.x + 5},${divider.y} H${CENTER.x + divider.w}`}
+                stroke={c.edge}
+                strokeWidth={0.6}
+                strokeOpacity={0.7}
+              />
+              <Path d={diamond(CENTER.x, divider.y, 2.2)} fill={c.edge} opacity={0.8} />
+            </G>
+          )}
           <Text
-            x={110}
-            y={56}
-            textAnchor="middle"
-            fontFamily={fonts.displaySemiBold}
-            fontSize={nameFs}
-            letterSpacing={nameLs}
-            fill={c.hi}
-            opacity={0.5}
-          >
-            {name.toUpperCase()}
-          </Text>
-          <Text
-            x={110}
-            y={55}
-            textAnchor="middle"
-            fontFamily={fonts.displaySemiBold}
-            fontSize={nameFs}
-            letterSpacing={nameLs}
-            fill={c.edge}
-          >
-            {name.toUpperCase()}
-          </Text>
-          <Text
-            x={110}
-            y={74}
+            x={CENTER.x}
+            y={layout.regionBaseline}
             textAnchor="middle"
             fontFamily={fonts.mono}
-            fontSize={8.5}
-            letterSpacing={1.5}
+            fontSize={regionFit.fontSize}
+            letterSpacing={regionFit.letterSpacing}
             fill={c.edge}
-            opacity={0.82}
+            opacity={0.85}
           >
-            {region.toUpperCase()}
+            {regionText}
           </Text>
+
           {/* Höhe */}
-          <Text
-            x={110}
-            y={224}
-            textAnchor="middle"
-            fontFamily={fonts.monoMedium}
-            fontSize={11}
-            letterSpacing={2}
-            fill={c.edge}
-          >
-            {elevation}
-          </Text>
+          {engraved(elevation, CENTER.x, ELEVATION_Y, {
+            fontFamily: fonts.monoMedium,
+            fontSize: ELEVATION_FS,
+            letterSpacing: ELEVATION_LS,
+          })}
+          {showOrnaments && (
+            <Path
+              d={`${diamond(CENTER.x - ornamentX, ELEVATION_Y - 3.6, 1.8)} ${diamond(CENTER.x + ornamentX, ELEVATION_Y - 3.6, 1.8)}`}
+              fill={c.edge}
+              opacity={0.75}
+            />
+          )}
         </G>
 
-        {/* Nietenköpfe */}
+        {/* Nieten: kugelig mit Glanzpunkt */}
         {nails.map(([nx, ny]) => (
           <G key={`${nx}-${ny}`}>
             <Circle
               cx={nx}
               cy={ny}
-              r={5.2}
-              fill={`url(#frame_${id})`}
+              r={4.5}
+              fill={`url(#nail_${id})`}
               stroke={c.edge}
-              strokeWidth={1}
+              strokeWidth={0.9}
             />
-            <Circle cx={nx - 1.4} cy={ny - 1.4} r={1.5} fill={cc('#ffffff')} opacity={0.55} />
+            {detail && (
+              <Circle
+                cx={nx}
+                cy={ny}
+                r={2.6}
+                fill="none"
+                stroke={c.lo}
+                strokeWidth={0.5}
+                strokeOpacity={0.6}
+              />
+            )}
+            <Circle cx={nx - 1.3} cy={ny - 1.4} r={1.1} fill={cc('#ffffff')} opacity={0.6} />
           </G>
         ))}
       </G>

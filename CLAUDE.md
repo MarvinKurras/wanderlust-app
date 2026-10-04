@@ -20,7 +20,7 @@ Mobile Wander-App: Nutzer schalten digitale „Stocknägel" (Badges) für real b
 
 - Expo (Managed Workflow), Expo Router: 3 Tabs (Karte, Orte, Sammlung) + Stack/Modal (Ort-Detail, Unlock-Flow, Onboarding).
 - State: Zustand (Client) + TanStack Query (Server). Persistenz: AsyncStorage + Query-Cache.
-- Badges: Portierung der SVG-Logik aus `wanderlust/badges.js` nach `react-native-svg` (3 Formen, 4 Metalltöne, 6 Motive) — pixel-treu zur Website.
+- Badges: `react-native-svg`, aufgebaut auf `wanderlust/badges.js` — 3 Formen, 4 Metalltöne, 6 Motive deckungsgleich zur Website. Die Ausführung ist seit AP-D2 (Nutzerauftrag) veredelt: Prägerand, Perlrand, Emaille-Konturen, Kupferstich-Schraffur, Namenssatz bis zwei Zeilen (`docs/AP-D2-Stocknagel-Plan.md`).
 - Backend: Supabase (Postgres, RLS, Edge Function `unlock`). Schema siehe Projektplan §7.
 - Geolocation: `expo-location`, nur Foreground, on demand. Kein Tracking, keine Bewegungsprofile.
 
@@ -52,13 +52,13 @@ Tonalität: Deutsch, warm, leicht poetisch („erwandert", „in Messing gepräg
 ```sh
 npm run lint        # ESLint (expo lint)
 npm run typecheck   # tsc --noEmit
-npx expo start      # Dev-Server (Expo Go / Dev Client)
+npx expo start      # Dev-Server (Dev Client; Expo Go kann native Module wie Skia nicht)
 npx expo export --platform ios|android  # Bundle-Proxy für "App startet" in Cloud-Umgebungen
 npm test            # Jest (jest-expo): Badge-Snapshots u. a.
 npm run preview:web     # Web-Vorschau (EXPO_PUBLIC_PREVIEW=1, Beispieldaten, nur Browser)
 npm run preview:export  # dieselbe Vorschau als statischer Export nach dist/preview
 ```
 
-Design-System (AP-D): neue UI aus den Bausteinen in `src/components/` (GlassSurface, Button, Glyph, ScreenChrome, BottomSheet, ConfirmDialog …) und `src/lib/motion.ts`/`haptics.ts` bauen; Schilder über `BadgeArt` (Glanz/Nebel), nicht direkt `StockBadge`. Plattform-Splits: Skia nur in `*.native.tsx`, `react-native-maps` nur in `WorldMap.tsx`. Der Vorschau-Modus (`src/lib/preview.ts`) gilt ausschließlich im Web.
+Design-System (AP-D): neue UI aus den Bausteinen in `src/components/` (GlassSurface, Button, Glyph, ScreenChrome, BottomSheet, ConfirmDialog …) und `src/lib/motion.ts`/`haptics.ts` bauen; Schilder über `BadgeArt` (Glanz/Nebel), nicht direkt `StockBadge`. Plattform-Splits: Skia nur in `*.native.tsx`, `react-native-maps` nur in `WorldMap.tsx`. `WorldMap.web.tsx` ist die einzige erlaubte eigene Kartendarstellung — ausschließlich für die Web-Vorschau, nie nativ. Der Vorschau-Modus (`src/lib/preview.ts`) gilt ausschließlich im Web.
 
 Hinweis Typed Routes: `.expo/types` wird nur von `npx expo start` generiert. Meldet `tsc` nach Routen-Änderungen Fehler wie `'/ort/[id]' is not assignable …`, sind die generierten Typen veraltet — einmal den Dev-Server starten (oder `rm -rf .expo/types`).

@@ -34,3 +34,70 @@ export const NAILS: Record<BadgeShape, readonly (readonly [number, number])[]> =
     [40, 134],
   ],
 };
+
+type Pt = readonly [number, number];
+
+function cubic(p0: Pt, p1: Pt, p2: Pt, p3: Pt, steps = 48): Pt[] {
+  const out: Pt[] = [];
+  for (let i = 1; i <= steps; i += 1) {
+    const t = i / steps;
+    const u = 1 - t;
+    out.push([
+      u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0],
+      u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1],
+    ]);
+  }
+  return out;
+}
+
+function quad(p0: Pt, p1: Pt, p2: Pt, steps = 24): Pt[] {
+  const out: Pt[] = [];
+  for (let i = 1; i <= steps; i += 1) {
+    const t = i / steps;
+    const u = 1 - t;
+    out.push([
+      u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0],
+      u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1],
+    ]);
+  }
+  return out;
+}
+
+/** Rechte Hälfte jedes Umrisses von oben nach unten (x ≥ CENTER.x) als Polylinie. */
+const RIGHT_OUTLINE: Record<BadgeShape, Pt[]> = {
+  shield: [
+    [110, 28],
+    [190, 28],
+    [190, 122],
+    ...cubic([190, 122], [190, 182], [152, 218], [110, 240]),
+  ],
+  arch: [
+    [110, 30],
+    [174, 30],
+    ...quad([174, 30], [186, 30], [186, 46]),
+    [186, 202],
+    ...cubic([186, 202], [186, 226], [162, 240], [110, 240]),
+  ],
+  oval: Array.from({ length: 97 }, (_, i): Pt => {
+    const a = -Math.PI / 2 + (Math.PI * i) / 96;
+    return [CENTER.x + 80 * Math.cos(a), CENTER.y + 108 * Math.sin(a)];
+  }),
+};
+
+/**
+ * Halbe Breite der Schildform auf Höhe `y` (viewBox-Einheiten, unskaliert) —
+ * für Namenssatz und Ornamente, damit nichts über den Rand läuft.
+ */
+export function fieldHalfWidth(shape: BadgeShape, y: number): number {
+  const pts = RIGHT_OUTLINE[shape];
+  if (y <= pts[0][1] || y >= pts[pts.length - 1][1]) return 0;
+  for (let i = 1; i < pts.length; i += 1) {
+    const [x0, y0] = pts[i - 1];
+    const [x1, y1] = pts[i];
+    if (y >= Math.min(y0, y1) && y <= Math.max(y0, y1)) {
+      const x = y1 === y0 ? Math.max(x0, x1) : x0 + ((y - y0) / (y1 - y0)) * (x1 - x0);
+      return x - CENTER.x;
+    }
+  }
+  return 0;
+}

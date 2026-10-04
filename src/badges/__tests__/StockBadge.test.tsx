@@ -2,7 +2,7 @@ import { render } from '@testing-library/react-native';
 
 import { StockBadge, type StockBadgeProps } from '../StockBadge';
 
-/** Badge-Konfigurationen der 8 MVP-Orte (Quelle: supabase/migrations/…_seed_places.sql). */
+/** Badge-Konfigurationen der 8 Gipfel-Orte (Quelle: supabase/migrations/…_seed_places.sql). */
 const PLACES: StockBadgeProps[] = [
   {
     name: 'Zugspitze',
@@ -110,13 +110,21 @@ describe('StockBadge', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('skaliert die Schrift nach Namenslänge wie badges.js', async () => {
-    const sizes = (tree: unknown) =>
-      collectProp(tree, 'font').map((f) => (f as { fontSize?: number }).fontSize);
-    const short = (await render(<StockBadge {...PLACES[3]} />)).toJSON(); // "Brocken" (7) → 19.5
-    expect(sizes(short)).toContain(19.5);
-    const long = (await render(<StockBadge {...PLACES[5]} />)).toJSON(); // "Königsstuhl" (11) → 17
-    expect(sizes(long)).toContain(17);
+  it('setzt lange Namen zweizeilig statt über den Rand', async () => {
+    const long = (
+      await render(
+        <StockBadge {...PLACES[0]} name="Automuseum Dr. Carl Benz" region="Ladenburg · Kurpfalz" />,
+      )
+    ).toJSON();
+    const all = JSON.stringify(long);
+    expect(all).toContain('AUTOMUSEUM');
+    expect(all).toContain('DR. CARL BENZ');
+  });
+
+  it('lässt unter 100 dp die Feinheiten weg (Perlrand, Schraffur)', async () => {
+    const big = JSON.stringify((await render(<StockBadge {...PLACES[0]} width={184} />)).toJSON());
+    const small = JSON.stringify((await render(<StockBadge {...PLACES[0]} width={62} />)).toJSON());
+    expect(small.length).toBeLessThan(big.length * 0.8);
   });
 
   it('zeigt Name (uppercase), Region und Höhe', async () => {
