@@ -26,6 +26,7 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { hasSeenOnboarding } from '@/features/onboarding/onboardingFlag';
+import { isPreview } from '@/lib/preview';
 import { TiltProvider } from '@/lib/tilt';
 import { colors } from '@/theme';
 
@@ -84,7 +85,12 @@ export default function RootLayout() {
       <TiltProvider>
         <PersistQueryClientProvider
           client={queryClient}
-          persistOptions={{ persister, maxAge: CACHE_MAX_AGE_MS }}
+          // Vorschau-Daten nie mit echtem Cache desselben Origins vermischen
+          persistOptions={{
+            persister,
+            maxAge: CACHE_MAX_AGE_MS,
+            buster: isPreview ? 'vorschau' : '',
+          }}
         >
           <StatusBar style="dark" />
           <Stack

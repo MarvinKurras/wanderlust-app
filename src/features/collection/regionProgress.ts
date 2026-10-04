@@ -1,3 +1,4 @@
+import { de } from '@/i18n/de';
 import type { Place } from '@/lib/places';
 import type { Region } from '@/lib/regions';
 import type { Unlock } from '@/lib/unlocks';
@@ -74,6 +75,5 @@ export function regionProgress(
 
 /** „3 von 8 Zielen in Ladenburg erledigt" */
 export function regionProgressLabel(p: RegionProgress): string {
-  const ziel = p.total === 1 ? 'Ziel' : 'Zielen';
-  return `${p.unlocked} von ${p.total} ${ziel} in ${p.name} erledigt`;
+  return de.regionen.fortschrittLabel(p.unlocked, p.total, p.name);
 }

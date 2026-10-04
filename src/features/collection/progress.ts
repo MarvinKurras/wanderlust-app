@@ -1,15 +1,13 @@
-/** Fortschrittstexte der Sammlung — Wording aus `wanderlust/map/app.js` (`updateProgress`). */
-export function progressLabel(unlocked: number, total: number): string {
-  return `${unlocked} / ${total} erwandert`;
-}
+import { de } from '@/i18n/de';
 
+/** Fortschrittszeile der Sammlung — Aufbau aus `wanderlust/map/app.js` (`updateProgress`). */
 export function progressSub(unlocked: number, total: number): string {
   const locked = total - unlocked;
   if (locked === 0) {
-    return 'Alle Gipfel erwandert — Sammlung komplett';
+    return de.sammlung.restKomplett;
   }
   if (unlocked === 0) {
-    return 'Noch kein Gipfel erwandert — leg los';
+    return de.sammlung.restLeer;
   }
-  return locked === 1 ? '1 Gipfel liegt noch im Nebel' : `${locked} Gipfel liegen noch im Nebel`;
+  return locked === 1 ? de.sammlung.restEins : de.sammlung.restViele(locked);
 }

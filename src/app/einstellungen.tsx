@@ -85,7 +85,7 @@ export default function EinstellungenScreen() {
   const back = (
     <IconButton
       glyph="chevronLeft"
-      accessibilityLabel={de.einstellungen.zurueck}
+      accessibilityLabel={de.allgemein.zurueck}
       onPress={() => (router.canGoBack() ? router.back() : router.replace('/sammlung'))}
     />
   );

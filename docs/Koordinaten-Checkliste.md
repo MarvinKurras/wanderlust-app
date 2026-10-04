@@ -13,7 +13,7 @@ Die Website-Koordinaten sind **nicht final** (nur Minuten-Präzision). Unten die
 | Gr. Arber | Gipfelkreuz | 49.1125 | 13.1347 | 300 m | ☐ |
 | Wendelstein | Gipfel/Bergstation | 47.7036 | 12.0139 | 250 m | ☐ |
 
-Änderungen an Koordinaten/Radien erfolgen per neuer Migration (Update auf `public.places`), nicht durch Editieren bestehender Migrationen.
+Änderungen an Koordinaten/Radien erfolgen per neuer Migration (Update auf `public.places`), nicht durch Editieren bestehender Migrationen. Danach `npm run preview:data` ausführen — der Generator liest alle Migrationen der Reihe nach (Seeds + `update public.places set … where id = '…';`) und schreibt die Web-Vorschau-Daten neu.
 
 ## Unterregion Ladenburg (AP-R, Stadt-Radien 150–200 m — A-R-1)
 

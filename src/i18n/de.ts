@@ -25,11 +25,9 @@ export const de = {
     nochmal: 'Nochmal versuchen',
   },
   detail: {
-    zurueck: 'Orte',
     erwandertAm: (datum: string) => `Erwandert am ${datum} · in Messing geprägt`,
     erwandertKurz: (datum: string) => `Erwandert · ${datum}`,
     erwandertOhneDatum: 'Erwandert · in Messing geprägt',
-    nochNichtErwandert: 'Noch nicht erwandert — sei vor Ort, um dieses Schild zu prägen.',
     shopTeaser: 'Als Stocknagel bestellen — bald verfügbar',
     shopTeaserKurz: 'Als Stocknagel bestellen',
     bald: 'Bald',
@@ -37,7 +35,6 @@ export const de = {
   },
   karte: {
     fogLabel: '? ? ?',
-    chipVerschlossen: 'Verschlossen',
     chipNebel: 'Noch im Nebel',
     sheetDetails: 'Details ansehen',
     sheetVerschlossen: 'Noch nicht erwandert',
@@ -54,7 +51,6 @@ export const de = {
     cta: 'Stocknagel prägen',
     locating: 'Wir peilen deinen Standort an …',
     submitting: 'Das Schild wird geprägt …',
-    erfolg: 'Erwandert — dein Schild ist geprägt.',
     permissionVerweigert: 'Ohne deinen Standort können wir nicht prägen.',
     settingsOeffnen: 'Einstellungen öffnen',
     gpsTimeout: 'Kein GPS-Empfang — tritt aus dem Schatten der Wand.',
@@ -65,7 +61,7 @@ export const de = {
       'Für die Prägung braucht Wanderlust deinen genauen Standort — schalte „Genauer Standort" in den Einstellungen ein.',
     dienstAus: 'Die Ortungsdienste sind aus — schalte sie in den Einstellungen ein.',
     nurApp: 'Prägen geht nur in der Wanderlust-App.',
-    zuWeit: (distanz: string) => `Noch ${distanz} bis zum Ziel — der Gipfel wartet.`,
+    zuWeit: (distanz: string) => `Noch ${distanz} bis zum Ziel — dein Stocknagel wartet.`,
     offline: 'Keine Verbindung — die Freischaltung braucht Netz.',
     rateLimit: 'Zu viele Versuche — gönn dir eine Rast, in einer Stunde geht es weiter.',
     mock: 'Dein Standort wirkt simuliert — echte Pfade zählen.',
@@ -105,9 +101,9 @@ export const de = {
       },
     ],
     primingIdx: '04 / Dein Standort',
-    primingTitel: 'Nur im Moment der Prägung',
+    primingTitel: 'Dein Standort bleibt bei dir',
     primingText:
-      'Wanderlust nutzt deinen Standort ausschließlich, wenn du ein Schild prägst oder dich auf der Karte zeigst. Kein Tracking, keine Bewegungsprofile.',
+      'Wanderlust nutzt deinen Standort nur bei geöffneter App: um dich auf der Karte zu zeigen, Entfernungen anzuzeigen und beim Prägen zu prüfen, ob du wirklich dort bist. Dein Gerät verlässt er nur beim Prägen. Kein Tracking, keine Bewegungsprofile.',
     primingErlauben: 'Standort erlauben',
     primingSpaeter: 'Später',
     weiter: 'Weiter',
@@ -119,7 +115,6 @@ export const de = {
     emailLabel: 'E-Mail-Adresse',
     loeschenHinweis: 'Entfernt dein Konto und alle geprägten Schilder endgültig.',
     version: (v: string) => `Wanderlust · Version ${v}`,
-    zurueck: 'Sammlung',
     kontoEyebrow: 'Dein Konto',
     kontoAnonym:
       'Du wanderst anonym. Sichere deine Sammlung mit einer E-Mail-Adresse — sonst geht sie mit dem Gerät verloren.',
@@ -131,7 +126,7 @@ export const de = {
     rechtlichesEyebrow: 'Rechtliches',
     impressum: 'Impressum',
     datenschutz: 'Datenschutz',
-    loeschenEyebrow: 'Gefahrenzone',
+    loeschenEyebrow: 'Abschied vom Pfad',
     loeschenCta: 'Konto & Sammlung löschen',
     loeschenTitel: 'Wirklich alles löschen?',
     loeschenText:
@@ -146,15 +141,16 @@ export const de = {
       'PLATZHALTER — wird vor dem öffentlichen Release durch finale Rechtstexte ersetzt.',
     impressumText: 'Wanderlust · Musterstraße 1 · 00000 Musterstadt · hallo@wanderlust.app',
     datenschutzText:
-      'Wanderlust verarbeitet deinen Standort nur im Moment einer Prägung oder Kartenanzeige (Foreground, on demand). Pro Freischaltung wird genau ein Standort-Snapshot (Position, Genauigkeit, Distanz) zur Missbrauchsprüfung gespeichert. Es findet kein Tracking statt, es werden keine Bewegungsprofile erstellt. Anonyme Konten enthalten keine personenbezogenen Pflichtdaten; eine E-Mail-Adresse wird nur beim freiwilligen Konto-Upgrade verarbeitet. Konto und alle Daten können jederzeit in den Einstellungen gelöscht werden.',
+      'Wanderlust verarbeitet deinen Standort nur bei geöffneter App (Foreground): für die Kartenanzeige, für Entfernungen zu Orten und für die Prüfung beim Prägen. Entfernungen werden auf deinem Gerät berechnet und weder gespeichert noch übertragen. Nur beim Prägen geht ein Standort-Snapshot (Position, Genauigkeit, Distanz) an unseren Server und wird dort zur Missbrauchsprüfung gespeichert. Die Karte stammt von Apple Karten (iOS) bzw. Google Maps (Android); beim Laden erhält der jeweilige Anbieter technische Daten wie deine IP-Adresse. Der Lagesensor deines Geräts wird nur lokal für Glanz- und Tiefeneffekte gelesen, nicht gespeichert und nicht übertragen. Es findet kein Tracking statt, es werden keine Bewegungsprofile erstellt. Anonyme Konten enthalten keine personenbezogenen Pflichtdaten; eine E-Mail-Adresse wird nur beim freiwilligen Konto-Upgrade verarbeitet. Konto und alle Daten kannst du jederzeit in den Einstellungen löschen.',
   },
   regionen: {
     weitereZiele: 'Weitere Ziele',
-    komplett: 'Komplett — in Messing besiegelt',
     komplettKurz: 'Komplett',
     siegelRegion: 'Unterregion',
     siegelBand: 'Komplett',
     sammlungEyebrow: 'Abschluss-Marken',
+    fortschrittLabel: (erledigt: number, gesamt: number, name: string) =>
+      `${erledigt} von ${gesamt} ${gesamt === 1 ? 'Ziel' : 'Zielen'} in ${name} erledigt`,
   },
   vorschau: {
     kartenhinweis: 'Kartenvorschau · im Browser ohne echte Karte',
@@ -164,9 +160,12 @@ export const de = {
     title: 'Sammlung',
     erwandert: 'erwandert',
     schilder: 'Deine Stockschilder',
-    verschlossen: 'Verschlossen',
-    nochNicht: 'Noch nicht erwandert',
     laden: 'Der Wanderstock wird poliert …',
     fehler: 'Die Sammlung konnte nicht geladen werden.',
+    /** Fortschrittszeile (Wording nach `wanderlust/map/app.js`, „Ziele" statt „Gipfel") */
+    restKomplett: 'Alle Ziele erwandert — Sammlung komplett',
+    restLeer: 'Noch kein Ziel erwandert — leg los',
+    restEins: '1 Ziel liegt noch im Nebel',
+    restViele: (n: number) => `${n} Ziele liegen noch im Nebel`,
   },
 } as const;

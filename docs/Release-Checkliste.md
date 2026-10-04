@@ -20,6 +20,28 @@
 - [ ] **Koordinaten verifizieren** (`docs/Koordinaten-Checkliste.md` — 8 Gipfel + 7 Ladenburg-Hotspots)
 - [ ] **Manuelle Gerätetests** durchführen (Permission-Testplan AP5, Edge-Case-Testplan AP6, Flugmodus-Test AP7)
 - [ ] **Supabase-Access-Token rotieren** (das in der Entwicklung verwendete Token widerrufen)
+- [ ] **Privacy-Labels** in App Store Connect / Play Console gemäß `docs/Store-Texte.md` („App-Privacy / Data Safety") eintragen
+- [ ] **Nach der Koordinatenprüfung** die Vorschau-Daten neu erzeugen: `npm run preview:data`
+
+## Web-Vorschau (AP-D) — nie als Produkt ausliefern
+
+- [ ] `EXPO_PUBLIC_PREVIEW` steht in **keinem** `eas.json`-Profil und in keinem EAS-Secret (nur in den Skripten `preview:*`)
+- [ ] `dist/preview` (statischer Export) nicht öffentlich hosten; Vorschau-Artefakte sind privat
+- [ ] Kein Web-Build mit echter Supabase-Env veröffentlichen — Prägen ist im Browser ohnehin gesperrt (`de.unlock.nurApp`), die Daten wären aber erreichbar
+
+## Gerätetests Design-Overhaul (AP-D / AP-D2)
+
+- [ ] iOS 26: Liquid Glass (Tab-Leiste, Chips, Kopfleisten) — iOS 16.4–18: Blur-Fallback lesbar
+- [ ] Skia-Messingglanz auf erwanderten Schildern folgt der Neigung, keine Artefakte (Shader ohne `pow`)
+- [ ] Neigungssensor stoppt in Hintergrund/anderen Tabs (Akku: Xcode Energy Log bzw. Android Battery Historian grob prüfen)
+- [ ] Android-Kartenstil (Pergament) und iOS `mutedStandard`; blauer Punkt nur bei sichtbarer Karte
+- [ ] Schatten: Android 8–11 ohne `filter: drop-shadow` — Schilder ohne Schlagschatten akzeptabel? (bekannte Abweichung), `boxShadow` erst ab Android 9
+- [ ] Stocknägel (AP-D2): Perlrand (gestrichelte Kontur, runde Kappen) auf Android sichtbar, Schraffur/Konturen scharf, 15 Schilder in Liste/Sammlung flüssig
+- [ ] Haptik der Prägung (iOS + Android; ggf. `android.permission.VIBRATE` per `npx expo config --type introspect` prüfen)
+- [ ] „Bewegung reduzieren": keine Dauerschleifen, keine Parallaxe, Prägung ohne Schläge, Erfolgs-Haptik bleibt
+- [ ] Statusleiste: hell auf Sammlung, Ort-Bühne und Prägung; dunkel sonst
+- [ ] Beim ersten TestFlight-Upload auf ITMS-90683 (fehlende Always-Location-Keys) achten — App nutzt nur WhenInUse
+- [ ] Edge Function `unlock`: im Insert-Fehlerpfad nur `code` loggen (Postgres-DETAIL kann Koordinaten enthalten) — supabase-reviewer
 
 ## Beta-Build (A-AP9-1 — auf deinem Rechner/Konto)
 

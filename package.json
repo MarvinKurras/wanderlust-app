@@ -60,7 +60,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "preview:web": "EXPO_PUBLIC_PREVIEW=1 expo start --web",
-    "preview:export": "EXPO_PUBLIC_PREVIEW=1 expo export --platform web --output-dir dist/preview"
+    "preview:export": "EXPO_PUBLIC_PREVIEW=1 expo export --platform web --output-dir dist/preview",
+    "preview:data": "node scripts/build-preview-data.mjs && prettier --write src/lib/previewData.ts"
   },
   "private": true,
   "jest": {

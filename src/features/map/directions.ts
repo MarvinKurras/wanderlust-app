@@ -8,7 +8,7 @@ import type { Place } from '@/lib/places';
  */
 export function directionsUrl(lat: number, lng: number, platform: string = Platform.OS): string {
   if (platform === 'ios') {
-    return `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=w`;
+    return `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=w`;
   }
   return `https://www.google.com/maps/dir/?api=1&destination=${lat}%2C${lng}&travelmode=walking`;
 }

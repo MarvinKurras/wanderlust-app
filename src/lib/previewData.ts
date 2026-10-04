@@ -3,8 +3,9 @@ import type { Region } from './regions';
 import type { Unlock } from './unlocks';
 
 /**
- * Vorschau-Daten für die Web-Vorschau (AP-D) — generiert aus den Seed-Migrationen
- * `20260610120100_seed_places.sql` und `20260611100100_seed_ladenburg.sql`.
+ * Vorschau-Daten für die Web-Vorschau (AP-D) — generiert aus den Migrationen
+ * `20260610120100_seed_places.sql`, `20260611100100_seed_ladenburg.sql`
+ * durch `npm run preview:data` (nicht von Hand bearbeiten).
  * Wird ausschließlich genutzt, wenn `isPreview` gilt (nur Web + EXPO_PUBLIC_PREVIEW=1).
  */
 export const previewPlaces: Place[] = [
@@ -266,16 +267,44 @@ export const previewPlaces: Place[] = [
 ];
 
 export const previewRegions: Region[] = [
-  { id: 'baden-wuerttemberg', name: 'Baden-Württemberg', parent_id: null, active: true },
-  { id: 'ladenburg', name: 'Ladenburg', parent_id: 'baden-wuerttemberg', active: true },
+  {
+    id: 'baden-wuerttemberg',
+    name: 'Baden-Württemberg',
+    parent_id: null,
+    active: true,
+  },
+  {
+    id: 'ladenburg',
+    name: 'Ladenburg',
+    parent_id: 'baden-wuerttemberg',
+    active: true,
+  },
 ];
 
 /** Einige Orte gelten in der Vorschau als erwandert, damit beide Zustände sichtbar sind. */
 export const previewUnlocks: Unlock[] = [
-  { place_id: 'zugspitze', unlocked_at: '2026-08-14T09:42:00Z' },
-  { place_id: 'koenigssee', unlocked_at: '2026-08-16T15:10:00Z' },
-  { place_id: 'brocken', unlocked_at: '2026-09-03T11:25:00Z' },
-  { place_id: 'ladenburg-marktplatz', unlocked_at: '2026-09-20T17:05:00Z' },
-  { place_id: 'ladenburg-martinstor', unlocked_at: '2026-09-20T17:31:00Z' },
-  { place_id: 'ladenburg-galluskirche', unlocked_at: '2026-09-21T10:12:00Z' },
+  {
+    place_id: 'zugspitze',
+    unlocked_at: '2026-08-14T09:42:00Z',
+  },
+  {
+    place_id: 'koenigssee',
+    unlocked_at: '2026-08-16T15:10:00Z',
+  },
+  {
+    place_id: 'brocken',
+    unlocked_at: '2026-09-03T11:25:00Z',
+  },
+  {
+    place_id: 'ladenburg-marktplatz',
+    unlocked_at: '2026-09-20T17:05:00Z',
+  },
+  {
+    place_id: 'ladenburg-martinstor',
+    unlocked_at: '2026-09-20T17:31:00Z',
+  },
+  {
+    place_id: 'ladenburg-galluskirche',
+    unlocked_at: '2026-09-21T10:12:00Z',
+  },
 ];

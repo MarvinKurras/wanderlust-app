@@ -19,7 +19,7 @@ import { Glow, Stars } from '@/components/atmosphere/SkyLife';
 import { Button } from '@/components/Button';
 import { de } from '@/i18n/de';
 import { formatDateDe } from '@/lib/format';
-import { praege, PRAEGE_SCHLAEGE_MS } from '@/lib/haptics';
+import { praege, PRAEGE_SCHLAEGE_MS, success } from '@/lib/haptics';
 import { motionSprings } from '@/lib/motion';
 import type { Place } from '@/lib/places';
 import { colors, fonts, landscape, spacing, textStyles } from '@/theme';
@@ -58,7 +58,11 @@ export function PraegeMoment({ place, unlockedAt, visible, onDone }: Props) {
   useEffect(() => {
     if (!visible) return;
     enter.value = withSpring(1, motionSprings.pop);
-    if (reducedMotion) return;
+    // „Bewegung reduzieren": keine Hammerschläge, aber die Bestätigung bleibt spürbar
+    if (reducedMotion) {
+      success();
+      return;
+    }
     const cancelHaptics = praege();
     const timers = PRAEGE_SCHLAEGE_MS.map((ms, i) =>
       setTimeout(() => {

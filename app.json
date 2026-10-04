@@ -12,7 +12,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "app.wanderlust.mobile",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Wanderlust nutzt deinen Standort, um dich auf der Gipfelkarte zu zeigen und zu prüfen, ob du nah genug an einem Ort bist, um sein Stockschild zu prägen. Kein Tracking, keine Bewegungsprofile."
+        "NSLocationWhenInUseUsageDescription": "Wanderlust nutzt deinen Standort bei geöffneter App, um dich auf der Karte zu zeigen, Entfernungen zu Orten anzuzeigen und beim Prägen zu prüfen, ob du nah genug an einem Ort bist. Kein Tracking, keine Bewegungsprofile."
       }
     },
     "android": {
