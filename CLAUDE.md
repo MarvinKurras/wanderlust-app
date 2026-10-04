@@ -55,6 +55,10 @@ npm run typecheck   # tsc --noEmit
 npx expo start      # Dev-Server (Expo Go / Dev Client)
 npx expo export --platform ios|android  # Bundle-Proxy für "App startet" in Cloud-Umgebungen
 npm test            # Jest (jest-expo): Badge-Snapshots u. a.
+npm run preview:web     # Web-Vorschau (EXPO_PUBLIC_PREVIEW=1, Beispieldaten, nur Browser)
+npm run preview:export  # dieselbe Vorschau als statischer Export nach dist/preview
 ```
+
+Design-System (AP-D): neue UI aus den Bausteinen in `src/components/` (GlassSurface, Button, Glyph, ScreenChrome, BottomSheet, ConfirmDialog …) und `src/lib/motion.ts`/`haptics.ts` bauen; Schilder über `BadgeArt` (Glanz/Nebel), nicht direkt `StockBadge`. Plattform-Splits: Skia nur in `*.native.tsx`, `react-native-maps` nur in `WorldMap.tsx`. Der Vorschau-Modus (`src/lib/preview.ts`) gilt ausschließlich im Web.
 
 Hinweis Typed Routes: `.expo/types` wird nur von `npx expo start` generiert. Meldet `tsc` nach Routen-Änderungen Fehler wie `'/ort/[id]' is not assignable …`, sind die generierten Typen veraltet — einmal den Dev-Server starten (oder `rm -rf .expo/types`).

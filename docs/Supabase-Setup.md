@@ -37,7 +37,7 @@ npx supabase db push                     # spielt supabase/migrations/* ein
 node supabase/verify.mjs   # nutzt nur URL + Anon-Key, wie die App
 ```
 
-Prüft: Orte via API lesbar (8 Seeds), Client-Insert in `unlocks` abgelehnt (anonym + eingeloggt), anonyme Anmeldung, eigene Unlocks lesbar. Der Cross-User-Negativtest („Fremd-Unlocks nicht lesbar") folgt in AP6, sobald die Edge Function Testdaten erzeugen kann.
+Prüft u. a.: Orte via API lesbar (15 Seeds: 8 Gipfel + 7 Ladenburg), Client-Insert in `unlocks` abgelehnt (anonym + eingeloggt), anonyme Anmeldung, eigene Unlocks lesbar, Cross-User-Negativtest (Fremd-Unlocks nicht lesbar), Edge-Function-Fälle inkl. Rate Limit (429), Methode (405) und Eingabeprüfung (400).
 
 ## Konventionen
 
