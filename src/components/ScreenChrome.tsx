@@ -6,6 +6,7 @@ import Animated, {
   type SharedValue,
   useAnimatedScrollHandler,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -51,13 +52,24 @@ export function LargeTitle({
   children,
 }: LargeTitleProps) {
   const insets = useSafeAreaInsets();
+  const reducedMotion = useReducedMotion();
   const pine = tone === 'pine';
+  // Ausblenden bleibt; Gleiten und Zoomen entfallen bei „Bewegung reduzieren".
   const style = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.value, [0, 70], [1, 0], Extrapolation.CLAMP),
-    transform: [
-      { translateY: interpolate(scrollY.value, [-120, 0, 120], [36, 0, -18], Extrapolation.CLAMP) },
-      { scale: interpolate(scrollY.value, [-120, 0], [1.06, 1], Extrapolation.CLAMP) },
-    ],
+    transform: reducedMotion
+      ? []
+      : [
+          {
+            translateY: interpolate(
+              scrollY.value,
+              [-120, 0, 120],
+              [36, 0, -18],
+              Extrapolation.CLAMP,
+            ),
+          },
+          { scale: interpolate(scrollY.value, [-120, 0], [1.06, 1], Extrapolation.CLAMP) },
+        ],
   }));
 
   return (

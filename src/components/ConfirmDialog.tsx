@@ -129,6 +129,8 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: spacing.lg,
+    // Opakes Pergament: Text dahinter soll nicht durchscheinen (wie das Website-Modal)
+    backgroundColor: colors.paper,
   },
   title: {
     fontFamily: fonts.displaySemiBold,

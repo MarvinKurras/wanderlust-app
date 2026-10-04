@@ -15,6 +15,27 @@ const MONTHS = [
   'Dezember',
 ] as const;
 
+const MONTHS_SHORT = [
+  'Jan',
+  'Feb',
+  'Mär',
+  'Apr',
+  'Mai',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Dez',
+] as const;
+
+/** ISO-Timestamp → „2. Aug 2024" (Website `badges.js`, für enge Zeilen) */
+export function formatDateShort(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()}. ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 /** ISO-Timestamp → „19. Juli 2024" */
 export function formatDateDe(iso: string): string {
   const d = new Date(iso);

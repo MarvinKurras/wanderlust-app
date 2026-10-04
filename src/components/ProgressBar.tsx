@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { motionEasings } from '@/lib/motion';
-import { badgeTones, colors } from '@/theme';
+import { colors } from '@/theme';
 
 type Props = {
   /** 0–1 */
@@ -44,7 +44,7 @@ export function ProgressBar({ value, tone = 'paper', height = 4, delay = 250 }: 
         {
           height,
           borderRadius: height / 2,
-          backgroundColor: tone === 'pine' ? colors.pineSoft : colors.paperLine,
+          backgroundColor: tone === 'pine' ? colors.pineSoft : colors.progressTrack,
         },
       ]}
       accessibilityRole="progressbar"
@@ -52,7 +52,8 @@ export function ProgressBar({ value, tone = 'paper', height = 4, delay = 250 }: 
     >
       <Animated.View style={[styles.bar, { borderRadius: height / 2 }, barStyle]}>
         <LinearGradient
-          colors={[badgeTones.brass.lo, badgeTones.brass.mid, badgeTones.brass.hi]}
+          // Website karte.html .prog .fill: brass-deep → brass → brass-light
+          colors={[colors.brassDeep, colors.brass, colors.brassLight]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={StyleSheet.absoluteFill}

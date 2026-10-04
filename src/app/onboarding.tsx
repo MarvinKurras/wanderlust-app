@@ -130,7 +130,7 @@ export default function OnboardingScreen() {
                       name={STEP_GLYPHS[step]}
                       size={46}
                       color={colors.brassDeep}
-                      strokeWidth={1.3}
+                      strokeWidth={0.8}
                     />
                     <Text style={styles.idx}>{current.idx}</Text>
                     <Text style={styles.stepTitle}>{current.titel}</Text>
@@ -138,7 +138,7 @@ export default function OnboardingScreen() {
                   </>
                 ) : (
                   <>
-                    <Glyph name="shield" size={46} color={colors.brassDeep} strokeWidth={1.3} />
+                    <Glyph name="shield" size={46} color={colors.brassDeep} strokeWidth={0.8} />
                     <Text style={styles.idx}>{de.onboarding.primingIdx}</Text>
                     <Text style={styles.stepTitle}>{de.onboarding.primingTitel}</Text>
                     <Text style={styles.stepText}>{de.onboarding.primingText}</Text>

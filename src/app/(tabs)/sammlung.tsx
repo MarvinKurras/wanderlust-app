@@ -15,6 +15,7 @@ import { Atmosphere } from '@/components/atmosphere/Atmosphere';
 import { IconButton } from '@/components/IconButton';
 import { PressableScale } from '@/components/PressableScale';
 import { ProgressBar } from '@/components/ProgressBar';
+import { FocusStatusBar } from '@/components/FocusStatusBar';
 import { CompactHeader, LargeTitle, useCollapsingHeader } from '@/components/ScreenChrome';
 import { StateView } from '@/components/StateView';
 import { StatusMark } from '@/components/StatusMark';
@@ -24,7 +25,7 @@ import { RegionBadge } from '@/features/collection/RegionBadge';
 import { regionProgress, regionProgressLabel } from '@/features/collection/regionProgress';
 import { usePlaces, useRefreshPlaces, useRegions, useUnlocks } from '@/features/places/queries';
 import { de } from '@/i18n/de';
-import { formatDateDe } from '@/lib/format';
+import { formatDateShort } from '@/lib/format';
 import { motionSprings, staggerDelay } from '@/lib/motion';
 import type { Place } from '@/lib/places';
 import type { Unlock } from '@/lib/unlocks';
@@ -125,7 +126,7 @@ export default function SammlungScreen() {
             {item.name}
           </Text>
           {unlock ? (
-            <Text style={styles.cardDate}>{formatDateDe(unlock.unlocked_at)}</Text>
+            <Text style={styles.cardDate}>{formatDateShort(unlock.unlocked_at)}</Text>
           ) : (
             <View style={styles.cardMark}>
               <StatusMark unlocked={false} label={de.orte.statusKurzNebel} tone="pine" size="sm" />
@@ -203,6 +204,7 @@ export default function SammlungScreen() {
 
   return (
     <View style={styles.screen}>
+      <FocusStatusBar style="light" />
       <Atmosphere variant="pine" />
       {/* Virtualisiertes Raster: nur sichtbare Schilder (mit Nebel/Glanz) sind gemountet. */}
       <Animated.FlatList

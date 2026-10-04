@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { StatusMark } from '@/components/StatusMark';
 import { openDirections } from '@/features/map/directions';
 import { de } from '@/i18n/de';
-import { formatCoords, formatDateDe } from '@/lib/format';
+import { formatCoords, formatDateShort } from '@/lib/format';
 import { formatDistance } from '@/lib/geo';
 import type { Place } from '@/lib/places';
 import type { Unlock } from '@/lib/unlocks';
@@ -48,9 +48,10 @@ export function PlaceSheet({ place, visible, unlock, distanceM, onClose }: Props
               <View style={styles.status}>
                 <StatusMark
                   unlocked={unlocked}
+                  lines={2}
                   label={
                     unlock
-                      ? de.detail.erwandertKurz(formatDateDe(unlock.unlocked_at))
+                      ? de.detail.erwandertKurz(formatDateShort(unlock.unlocked_at))
                       : de.karte.sheetVerschlossen
                   }
                 />

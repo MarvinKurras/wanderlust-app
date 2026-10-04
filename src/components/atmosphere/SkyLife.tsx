@@ -52,12 +52,13 @@ export function Sun({
     >
       <Svg width={size} height={size}>
         <Defs>
-          <RadialGradient id={halo} cx="50%" cy="50%" r="50%">
+          {/* CSS radial-gradient(circle) reicht bis zur Ecke: r = 70,7 % (index.html .sun) */}
+          <RadialGradient id={halo} cx="50%" cy="50%" r="70.7%">
             <Stop offset="0%" stopColor={landscape.sunHalo} stopOpacity={0.95} />
             <Stop offset="42%" stopColor={landscape.sunHaloWarm} stopOpacity={0.55} />
             <Stop offset="70%" stopColor={landscape.sunHaloWarm} stopOpacity={0} />
           </RadialGradient>
-          <RadialGradient id={core} cx="50%" cy="50%" r="50%">
+          <RadialGradient id={core} cx="50%" cy="50%" r="70.7%">
             <Stop offset="0%" stopColor={landscape.sunCore} />
             <Stop offset="70%" stopColor={landscape.sunWarm} />
             <Stop offset="100%" stopColor={landscape.sunWarm} stopOpacity={0} />
@@ -78,15 +79,22 @@ const cloudDrift = css.keyframes({
 const CLOUDS = [
   {
     viewBox: '0 0 230 78',
+    fillOpacity: 0.9,
+    driftDelay: 0,
+    direction: 'alternate',
     d: 'M26,58 Q12,56 14,46 Q8,34 24,30 Q26,14 46,16 Q56,2 78,8 Q96,0 108,12 Q128,6 134,22 Q154,20 156,36 Q170,40 164,52 Q168,62 150,60 Q120,66 88,62 Q52,66 26,58 Z',
     ratio: 78 / 230,
   },
   {
     viewBox: '0 0 120 60',
+    // index.html .cloud.c2: blasser, 3 s später und gegenläufig
+    fillOpacity: 0.85,
+    driftDelay: 3000,
+    direction: 'alternate-reverse',
     d: 'M18,44 Q8,42 12,34 Q10,22 26,22 Q32,8 52,12 Q66,4 78,14 Q94,12 96,26 Q108,30 102,40 Q104,48 88,46 Q56,52 18,44 Z',
     ratio: 60 / 120,
   },
-];
+] as const;
 
 /** Skizzierte Wolke (app.js .cloud c1/c2), driftet langsam hin und her. */
 export function Cloud({
@@ -112,14 +120,16 @@ export function Cloud({
       pointerEvents="none"
       style={[
         { position: 'absolute', left, top, width, height: width * cloud.ratio },
+        // Website (prefers-reduced-motion): Wolken stehen still bei .85 Deckung
+        reducedMotion && { opacity: 0.85 },
         !reducedMotion && {
           opacity: 0,
           animationName: [fadeIn, cloudDrift],
           animationDuration: ['1800ms', `${duration}ms`],
-          animationDelay: [`${delay}ms`, '0ms'],
+          animationDelay: [`${delay}ms`, `${cloud.driftDelay}ms`],
           animationFillMode: ['forwards', 'none'],
           animationIterationCount: [1, 'infinite'],
-          animationDirection: ['normal', 'alternate'],
+          animationDirection: ['normal', cloud.direction],
           animationTimingFunction: ['ease', 'ease-in-out'],
           animationPlayState: playState(active),
         },
@@ -129,7 +139,7 @@ export function Cloud({
         <Path
           d={cloud.d}
           fill={landscape.cloudFill}
-          fillOpacity={0.9}
+          fillOpacity={cloud.fillOpacity}
           stroke={landscape.cloudStroke}
           strokeWidth={2}
           strokeLinecap="round"
@@ -160,10 +170,11 @@ export function Flock({ width, top }: { width: number; top: number }) {
     [width],
   );
   if (reducedMotion) return null;
+  // index.html .flock svg:nth-child(n)
   const birds = [
-    { w: 26, mt: 0, delay: 0 },
-    { w: 20, mt: 14, delay: 200 },
-    { w: 16, mt: 4, delay: 450 },
+    { w: 26, mt: 0, ml: 0, delay: 0 },
+    { w: 20, mt: 14, ml: 0, delay: 200 },
+    { w: 16, mt: 4, ml: -6, delay: 450 },
   ];
   return (
     <Animated.View
@@ -190,6 +201,8 @@ export function Flock({ width, top }: { width: number; top: number }) {
             width: b.w,
             height: (b.w * 12) / 28,
             marginTop: b.mt,
+            marginLeft: b.ml,
+            transformOrigin: '50% 100%',
             animationName: flap,
             animationDuration: '850ms',
             animationDelay: `${b.delay}ms`,

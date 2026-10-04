@@ -65,6 +65,7 @@ const GLYPHS: Record<GlyphName, Draw> = {
       <Path d="M8.5 8.5 V3.5" />
       <Path d="M8.5 3.5 l4 1.3 -4 1.3" />
       <Circle cx={19.5} cy={4.5} r={1.8} />
+      <Path d="M10.75 12.25 l1.25 1.75 1.3 -1.4" />
     </>
   ),
   emboss: () => (

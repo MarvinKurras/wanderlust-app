@@ -6,6 +6,7 @@ import Animated, {
   interpolate,
   type SharedValue,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
 } from 'react-native-reanimated';
 
@@ -36,15 +37,19 @@ export const Atmosphere = memo(function Atmosphere({ variant, horizon = 240, scr
   const { width, height } = useWindowDimensions();
   const fallbackScroll = useSharedValue(0);
   const scroll = scrollY ?? fallbackScroll;
+  const reducedMotion = useReducedMotion();
+  // „Bewegung reduzieren": der Horizont steht still statt mitzugleiten.
   const horizonStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateY: interpolate(
-          scroll.value,
-          [-200, 0, horizon * 2],
-          [60, 0, -horizon * 0.9],
-          Extrapolation.CLAMP,
-        ),
+        translateY: reducedMotion
+          ? 0
+          : interpolate(
+              scroll.value,
+              [-200, 0, horizon * 2],
+              [60, 0, -horizon * 0.9],
+              Extrapolation.CLAMP,
+            ),
       },
     ],
   }));

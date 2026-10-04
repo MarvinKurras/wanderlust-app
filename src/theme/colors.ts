@@ -40,6 +40,10 @@ export const colors = {
   lockedTextSoft: 'rgba(60,74,64,0.5)',
   /** Hintergrund des Schloss-Icons im Locked-Chip (Website: .chip.locked .cmedal) */
   lockedMedalBg: 'rgba(60,74,64,0.14)',
+  /** Spur des Fortschrittsbalkens (Website: karte.html .prog .bar) */
+  progressTrack: 'rgba(60,74,64,0.16)',
+  /** Sheet-Scrim (Website: karte.html .sheet-scrim rgba(18,24,20,.45)) */
+  scrimSheet: 'rgba(18,24,20,0.45)',
   /** Füllung des Präge-Zonen-Rings auf der Karte (brass mit 14 % Deckung) */
   brassVeil: 'rgba(187,139,75,0.14)',
 } as const;

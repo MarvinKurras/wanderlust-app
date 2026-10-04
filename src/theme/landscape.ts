@@ -1,3 +1,5 @@
+import { colors } from './colors';
+
 /**
  * Farben der Bergbühne (AP-D, A-D-1).
  * Quelle: Website-Hero — `wanderlust/app.js` (LAYERS, Wolken, Vögel) und
@@ -24,10 +26,10 @@ export const landscape = {
   /** Nacht der Sammlung */
   nightSky: '#141c17',
   nightRidges: ['#34443a', '#2d3b32', '#26322a', '#1f2a23', '#19221c', '#121914'],
-  star: '#f3ead7',
-  moonGlow: '#e9cd86',
+  star: colors.paperOnPine,
+  moonGlow: colors.brassLight,
   /** Nebel (karte.html .fog .veil) */
-  fog: '#f5f0e5',
-  fogDeep: '#eee6d4',
-  nightFog: '#3c4a40',
+  fog: colors.fogInner,
+  fogDeep: colors.fogOuter,
+  nightFog: colors.inkSoft,
 } as const;

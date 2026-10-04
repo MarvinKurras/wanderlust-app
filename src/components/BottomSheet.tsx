@@ -126,10 +126,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   scrim: {
-    backgroundColor: colors.scrim,
+    backgroundColor: colors.scrimSheet,
   },
   sheet: {
-    backgroundColor: glass.paperFillStrong,
+    backgroundColor: colors.paper,
     borderTopLeftRadius: radius.sheet,
     borderTopRightRadius: radius.sheet,
     borderTopWidth: StyleSheet.hairlineWidth * 2,

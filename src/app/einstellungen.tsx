@@ -97,6 +97,7 @@ export default function EinstellungenScreen() {
       <Animated.ScrollView
         onScroll={onScroll}
         scrollEventThrottle={16}
+        automaticallyAdjustKeyboardInsets
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}
       >

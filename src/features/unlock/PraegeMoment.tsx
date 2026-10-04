@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
@@ -111,6 +112,7 @@ export function PraegeMoment({ place, unlockedAt, visible, onDone }: Props) {
       navigationBarTranslucent
       onRequestClose={onDone}
     >
+      {visible && <StatusBar style="light" />}
       <Animated.View style={[StyleSheet.absoluteFill, styles.scrim, scrimStyle]}>
         <Stars width={width} height={height * 0.7} count={36} />
       </Animated.View>
@@ -200,6 +202,8 @@ const styles = StyleSheet.create({
   },
   name: {
     ...textStyles.hero,
+    // Ortsnamen setzt die Website in Cormorant 500–600 (badges.js .bm-name)
+    fontFamily: fonts.displayMedium,
     fontSize: 46,
     lineHeight: 50,
     color: colors.paperOnPine,

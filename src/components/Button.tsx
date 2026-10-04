@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   ActivityIndicator,
+  Platform,
   type StyleProp,
   StyleSheet,
   Text,
@@ -90,10 +91,10 @@ export function Button({
           <LinearGradient
             colors={[brass.hi, brass.mid, brass.lo]}
             locations={[0, 0.55, 1]}
-            style={StyleSheet.absoluteFill}
+            style={[StyleSheet.absoluteFill, layerBehind]}
             pointerEvents="none"
           />
-          <View style={styles.brassLight} pointerEvents="none" />
+          <View style={[styles.brassLight, layerBehind]} pointerEvents="none" />
         </>
       )}
       {busy ? (
@@ -116,6 +117,9 @@ export function Button({
     </PressableScale>
   );
 }
+
+/** Web: absolut positionierte Ebenen sonst ÜBER dem (nicht positionierten) Glyph — wie in Glass.tsx. */
+const layerBehind = Platform.OS === 'web' ? { zIndex: -1 } : null;
 
 const styles = StyleSheet.create({
   base: {

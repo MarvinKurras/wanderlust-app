@@ -27,6 +27,9 @@ import {
   VIEW_W,
 } from './ranges';
 
+/** Seitlicher Überstand jeder Kette (Anteil der Breite) — Spielraum für die Neigung. */
+const OVERHANG = 0.05;
+
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedG = Animated.createAnimatedComponent(G);
 
@@ -118,7 +121,9 @@ const LayerView = memo(function LayerView({
     [layer.details],
   );
 
-  const swing = parallax ? 6 + index * 7 : 0;
+  // Website app.js: x = mx·(6+i·7) mit mx in ±0,5 — die Neigung hier läuft ±1,
+  // darum halbiert und auf den Überstand begrenzt, damit keine Kante ins Bild rückt.
+  const swing = parallax ? Math.min((6 + index * 7) / 2, width * OVERHANG) : 0;
   const containerStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: tilt.value.x * swing },
@@ -143,7 +148,12 @@ const LayerView = memo(function LayerView({
       pointerEvents="none"
       style={[
         styles.layer,
-        { height: layerH, left: -width * 0.02, width: width * 1.04, zIndex: index + 1 },
+        {
+          height: layerH,
+          left: -width * OVERHANG,
+          width: width * (1 + OVERHANG * 2),
+          zIndex: index + 1,
+        },
         containerStyle,
       ]}
     >

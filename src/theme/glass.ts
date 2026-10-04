@@ -6,7 +6,8 @@
 export const glass = {
   paperFill: 'rgba(236,225,205,0.82)',
   paperFillStrong: 'rgba(236,225,205,0.95)',
-  paperBorder: 'rgba(205,191,159,0.9)',
+  /** Website karte.html: .5px rgba(255,255,255,.4–.5) */
+  paperBorder: 'rgba(255,255,255,0.5)',
   paperHighlight: 'rgba(255,255,255,0.45)',
   /** Ende des Lichtverlaufs (transparent) */
   highlightEnd: 'rgba(255,255,255,0)',

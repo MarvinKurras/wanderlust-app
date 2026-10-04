@@ -2,8 +2,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import Animated, { FadeInDown, useAnimatedStyle } from 'react-native-reanimated';
+import Animated, {
+  FadeInDown,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useReducedMotion,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { BadgeArt } from '@/badges';
 import { Ranges } from '@/components/atmosphere/Ranges';
@@ -11,6 +17,7 @@ import { Glow, Stars } from '@/components/atmosphere/SkyLife';
 import { GlassSurface } from '@/components/Glass';
 import { Glyph, type GlyphName } from '@/components/Glyph';
 import { IconButton } from '@/components/IconButton';
+import { FocusStatusBar } from '@/components/FocusStatusBar';
 import { CompactHeader, useCollapsingHeader } from '@/components/ScreenChrome';
 import { StateView } from '@/components/StateView';
 import { StatusMark } from '@/components/StatusMark';
@@ -48,6 +55,7 @@ export default function OrtDetailScreen() {
   const tilt = useTilt(active);
   const { coords: here } = useKnownPosition();
   const { scrollY, onScroll } = useCollapsingHeader();
+  const reducedMotion = useReducedMotion();
 
   const place = useMemo(() => places.data?.find((p) => p.id === id), [places.data, id]);
   const unlock = useMemo(() => unlocks.data?.find((u) => u.place_id === id), [unlocks.data, id]);
@@ -67,6 +75,16 @@ export default function OrtDetailScreen() {
 
   const stageH = Math.min(460, height * 0.52);
   const badgeWidth = Math.min(210, width * 0.52);
+  const headerThreshold = stageH - 90;
+
+  // Helle Statusleiste über der Nachtbühne, dunkle, sobald die Pergament-Kopfleiste steht.
+  const [pastStage, setPastStage] = useState(false);
+  useAnimatedReaction(
+    () => scrollY.get() > headerThreshold,
+    (past, prev) => {
+      if (past !== prev) scheduleOnRN(setPastStage, past);
+    },
+  );
 
   // Das Schild dreht sich leicht mit der Handyneigung — wie Messing im Licht.
   const badgeTilt = useAnimatedStyle(() => ({
@@ -76,9 +94,14 @@ export default function OrtDetailScreen() {
       { rotateX: `${-tilt.value.y * 7}deg` },
     ],
   }));
+  // Bei „Bewegung reduzieren" läuft die Bühne ohne Parallaxe 1:1 mit dem Inhalt.
   const stageParallax = useAnimatedStyle(() => ({
     transform: [
-      { translateY: Math.min(0, scrollY.value) * -0.5 + Math.max(0, scrollY.value) * 0.35 },
+      {
+        translateY: reducedMotion
+          ? 0
+          : Math.min(0, scrollY.value) * -0.5 + Math.max(0, scrollY.value) * 0.35,
+      },
     ],
   }));
 
@@ -107,6 +130,7 @@ export default function OrtDetailScreen() {
 
   return (
     <View style={styles.screen}>
+      <FocusStatusBar style={pastStage ? 'dark' : 'light'} />
       <Animated.ScrollView
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -210,7 +234,7 @@ export default function OrtDetailScreen() {
         </GlassSurface>
       )}
 
-      <CompactHeader title={place.name} scrollY={scrollY} left={back} threshold={stageH - 90} />
+      <CompactHeader title={place.name} scrollY={scrollY} left={back} threshold={headerThreshold} />
 
       {freshUnlock && (
         <PraegeMoment
