@@ -1,4 +1,5 @@
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { useEffect } from 'react';
+import { AccessibilityInfo, Linking, Platform, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
@@ -29,6 +30,14 @@ export function UnlockSection({ state, onStart, radiusM }: Props) {
         : de.unlock.cta;
   // Der Radius-Hinweis bleibt auch nach einem Fehlversuch stehen („wie nah muss ich ran?").
   const showHint = state.phase === 'idle' || state.phase === 'error';
+
+  // Android liest den Fehlerkasten über die Live-Region vor; iOS braucht eine Ansage.
+  const errorMessage = state.phase === 'error' ? state.message : null;
+  useEffect(() => {
+    if (errorMessage && Platform.OS === 'ios') {
+      AccessibilityInfo.announceForAccessibility(errorMessage);
+    }
+  }, [errorMessage]);
 
   return (
     <View style={styles.wrap}>

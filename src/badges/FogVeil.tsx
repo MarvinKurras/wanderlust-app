@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { css, useReducedMotion } from 'react-native-reanimated';
 import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 
+import { playState, useScreenActive } from '@/lib/screenActive';
 import { landscape } from '@/theme';
 
 type Props = {
@@ -12,29 +13,30 @@ type Props = {
   uid: string;
   /** Dunkler Nebel für die Tannen-Nacht. */
   night?: boolean;
+  /** `false` für kleine Schilder in Listen: Nebel liegt still (spart Dauerschleifen). */
+  animated?: boolean;
 };
 
-const drift = css.keyframes({
-  from: { transform: [{ translateX: -7 }, { translateY: 2 }] },
-  to: { transform: [{ translateX: 7 }, { translateY: -2 }] },
-});
-const breathe = css.keyframes({
-  from: { opacity: 0.7 },
-  to: { opacity: 1 },
+/** Eine Keyframe-Folge pro Schwade: seitwärts driften und dabei atmen. */
+const puff = css.keyframes({
+  from: { transform: [{ translateX: -7 }, { translateY: 2 }], opacity: 0.7 },
+  to: { transform: [{ translateX: 7 }, { translateY: -2 }], opacity: 1 },
 });
 
-/** Eine Schwade: driftet langsam seitwärts (außen) und atmet (innen). */
 function Drift({
   duration,
   reverse,
+  animated,
   children,
 }: {
   duration: number;
   reverse: boolean;
+  animated: boolean;
   children: ReactNode;
 }) {
   const reducedMotion = useReducedMotion();
-  if (reducedMotion) {
+  const active = useScreenActive();
+  if (reducedMotion || !animated) {
     return <View style={StyleSheet.absoluteFill}>{children}</View>;
   }
   return (
@@ -42,28 +44,16 @@ function Drift({
       style={[
         StyleSheet.absoluteFill,
         {
-          animationName: drift,
+          animationName: puff,
           animationDuration: `${duration}ms`,
           animationIterationCount: 'infinite',
           animationDirection: reverse ? 'alternate-reverse' : 'alternate',
           animationTimingFunction: 'ease-in-out',
+          animationPlayState: playState(active),
         },
       ]}
     >
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            animationName: breathe,
-            animationDuration: `${Math.round(duration * 0.7)}ms`,
-            animationIterationCount: 'infinite',
-            animationDirection: 'alternate',
-            animationTimingFunction: 'ease-in-out',
-          },
-        ]}
-      >
-        {children}
-      </Animated.View>
+      {children}
     </Animated.View>
   );
 }
@@ -72,7 +62,7 @@ function Drift({
  * „Liegt noch im Nebel" wörtlich: zwei Schwaden ziehen langsam über ein
  * verschlossenes Schild (karte.html `.fog .veil`, radial von innen nach außen).
  */
-export function FogVeil({ width, height, uid, night = false }: Props) {
+export function FogVeil({ width, height, uid, night = false, animated = true }: Props) {
   const color = night ? landscape.nightFog : landscape.fog;
   const deep = night ? landscape.nightFog : landscape.fogDeep;
   // Die Zeichenfläche ragt über das Schild hinaus, damit die weichen Ränder
@@ -87,7 +77,7 @@ export function FogVeil({ width, height, uid, night = false }: Props) {
       pointerEvents="none"
       style={{ position: 'absolute', left: -padX, top: -padY, width: w, height: h }}
     >
-      <Drift duration={9000} reverse={false}>
+      <Drift duration={9000} reverse={false} animated={animated}>
         <Svg width={w} height={h}>
           <Defs>
             <RadialGradient id={`fogA_${uid}`} cx="50%" cy="50%" r="50%">
@@ -105,7 +95,7 @@ export function FogVeil({ width, height, uid, night = false }: Props) {
           />
         </Svg>
       </Drift>
-      <Drift duration={12500} reverse>
+      <Drift duration={12500} reverse animated={animated}>
         <Svg width={w} height={h}>
           <Defs>
             <RadialGradient id={`fogB_${uid}`} cx="50%" cy="50%" r="50%">

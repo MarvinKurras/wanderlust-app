@@ -41,6 +41,8 @@ describe('formatDistance', () => {
   it('formatiert Meter und Kilometer deutsch', () => {
     expect(formatDistance(830)).toBe('830 m');
     expect(formatDistance(999.4)).toBe('999 m');
+    expect(formatDistance(999.6)).toBe('1 km');
+    expect(formatDistance(9960)).toBe('10 km');
     expect(formatDistance(3210)).toBe('3,2 km');
     expect(formatDistance(12600)).toBe('13 km');
   });

@@ -22,6 +22,7 @@ import { useUnlock } from '@/features/unlock/useUnlock';
 import { de } from '@/i18n/de';
 import { formatCoords, formatDateDe } from '@/lib/format';
 import { formatDistance, haversineM } from '@/lib/geo';
+import { useScreenActive } from '@/lib/screenActive';
 import { useTilt } from '@/lib/tilt';
 import { colors, fonts, landscape, radius, spacing, textStyles } from '@/theme';
 
@@ -43,8 +44,9 @@ export default function OrtDetailScreen() {
   const { width, height } = useWindowDimensions();
   const places = usePlaces();
   const unlocks = useUnlocks();
-  const tilt = useTilt();
-  const here = useKnownPosition();
+  const active = useScreenActive();
+  const tilt = useTilt(active);
+  const { coords: here } = useKnownPosition();
   const { scrollY, onScroll } = useCollapsingHeader();
 
   const place = useMemo(() => places.data?.find((p) => p.id === id), [places.data, id]);

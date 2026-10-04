@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -6,6 +6,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { Button } from '@/components/Button';
 import { GlassSurface } from '@/components/Glass';
@@ -39,31 +40,51 @@ export function ConfirmDialog({
   onCancel,
 }: Props) {
   const progress = useSharedValue(0);
+  // Das Modal bleibt bis zum Ende der Ausblendung gemountet (wie BottomSheet).
+  const [mounted, setMounted] = useState(visible);
+  if (visible && !mounted) {
+    setMounted(true);
+  }
 
   useEffect(() => {
-    progress.value = visible
-      ? withSpring(1, motionSprings.sheet)
-      : withTiming(0, { duration: 160 });
-    if (visible && destructive) warning();
-  }, [visible, destructive, progress]);
+    if (!mounted) return;
+    if (visible) {
+      progress.set(withSpring(1, motionSprings.sheet));
+      if (destructive) warning();
+    } else {
+      progress.set(
+        withTiming(0, { duration: 160 }, (finished) => {
+          if (finished) scheduleOnRN(setMounted, false);
+        }),
+      );
+    }
+  }, [visible, mounted, destructive, progress]);
 
   const cardStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ scale: 0.92 + progress.value * 0.08 }, { translateY: (1 - progress.value) * 16 }],
+    opacity: progress.get(),
+    transform: [{ scale: 0.92 + progress.get() * 0.08 }, { translateY: (1 - progress.get()) * 16 }],
   }));
-  const scrimStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
+  const scrimStyle = useAnimatedStyle(() => ({ opacity: progress.get() }));
+
+  // Während die Aktion läuft, lässt sich der Dialog nicht wegtippen.
+  const cancel = () => {
+    if (!busy) onCancel();
+  };
+
+  if (!mounted) return null;
 
   return (
     <Modal
-      visible={visible}
+      visible
       transparent
       animationType="none"
-      onRequestClose={onCancel}
+      onRequestClose={cancel}
       statusBarTranslucent
+      navigationBarTranslucent
     >
-      <View style={styles.center}>
+      <View style={styles.center} pointerEvents={visible ? 'auto' : 'none'}>
         <Animated.View style={[StyleSheet.absoluteFill, scrimStyle]}>
-          <Pressable style={[StyleSheet.absoluteFill, styles.scrim]} onPress={onCancel} />
+          <Pressable style={[StyleSheet.absoluteFill, styles.scrim]} onPress={cancel} />
         </Animated.View>
         <Animated.View style={[styles.cardWrap, cardStyle]}>
           <GlassSurface radius={24} style={styles.card} intensity={50}>
@@ -77,7 +98,13 @@ export function ConfirmDialog({
                 busy={busy}
                 fullWidth
               />
-              <Button label={cancelLabel} variant="ghost" onPress={onCancel} fullWidth />
+              <Button
+                label={cancelLabel}
+                variant="ghost"
+                onPress={cancel}
+                disabled={busy}
+                fullWidth
+              />
             </View>
           </GlassSurface>
         </Animated.View>

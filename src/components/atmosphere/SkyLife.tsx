@@ -1,16 +1,23 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { memo, useMemo } from 'react';
+import { memo, useId, useMemo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Animated, { css, useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 
+import { playState, useScreenActive } from '@/lib/screenActive';
 import { landscape, withAlpha } from '@/theme';
 
 /**
  * Himmelsleben der Bergbühne — Port aus dem Website-Hero (`app.js` skylife,
- * `index.html` .sun/.cloud/.flock). Alle Dauerschleifen sind langsam und
- * entfallen bei „Bewegung reduzieren".
+ * `index.html` .sun/.cloud/.flock). Alle Dauerschleifen sind langsam,
+ * entfallen bei „Bewegung reduzieren" und pausieren, solange der Screen nicht
+ * sichtbar ist (`useScreenActive`).
  */
+
+/** SVG-IDs sind im Web dokumentweit — pro Instanz eindeutig machen. */
+function useSvgId(prefix: string) {
+  return `${prefix}${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+}
 
 const fadeIn = css.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } });
 
@@ -27,6 +34,8 @@ export function Sun({
   delay?: number;
 }) {
   const reducedMotion = useReducedMotion();
+  const halo = useSvgId('sunHalo');
+  const core = useSvgId('sunCore');
   return (
     <Animated.View
       pointerEvents="none"
@@ -43,19 +52,19 @@ export function Sun({
     >
       <Svg width={size} height={size}>
         <Defs>
-          <RadialGradient id="sunHalo" cx="50%" cy="50%" r="50%">
+          <RadialGradient id={halo} cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor={landscape.sunHalo} stopOpacity={0.95} />
             <Stop offset="42%" stopColor={landscape.sunHaloWarm} stopOpacity={0.55} />
             <Stop offset="70%" stopColor={landscape.sunHaloWarm} stopOpacity={0} />
           </RadialGradient>
-          <RadialGradient id="sunCore" cx="50%" cy="50%" r="50%">
+          <RadialGradient id={core} cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor={landscape.sunCore} />
             <Stop offset="70%" stopColor={landscape.sunWarm} />
             <Stop offset="100%" stopColor={landscape.sunWarm} stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill="url(#sunHalo)" />
-        <Circle cx={size / 2} cy={size / 2} r={size * 0.14} fill="url(#sunCore)" />
+        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#${halo})`} />
+        <Circle cx={size / 2} cy={size / 2} r={size * 0.14} fill={`url(#${core})`} />
       </Svg>
     </Animated.View>
   );
@@ -96,6 +105,7 @@ export function Cloud({
   duration: number;
 }) {
   const reducedMotion = useReducedMotion();
+  const active = useScreenActive();
   const cloud = CLOUDS[kind];
   return (
     <Animated.View
@@ -111,6 +121,7 @@ export function Cloud({
           animationIterationCount: [1, 'infinite'],
           animationDirection: ['normal', 'alternate'],
           animationTimingFunction: ['ease', 'ease-in-out'],
+          animationPlayState: playState(active),
         },
       ]}
     >
@@ -136,6 +147,7 @@ const flap = css.keyframes({
 /** Vogelschwarm (app.js .flock): drei Vögel ziehen quer über den Himmel. */
 export function Flock({ width, top }: { width: number; top: number }) {
   const reducedMotion = useReducedMotion();
+  const active = useScreenActive();
   const fly = useMemo(
     () =>
       css.keyframes({
@@ -168,6 +180,7 @@ export function Flock({ width, top }: { width: number; top: number }) {
         animationDelay: '3.4s',
         animationIterationCount: 'infinite',
         animationTimingFunction: 'linear',
+        animationPlayState: playState(active),
       }}
     >
       {birds.map((b) => (
@@ -183,6 +196,7 @@ export function Flock({ width, top }: { width: number; top: number }) {
             animationIterationCount: 'infinite',
             animationDirection: 'alternate',
             animationTimingFunction: 'ease-in-out',
+            animationPlayState: playState(active),
           }}
         >
           <Svg width="100%" height="100%" viewBox="0 0 28 12">
@@ -206,9 +220,16 @@ function pseudoRandom(seed: number): number {
 }
 
 const twinkle = css.keyframes({
-  from: { opacity: 0.15 },
-  to: { opacity: 0.85 },
+  from: { opacity: 0.2 },
+  to: { opacity: 1 },
 });
+
+/** Drei phasenversetzte Gruppen statt einer Schleife pro Stern (UI-Thread schonen). */
+const STAR_GROUPS = [
+  { duration: 3400, delay: 0 },
+  { duration: 4700, delay: 1300 },
+  { duration: 6100, delay: 2600 },
+];
 
 /** Sternenhimmel der Sammlung (Tannen-Nacht). */
 export const Stars = memo(function Stars({
@@ -221,43 +242,56 @@ export const Stars = memo(function Stars({
   count?: number;
 }) {
   const reducedMotion = useReducedMotion();
-  const stars = useMemo(
-    () =>
-      Array.from({ length: count }, (_, i) => ({
+  const active = useScreenActive();
+  const groups = useMemo(() => {
+    const out = STAR_GROUPS.map(
+      () => [] as { left: number; top: number; size: number; glow: number }[],
+    );
+    for (let i = 0; i < count; i += 1) {
+      out[i % STAR_GROUPS.length].push({
         left: pseudoRandom(i + 3) * width,
         top: Math.pow(pseudoRandom(i + 17), 1.4) * height,
         size: 1 + pseudoRandom(i + 29) * 1.8,
-        duration: 2600 + pseudoRandom(i + 41) * 4200,
-        delay: pseudoRandom(i + 53) * 4000,
-      })),
-    [width, height, count],
-  );
+        glow: 0.45 + pseudoRandom(i + 41) * 0.4,
+      });
+    }
+    return out;
+  }, [width, height, count]);
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      {stars.map((s, i) => (
+      {groups.map((stars, g) => (
         <Animated.View
-          key={i}
+          key={g}
           style={[
-            {
-              position: 'absolute',
-              left: s.left,
-              top: s.top,
-              width: s.size,
-              height: s.size,
-              borderRadius: s.size,
-              backgroundColor: landscape.star,
-              opacity: 0.5,
-            },
+            StyleSheet.absoluteFill,
+            { opacity: 0.6 },
             !reducedMotion && {
               animationName: twinkle,
-              animationDuration: `${s.duration}ms`,
-              animationDelay: `${s.delay}ms`,
+              animationDuration: `${STAR_GROUPS[g].duration}ms`,
+              animationDelay: `${STAR_GROUPS[g].delay}ms`,
               animationIterationCount: 'infinite',
               animationDirection: 'alternate',
               animationTimingFunction: 'ease-in-out',
+              animationPlayState: playState(active),
             },
           ]}
-        />
+        >
+          {stars.map((star, i) => (
+            <View
+              key={i}
+              style={{
+                position: 'absolute',
+                left: star.left,
+                top: star.top,
+                width: star.size,
+                height: star.size,
+                borderRadius: star.size,
+                backgroundColor: landscape.star,
+                opacity: star.glow,
+              }}
+            />
+          ))}
+        </Animated.View>
       ))}
     </View>
   );
@@ -277,6 +311,7 @@ export function Glow({
   color: string;
   opacity?: number;
 }) {
+  const id = useSvgId('glow');
   return (
     <View
       pointerEvents="none"
@@ -284,18 +319,13 @@ export function Glow({
     >
       <Svg width={size} height={size}>
         <Defs>
-          <RadialGradient id={`glow${color.replace('#', '')}`} cx="50%" cy="50%" r="50%">
+          <RadialGradient id={id} cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor={color} stopOpacity={0.55} />
             <Stop offset="45%" stopColor={color} stopOpacity={0.16} />
             <Stop offset="100%" stopColor={color} stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={size / 2}
-          fill={`url(#glow${color.replace('#', '')})`}
-        />
+        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#${id})`} />
       </Svg>
     </View>
   );
@@ -320,6 +350,8 @@ export function FogBand({
   reverse?: boolean;
 }) {
   const reducedMotion = useReducedMotion();
+  const active = useScreenActive();
+  const puffId = useSvgId('puff');
   const drift = useMemo(
     () =>
       css.keyframes({
@@ -339,6 +371,7 @@ export function FogBand({
           animationIterationCount: 'infinite',
           animationDirection: reverse ? 'alternate-reverse' : 'alternate',
           animationTimingFunction: 'ease-in-out',
+          animationPlayState: playState(active),
         },
       ]}
     >
@@ -350,7 +383,7 @@ export function FogBand({
       {/* Schwaden: weiche Ellipsen geben dem Band Struktur */}
       <Svg style={StyleSheet.absoluteFill}>
         <Defs>
-          <RadialGradient id={`puff${top}`} cx="50%" cy="50%" r="50%">
+          <RadialGradient id={puffId} cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor={color} stopOpacity={0.7} />
             <Stop offset="100%" stopColor={color} stopOpacity={0} />
           </RadialGradient>
@@ -361,7 +394,7 @@ export function FogBand({
             cx={fx * width * 2}
             cy={height / 2}
             r={height * 0.9}
-            fill={`url(#puff${top})`}
+            fill={`url(#${puffId})`}
           />
         ))}
       </Svg>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedProps,
   useReducedMotion,
@@ -13,9 +14,10 @@ import Animated, {
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import type { BadgeShape } from '@/lib/places';
-import { badgeTones } from '@/theme';
+import { useScreenActive } from '@/lib/screenActive';
+import { glass } from '@/theme';
 
-import { SHAPES, VIEWBOX } from './geometry';
+import { CENTER, SHAPES, VIEWBOX } from './geometry';
 
 export type BrassSheenProps = {
   shape: BadgeShape;
@@ -31,18 +33,25 @@ const AnimatedRect = Animated.createAnimatedComponent(Rect);
 const BAND_W = 70;
 const PAUSE_MS = 3200;
 
+/** Website `badges.js` glint: im eingelassenen, auf 0,88 skalierten Feld. */
+const INSET = `translate(${CENTER.x} ${CENTER.y}) scale(0.88) translate(${-CENTER.x} ${-CENTER.y})`;
+
 /**
  * Web-Fallback des Messingglanzes (nativ: Skia-Shader in `BrassSheen.native.tsx`):
  * ein Lichtstreif zieht in Abständen über das Schild — wie der Glanz-Sweep der
- * Website (`badges.js` glint), exakt auf die Schildform beschnitten.
+ * Website (`badges.js` glint), beschnitten auf die eingelassene Schildfläche.
  */
 export function BrassSheen({ shape, width, intensity = 1, uid }: BrassSheenProps) {
   const reducedMotion = useReducedMotion();
+  const active = useScreenActive();
   const height = (width * VIEWBOX.height) / VIEWBOX.width;
   const x = useSharedValue(-BAND_W * 2.5);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !active) {
+      cancelAnimation(x);
+      return;
+    }
     x.value = withDelay(
       400,
       withRepeat(
@@ -54,7 +63,7 @@ export function BrassSheen({ shape, width, intensity = 1, uid }: BrassSheenProps
         -1,
       ),
     );
-  }, [reducedMotion, x]);
+  }, [reducedMotion, active, x]);
 
   const bandProps = useAnimatedProps(() => ({ x: x.value }));
 
@@ -71,16 +80,16 @@ export function BrassSheen({ shape, width, intensity = 1, uid }: BrassSheenProps
     >
       <Defs>
         <LinearGradient id={`${id}_band`} x1="0" y1="0" x2="1" y2="0">
-          <Stop offset="0" stopColor={badgeTones.brass.hi} stopOpacity={0} />
-          <Stop offset="0.5" stopColor={badgeTones.silver.hi} stopOpacity={0.6 * intensity} />
-          <Stop offset="1" stopColor={badgeTones.brass.hi} stopOpacity={0} />
+          <Stop offset="0" stopColor={glass.sheen} stopOpacity={0} />
+          <Stop offset="0.5" stopColor={glass.sheen} stopOpacity={glass.sheenPeak * intensity} />
+          <Stop offset="1" stopColor={glass.sheen} stopOpacity={0} />
         </LinearGradient>
         <ClipPath id={`${id}_shape`}>
-          <Path d={SHAPES[shape]} />
+          <Path d={SHAPES[shape]} transform={INSET} />
         </ClipPath>
       </Defs>
       <G clipPath={`url(#${id}_shape)`}>
-        <G transform="skewX(-18)">
+        <G transform="skewX(-16)">
           <AnimatedRect
             animatedProps={bandProps}
             y={-20}

@@ -26,12 +26,15 @@ describe('Vorschau-Modus', () => {
     await expect(native.previewUnlock('zugspitze')).rejects.toThrow();
   });
 
-  it.each(['ios', 'android'] as const)('Web-Fassung bleibt auf %s aus, auch mit Variable', async (os) => {
-    process.env.EXPO_PUBLIC_PREVIEW = '1';
-    const web = loadWeb(os);
-    expect(web.isPreview).toBe(false);
-    await expect(web.previewFetchPlaces()).rejects.toThrow();
-  });
+  it.each(['ios', 'android'] as const)(
+    'Web-Fassung bleibt auf %s aus, auch mit Variable',
+    async (os) => {
+      process.env.EXPO_PUBLIC_PREVIEW = '1';
+      const web = loadWeb(os);
+      expect(web.isPreview).toBe(false);
+      await expect(web.previewFetchPlaces()).rejects.toThrow();
+    },
+  );
 
   it('gilt im Browser nur mit EXPO_PUBLIC_PREVIEW=1', () => {
     process.env.EXPO_PUBLIC_PREVIEW = '1';

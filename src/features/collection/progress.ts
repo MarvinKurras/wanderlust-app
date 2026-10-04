@@ -11,7 +11,5 @@ export function progressSub(unlocked: number, total: number): string {
   if (unlocked === 0) {
     return 'Noch kein Gipfel erwandert — leg los';
   }
-  return locked === 1
-    ? '1 Gipfel liegt noch im Nebel'
-    : `${locked} Gipfel liegen noch im Nebel`;
+  return locked === 1 ? '1 Gipfel liegt noch im Nebel' : `${locked} Gipfel liegen noch im Nebel`;
 }

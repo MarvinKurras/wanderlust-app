@@ -108,6 +108,7 @@ export function PraegeMoment({ place, unlockedAt, visible, onDone }: Props) {
       transparent
       animationType="none"
       statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onDone}
     >
       <Animated.View style={[StyleSheet.absoluteFill, styles.scrim, scrimStyle]}>

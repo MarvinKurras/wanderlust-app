@@ -17,6 +17,9 @@ export const glass = {
   pineBorder: 'rgba(243,234,215,0.14)',
   pineHighlight: 'rgba(255,255,255,0.07)',
   pineTint: 'rgba(28,38,32,0.45)',
+  /** Lichtstreif des Messingglanzes (Website `badges.js` glint: #fff, Spitze .7) */
+  sheen: '#ffffff',
+  sheenPeak: 0.7,
 } as const;
 
 /** Schatten als `boxShadow` (RN ≥ 0.76, alle Plattformen inkl. Web). Farbe: ink. */

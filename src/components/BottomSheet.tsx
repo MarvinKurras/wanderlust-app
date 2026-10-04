@@ -32,7 +32,9 @@ export function BottomSheet({ visible, onClose, children }: Props) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [mounted, setMounted] = useState(visible);
-  const translateY = useSharedValue(height);
+  // 0 = offen, 1 = ganz unten — relativ, damit eine Höhenänderung (Multi-Window,
+  // Foldables) das Sheet nicht neu einfedern lässt.
+  const hidden = useSharedValue(1);
   const drag = useSharedValue(0);
 
   if (visible && !mounted) {
@@ -43,16 +45,16 @@ export function BottomSheet({ visible, onClose, children }: Props) {
     if (!mounted) return;
     if (visible) {
       drag.set(0);
-      translateY.set(height);
-      translateY.set(withSpring(0, motionSprings.sheet));
+      hidden.set(1);
+      hidden.set(withSpring(0, motionSprings.sheet));
     } else {
-      translateY.set(
-        withTiming(height, { duration: 240 }, (finished) => {
+      hidden.set(
+        withTiming(1, { duration: 240 }, (finished) => {
           if (finished) scheduleOnRN(setMounted, false);
         }),
       );
     }
-  }, [drag, height, mounted, translateY, visible]);
+  }, [drag, hidden, mounted, visible]);
 
   const pan = Gesture.Pan()
     .onUpdate((event) => {
@@ -68,11 +70,11 @@ export function BottomSheet({ visible, onClose, children }: Props) {
     });
 
   const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value + drag.value }],
+    transform: [{ translateY: hidden.get() * height + drag.get() }],
   }));
   const scrimStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
-      translateY.value + drag.value,
+      hidden.get() * height + drag.get(),
       [0, height * 0.6],
       [1, 0],
       Extrapolation.CLAMP,

@@ -26,7 +26,8 @@ export function wouldUnlock(distanceM: number, radiusM: number, accuracyM: numbe
 
 /** Distanz deutsch formatiert: „830 m" bzw. „3,2 km". */
 export function formatDistance(meters: number): string {
-  if (meters < 1000) {
+  // Erst runden, dann umschalten — sonst stünde bei 999,6 m „1000 m".
+  if (Math.round(meters) < 1000) {
     return `${Math.round(meters)} m`;
   }
   const km = meters / 1000;

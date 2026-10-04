@@ -4,14 +4,70 @@ import { StockBadge, type StockBadgeProps } from '../StockBadge';
 
 /** Badge-Konfigurationen der 8 MVP-Orte (Quelle: supabase/migrations/…_seed_places.sql). */
 const PLACES: StockBadgeProps[] = [
-  { name: 'Zugspitze', region: 'Wettersteingebirge', elevationM: 2962, motif: 'peak', shape: 'shield', tone: 'brass' },
-  { name: 'Watzmann', region: 'Berchtesgadener Alpen', elevationM: 2713, motif: 'twin', shape: 'shield', tone: 'brass' },
-  { name: 'Königssee', region: 'Berchtesgaden', elevationM: 603, motif: 'lake', shape: 'arch', tone: 'brass' },
-  { name: 'Brocken', region: 'Harz', elevationM: 1141, motif: 'tower', shape: 'oval', tone: 'pewter' },
-  { name: 'Feldberg', region: 'Schwarzwald', elevationM: 1493, motif: 'forest', shape: 'oval', tone: 'copper' },
-  { name: 'Königsstuhl', region: 'Rügen · Jasmund', elevationM: 118, motif: 'cliff', shape: 'arch', tone: 'silver' },
-  { name: 'Gr. Arber', region: 'Bayerischer Wald', elevationM: 1456, motif: 'peak', shape: 'shield', tone: 'pewter' },
-  { name: 'Wendelstein', region: 'Mangfallgebirge', elevationM: 1838, motif: 'tower', shape: 'shield', tone: 'copper' },
+  {
+    name: 'Zugspitze',
+    region: 'Wettersteingebirge',
+    elevationM: 2962,
+    motif: 'peak',
+    shape: 'shield',
+    tone: 'brass',
+  },
+  {
+    name: 'Watzmann',
+    region: 'Berchtesgadener Alpen',
+    elevationM: 2713,
+    motif: 'twin',
+    shape: 'shield',
+    tone: 'brass',
+  },
+  {
+    name: 'Königssee',
+    region: 'Berchtesgaden',
+    elevationM: 603,
+    motif: 'lake',
+    shape: 'arch',
+    tone: 'brass',
+  },
+  {
+    name: 'Brocken',
+    region: 'Harz',
+    elevationM: 1141,
+    motif: 'tower',
+    shape: 'oval',
+    tone: 'pewter',
+  },
+  {
+    name: 'Feldberg',
+    region: 'Schwarzwald',
+    elevationM: 1493,
+    motif: 'forest',
+    shape: 'oval',
+    tone: 'copper',
+  },
+  {
+    name: 'Königsstuhl',
+    region: 'Rügen · Jasmund',
+    elevationM: 118,
+    motif: 'cliff',
+    shape: 'arch',
+    tone: 'silver',
+  },
+  {
+    name: 'Gr. Arber',
+    region: 'Bayerischer Wald',
+    elevationM: 1456,
+    motif: 'peak',
+    shape: 'shield',
+    tone: 'pewter',
+  },
+  {
+    name: 'Wendelstein',
+    region: 'Mangfallgebirge',
+    elevationM: 1838,
+    motif: 'tower',
+    shape: 'shield',
+    tone: 'copper',
+  },
 ];
 
 // useId in Snapshots stabil halten (Gradient-/Clip-IDs)
@@ -38,11 +94,14 @@ function collectProp(node: unknown, prop: string, acc: unknown[] = []): unknown[
 }
 
 describe('StockBadge', () => {
-  it.each(PLACES.map((p) => [p.name, p] as const))('rendert %s pixel-stabil', async (_name, place) => {
-    const tree = (await render(<StockBadge {...place} />)).toJSON();
-    expect(tree).not.toBeNull();
-    expect(tree).toMatchSnapshot();
-  });
+  it.each(PLACES.map((p) => [p.name, p] as const))(
+    'rendert %s pixel-stabil',
+    async (_name, place) => {
+      const tree = (await render(<StockBadge {...place} />)).toJSON();
+      expect(tree).not.toBeNull();
+      expect(tree).toMatchSnapshot();
+    },
+  );
 
   it('rendert die Locked-Variante (entsättigt, Opacity 0.62)', async () => {
     const tree = (await render(<StockBadge {...PLACES[7]} locked />)).toJSON();

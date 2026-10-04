@@ -31,6 +31,8 @@ import type { Unlock } from '@/lib/unlocks';
 import { colors, fonts, spacing, textStyles } from '@/theme';
 
 const GRID_GAP = spacing.md;
+/** Etwa eine Bildschirmfüllung — so viele Schilder rendert das Raster sofort. */
+const INITIAL_CARDS = 8;
 
 /**
  * Sammlung — die Vitrine in der Tannen-Nacht (Website `.collection`/`.coll-grid`,
@@ -77,11 +79,9 @@ export default function SammlungScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    try {
-      await refresh();
-    } finally {
-      setRefreshing(false);
-    }
+    // Fehler zeigt die Liste selbst (StateView); hier nur das Ziehen beenden.
+    await refresh().catch(() => undefined);
+    setRefreshing(false);
   };
 
   const cardWidth = (width - spacing.lg * 2 - GRID_GAP) / 2;
@@ -97,15 +97,20 @@ export default function SammlungScreen() {
     />
   );
 
-  const renderCard = (item: Place, index: number) => {
+  const renderCard = ({ item, index }: { item: Place; index: number }) => {
     const unlock = unlockByPlace.get(item.id);
     const unlocked = Boolean(unlock);
     return (
       <Animated.View
-        key={item.id}
-        entering={FadeInDown.delay(300 + staggerDelay(index, 12))
-          .springify()
-          .damping(motionSprings.sheet.damping)}
+        // Nur die erste Bildschirmfüllung staffelt herein; später nachgeladene
+        // Zeilen (Virtualisierung) erscheinen ohne Verzögerung.
+        entering={
+          index < INITIAL_CARDS
+            ? FadeInDown.delay(300 + staggerDelay(index, 12))
+                .springify()
+                .damping(motionSprings.sheet.damping)
+            : undefined
+        }
         style={{ width: cardWidth }}
       >
         <PressableScale
@@ -131,10 +136,86 @@ export default function SammlungScreen() {
     );
   };
 
+  const header = (
+    <>
+      <LargeTitle
+        eyebrow={de.sammlung.eyebrow}
+        title={de.sammlung.title}
+        scrollY={scrollY}
+        tone="pine"
+      />
+
+      <Animated.View entering={FadeIn.delay(120)} style={styles.progress}>
+        <View style={styles.counterRow}>
+          <Text style={styles.counter}>{unlockedCount}</Text>
+          <Text style={styles.counterOf}>/ {all.length}</Text>
+          <Text style={styles.counterLabel}>{de.sammlung.erwandert}</Text>
+        </View>
+        <ProgressBar
+          value={all.length ? unlockedCount / all.length : 0}
+          tone="pine"
+          height={4}
+          delay={400}
+        />
+        <Text style={styles.progressSub}>{progressSub(unlockedCount, all.length)}</Text>
+      </Animated.View>
+
+      {regionRow.length > 0 && (
+        <View style={styles.regionBlock}>
+          <Text style={styles.blockEyebrow}>{de.regionen.sammlungEyebrow}</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.regionRow}
+          >
+            {regionRow.map((p) => (
+              <View
+                key={p.regionId}
+                style={styles.regionItem}
+                accessible
+                accessibilityLabel={regionProgressLabel(p)}
+              >
+                <RegionBadge progress={p} width={78} />
+                <Text style={styles.regionName}>{p.name}</Text>
+                <Text style={[styles.regionLabel, p.complete && styles.regionDone]}>
+                  {p.complete ? de.regionen.komplettKurz : `${p.unlocked} / ${p.total}`}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      <Text style={[styles.blockEyebrow, styles.gridEyebrow]}>{de.sammlung.schilder}</Text>
+    </>
+  );
+
+  const empty = places.isPending ? (
+    <StateView loading message={de.sammlung.laden} tone="pine" />
+  ) : places.isError ? (
+    <StateView
+      message={de.sammlung.fehler}
+      actionLabel={de.orte.nochmal}
+      onAction={() => refresh()}
+      tone="pine"
+    />
+  ) : null;
+
   return (
     <View style={styles.screen}>
       <Atmosphere variant="pine" />
-      <Animated.ScrollView
+      {/* Virtualisiertes Raster: nur sichtbare Schilder (mit Nebel/Glanz) sind gemountet. */}
+      <Animated.FlatList
+        data={all}
+        keyExtractor={(p) => p.id}
+        numColumns={2}
+        renderItem={renderCard}
+        ListHeaderComponent={header}
+        ListEmptyComponent={empty}
+        columnWrapperStyle={styles.gridRow}
+        ItemSeparatorComponent={RowGap}
+        initialNumToRender={INITIAL_CARDS}
+        windowSize={5}
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: tabSpace + spacing.lg }}
@@ -146,71 +227,7 @@ export default function SammlungScreen() {
             colors={[colors.brassDeep]}
           />
         }
-      >
-        <LargeTitle
-          eyebrow={de.sammlung.eyebrow}
-          title={de.sammlung.title}
-          scrollY={scrollY}
-          tone="pine"
-        />
-
-        <Animated.View entering={FadeIn.delay(120)} style={styles.progress}>
-          <View style={styles.counterRow}>
-            <Text style={styles.counter}>{unlockedCount}</Text>
-            <Text style={styles.counterOf}>/ {all.length}</Text>
-            <Text style={styles.counterLabel}>{de.sammlung.erwandert}</Text>
-          </View>
-          <ProgressBar
-            value={all.length ? unlockedCount / all.length : 0}
-            tone="pine"
-            height={4}
-            delay={400}
-          />
-          <Text style={styles.progressSub}>{progressSub(unlockedCount, all.length)}</Text>
-        </Animated.View>
-
-        {regionRow.length > 0 && (
-          <View style={styles.regionBlock}>
-            <Text style={styles.blockEyebrow}>{de.regionen.sammlungEyebrow}</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.regionRow}
-            >
-              {regionRow.map((p) => (
-                <View
-                  key={p.regionId}
-                  style={styles.regionItem}
-                  accessible
-                  accessibilityLabel={regionProgressLabel(p)}
-                >
-                  <RegionBadge progress={p} width={78} />
-                  <Text style={styles.regionName}>{p.name}</Text>
-                  <Text style={[styles.regionLabel, p.complete && styles.regionDone]}>
-                    {p.complete ? de.regionen.komplettKurz : `${p.unlocked} / ${p.total}`}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-
-        <View style={styles.gridBlock}>
-          <Text style={styles.blockEyebrow}>{de.sammlung.schilder}</Text>
-          {places.isPending ? (
-            <StateView loading message={de.sammlung.laden} tone="pine" />
-          ) : places.isError && all.length === 0 ? (
-            <StateView
-              message={de.sammlung.fehler}
-              actionLabel={de.orte.nochmal}
-              onAction={() => refresh()}
-              tone="pine"
-            />
-          ) : (
-            <View style={styles.grid}>{all.map(renderCard)}</View>
-          )}
-        </View>
-      </Animated.ScrollView>
+      />
       <CompactHeader
         title={de.sammlung.title}
         scrollY={scrollY}
@@ -220,6 +237,10 @@ export default function SammlungScreen() {
       />
     </View>
   );
+}
+
+function RowGap() {
+  return <View style={styles.rowGap} />;
 }
 
 const styles = StyleSheet.create({
@@ -298,15 +319,15 @@ const styles = StyleSheet.create({
   regionDone: {
     color: colors.brassLight,
   },
-  gridBlock: {
+  gridEyebrow: {
     marginTop: spacing.xl,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  gridRow: {
     gap: GRID_GAP,
-    rowGap: spacing.lg,
     paddingHorizontal: spacing.lg,
+  },
+  rowGap: {
+    height: spacing.lg,
   },
   card: {
     alignItems: 'center',

@@ -61,11 +61,9 @@ export default function OrteScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    try {
-      await refresh();
-    } finally {
-      setRefreshing(false);
-    }
+    // Fehler zeigt die Liste selbst (StateView); hier nur das Ziehen beenden.
+    await refresh().catch(() => undefined);
+    setRefreshing(false);
   };
 
   const header = (

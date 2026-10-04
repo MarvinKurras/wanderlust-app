@@ -20,6 +20,8 @@ type Props = {
   sheen?: boolean;
   /** Nebelschwaden auf verschlossenen Schildern. */
   fog?: boolean;
+  /** `false` lässt den Nebel stillstehen (kleine Schilder in Listen und Karussell). */
+  fogMotion?: boolean;
   /** Dunkler Nebel für die Tannen-Nacht. */
   night?: boolean;
   bandLabel?: string;
@@ -52,6 +54,7 @@ export function BadgeArt({
   locked,
   sheen = true,
   fog = true,
+  fogMotion = true,
   night = false,
   bandLabel,
 }: Props) {
@@ -73,7 +76,9 @@ export function BadgeArt({
         />
       </View>
       {!locked && sheen && <BrassSheen shape={place.badge_shape} width={width} uid={uid} />}
-      {locked && fog && <FogVeil width={width} height={height} uid={uid} night={night} />}
+      {locked && fog && (
+        <FogVeil width={width} height={height} uid={uid} night={night} animated={fogMotion} />
+      )}
     </View>
   );
 }

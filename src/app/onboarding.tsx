@@ -45,11 +45,9 @@ export default function OnboardingScreen() {
   };
 
   const allowLocation = async () => {
-    try {
-      await Location.requestForegroundPermissionsAsync();
-    } finally {
-      await finish();
-    }
+    // Ablehnung oder Fehler halten das Onboarding nicht auf.
+    await Location.requestForegroundPermissionsAsync().catch(() => undefined);
+    await finish();
   };
 
   const go = (next: number) => {

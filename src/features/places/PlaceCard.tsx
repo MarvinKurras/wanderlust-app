@@ -32,7 +32,7 @@ export function PlaceCard({ place, unlocked, index }: Props) {
         tilt={3}
         style={styles.card}
       >
-        <BadgeArt place={place} width={62} locked={!unlocked} />
+        <BadgeArt place={place} width={62} locked={!unlocked} sheen={false} fogMotion={false} />
         <View style={styles.body}>
           <Text style={styles.name} numberOfLines={2}>
             {place.name}

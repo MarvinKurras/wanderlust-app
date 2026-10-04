@@ -109,6 +109,10 @@ export function PlaceCarousel({
       onScroll={onScroll}
       scrollEventThrottle={16}
       getItemLayout={(_, index) => ({ length: interval, offset: interval * index, index })}
+      // Nur Karten nahe dem Sichtfeld montieren — jede trägt Glas (Blur) und ein Schild.
+      initialNumToRender={4}
+      maxToRenderPerBatch={4}
+      windowSize={5}
       renderItem={({ item, index }) => (
         <CarouselCard
           place={item}
@@ -169,7 +173,7 @@ function CarouselCard({
           style={[styles.card, active && styles.cardActive]}
           intensity={40}
         >
-          <BadgeArt place={place} width={46} locked={!unlocked} sheen={false} />
+          <BadgeArt place={place} width={46} locked={!unlocked} sheen={false} fogMotion={false} />
           <View style={styles.info}>
             <Text style={[styles.name, !unlocked && styles.nameLocked]} numberOfLines={1}>
               {place.name}

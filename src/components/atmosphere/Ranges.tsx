@@ -12,6 +12,7 @@ import Animated, {
 import Svg, { G, Path } from 'react-native-svg';
 
 import { motionEasings } from '@/lib/motion';
+import { useScreenActive } from '@/lib/screenActive';
 import { useTilt } from '@/lib/tilt';
 import { landscape } from '@/theme';
 
@@ -80,7 +81,8 @@ const LayerView = memo(function LayerView({
   delay: number;
 }) {
   const reducedMotion = useReducedMotion();
-  const tilt = useTilt();
+  const active = useScreenActive();
+  const tilt = useTilt(parallax && active);
   const animate = intro !== 'none' && !reducedMotion;
   const sketch = intro === 'sketch' && !reducedMotion;
 

@@ -1,4 +1,8 @@
-import { AuthRetryableFetchError, FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
+import {
+  AuthRetryableFetchError,
+  FunctionsFetchError,
+  FunctionsHttpError,
+} from '@supabase/supabase-js';
 
 import { de } from '@/i18n/de';
 
@@ -6,7 +10,9 @@ import { stateFromError, stateFromResponse } from '../unlockOutcome';
 
 describe('stateFromResponse', () => {
   it('UNLOCKED → frische Prägung (Inszenierung)', () => {
-    expect(stateFromResponse({ ok: true, code: 'UNLOCKED', unlockedAt: '2026-10-04T10:00:00Z' })).toEqual({
+    expect(
+      stateFromResponse({ ok: true, code: 'UNLOCKED', unlockedAt: '2026-10-04T10:00:00Z' }),
+    ).toEqual({
       phase: 'unlocked',
       unlockedAt: '2026-10-04T10:00:00Z',
       fresh: true,
@@ -27,16 +33,22 @@ describe('stateFromResponse', () => {
   });
 
   it('ACCURACY_TOO_LOW nennt ±m nur bei plausiblem Wert', () => {
-    expect(stateFromResponse({ ok: false, code: 'ACCURACY_TOO_LOW', accuracyM: 140 })).toMatchObject({
+    expect(
+      stateFromResponse({ ok: false, code: 'ACCURACY_TOO_LOW', accuracyM: 140 }),
+    ).toMatchObject({
       message: de.unlock.zuUngenau(140),
     });
-    expect(stateFromResponse({ ok: false, code: 'ACCURACY_TOO_LOW', accuracyM: 9999 })).toMatchObject({
+    expect(
+      stateFromResponse({ ok: false, code: 'ACCURACY_TOO_LOW', accuracyM: 9999 }),
+    ).toMatchObject({
       message: de.unlock.zuUngenauOhneWert,
     });
   });
 
   it('MOCK_LOCATION bleibt wiederholbar (Mock-App abschalten, neu versuchen)', () => {
-    expect(stateFromResponse({ ok: false, code: 'MOCK_LOCATION' })).toMatchObject({ canRetry: true });
+    expect(stateFromResponse({ ok: false, code: 'MOCK_LOCATION' })).toMatchObject({
+      canRetry: true,
+    });
   });
 
   it('unbekannte Codes → generischer Fehler', () => {
@@ -49,7 +61,11 @@ describe('stateFromResponse', () => {
 describe('stateFromError', () => {
   it('429 → Rast, ohne Retry', () => {
     const e = new FunctionsHttpError({ status: 429 });
-    expect(stateFromError(e)).toEqual({ phase: 'error', message: de.unlock.rateLimit, canRetry: false });
+    expect(stateFromError(e)).toEqual({
+      phase: 'error',
+      message: de.unlock.rateLimit,
+      canRetry: false,
+    });
   });
 
   it('andere HTTP-Fehler → generisch mit Retry', () => {
