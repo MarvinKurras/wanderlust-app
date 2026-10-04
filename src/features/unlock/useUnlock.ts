@@ -7,6 +7,7 @@ import { unlocksQueryKey } from '@/features/places/queries';
 import { de } from '@/i18n/de';
 import { ensureSession } from '@/lib/auth';
 import { formatDistance } from '@/lib/geo';
+import { isPreview, previewUnlock } from '@/lib/preview';
 import { supabase } from '@/lib/supabase';
 
 const LOCATION_TIMEOUT_MS = 15_000;
@@ -84,6 +85,19 @@ export function useUnlock(placeId: string) {
   const queryClient = useQueryClient();
 
   const start = useCallback(async () => {
+    // Web-Vorschau (nur Browser + EXPO_PUBLIC_PREVIEW=1): Ablauf ohne Standort und
+    // ohne Netz nachspielen, damit die Prägung sichtbar wird. Native Builds
+    // erreichen diesen Pfad nie (Plattform-Gate in `isPreview`).
+    if (isPreview) {
+      setState({ phase: 'locating' });
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      setState({ phase: 'submitting' });
+      const { unlockedAt } = await previewUnlock(placeId);
+      await queryClient.invalidateQueries({ queryKey: unlocksQueryKey });
+      setState({ phase: 'unlocked', unlockedAt });
+      return;
+    }
+
     // 1) Permission
     const permission = await Location.requestForegroundPermissionsAsync();
     if (permission.status !== Location.PermissionStatus.GRANTED) {

@@ -1,51 +1,57 @@
-import { Link } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { StockBadge } from '@/badges';
+import { BadgeArt } from '@/badges';
+import { Glyph } from '@/components/Glyph';
+import { PressableScale } from '@/components/PressableScale';
+import { StatusMark } from '@/components/StatusMark';
 import { de } from '@/i18n/de';
+import { motionSprings, staggerDelay } from '@/lib/motion';
 import type { Place } from '@/lib/places';
-import { colors, fonts, radius, spacing } from '@/theme';
+import { colors, fonts, glass, shadows, spacing } from '@/theme';
 
 type Props = {
   place: Place;
   unlocked: boolean;
+  index: number;
 };
 
-/** Listenkarte eines Ortes (Orte-Tab). */
-export function PlaceCard({ place, unlocked }: Props) {
+/** Listenkarte eines Ortes (Orte-Tab): Schild mit Glanz bzw. Nebel, Name, Höhe, Zustand. */
+export function PlaceCard({ place, unlocked, index }: Props) {
   return (
-    <Link href={{ pathname: '/ort/[id]', params: { id: place.id } }} asChild>
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    <Animated.View
+      entering={FadeInDown.delay(staggerDelay(index))
+        .springify()
+        .damping(motionSprings.sheet.damping)}
+    >
+      <PressableScale
+        onPress={() => router.push({ pathname: '/ort/[id]', params: { id: place.id } })}
         accessibilityRole="button"
-        accessibilityLabel={place.name}
+        accessibilityLabel={`${place.name}, ${unlocked ? de.orte.statusErwandert : de.orte.statusVerschlossen}`}
+        tilt={3}
+        style={styles.card}
       >
-        <View style={styles.art}>
-          <StockBadge
-            name={place.name}
-            region={place.region}
-            elevationM={place.elevation_m}
-            motif={place.badge_motif}
-            shape={place.badge_shape}
-            tone={place.badge_tone}
-            locked={!unlocked}
-            width={64}
-          />
-        </View>
+        <BadgeArt place={place} width={62} locked={!unlocked} />
         <View style={styles.body}>
-          <Text style={styles.name}>{place.name}</Text>
-          <Text style={styles.meta}>
-            {place.elevation_m} m · {place.region}
+          <Text style={styles.name} numberOfLines={2}>
+            {place.name}
           </Text>
-          <View style={styles.statusRow}>
-            <View style={[styles.pip, unlocked ? styles.pipDone : styles.pipLocked]} />
-            <Text style={[styles.status, unlocked && styles.statusDone]}>
-              {unlocked ? de.orte.statusErwandert : de.orte.statusVerschlossen}
-            </Text>
+          <Text style={styles.meta} numberOfLines={1}>
+            <Text style={styles.elevation}>{place.elevation_m} m</Text>
+            {' · '}
+            {place.type}
+          </Text>
+          <View style={styles.status}>
+            <StatusMark
+              unlocked={unlocked}
+              label={unlocked ? de.orte.statusErwandert : de.orte.statusKurzNebel}
+            />
           </View>
         </View>
-      </Pressable>
-    </Link>
+        <Glyph name="chevronRight" size={18} color={colors.inkSoft} style={styles.chevron} />
+      </PressableScale>
+    </Animated.View>
   );
 }
 
@@ -54,59 +60,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.paperDeep,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    borderColor: colors.paperLine,
-    padding: spacing.md,
-  },
-  cardPressed: {
-    opacity: 0.85,
-  },
-  art: {
-    width: 64,
+    backgroundColor: glass.paperFillStrong,
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: glass.paperBorder,
+    paddingVertical: spacing.sm + 2,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
+    boxShadow: shadows.card,
   },
   body: {
     flex: 1,
   },
   name: {
-    fontFamily: fonts.displayMedium,
-    fontSize: 24,
+    fontFamily: fonts.displaySemiBold,
+    fontSize: 23,
+    lineHeight: 27,
     color: colors.ink,
   },
   meta: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
+    fontFamily: fonts.sans,
+    fontSize: 13,
     color: colors.inkSoft,
-    marginTop: spacing.xs,
+    marginTop: 3,
   },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  pip: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  pipDone: {
-    backgroundColor: colors.brass,
-  },
-  pipLocked: {
-    backgroundColor: colors.lockedGray,
+  elevation: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 10.5,
+    letterSpacing: 0.8,
+    color: colors.brassDeep,
   },
   status: {
-    fontFamily: fonts.mono,
-    fontSize: 10,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: colors.inkSoft,
+    marginTop: spacing.sm,
   },
-  statusDone: {
-    color: colors.brassDeep,
+  chevron: {
+    opacity: 0.5,
   },
 });

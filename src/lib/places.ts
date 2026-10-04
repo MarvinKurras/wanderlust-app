@@ -1,5 +1,6 @@
 import type { BadgeTone } from '@/theme';
 
+import { isPreview, previewFetchPlaces } from './preview';
 import { supabase } from './supabase';
 
 export type BadgeMotif = 'peak' | 'twin' | 'lake' | 'cliff' | 'forest' | 'tower';
@@ -26,6 +27,7 @@ export type Place = {
 
 /** Lädt alle aktiven Orte, höchste zuerst (RLS filtert auf `active`). */
 export async function fetchPlaces(): Promise<Place[]> {
+  if (isPreview) return previewFetchPlaces();
   const { data, error } = await supabase
     .from('places')
     .select('*')

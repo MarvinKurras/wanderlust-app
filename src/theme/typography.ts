@@ -9,6 +9,7 @@ import { colors } from './colors';
  * Die Font-Keys entsprechen den in `src/app/_layout.tsx` geladenen Schnitten.
  */
 export const fonts = {
+  displayLight: 'Cormorant_300Light',
   display: 'Cormorant_400Regular',
   displayMedium: 'Cormorant_500Medium',
   displaySemiBold: 'Cormorant_600SemiBold',
@@ -52,5 +53,43 @@ export const textStyles = {
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     color: colors.inkSoft,
+  },
+  /** Wortmarke / Hero (Website: .wordmark, Cormorant leicht) */
+  hero: {
+    fontFamily: fonts.displayLight,
+    fontSize: 58,
+    lineHeight: 60,
+    letterSpacing: -1,
+    color: colors.ink,
+  },
+  /** Ortsname in Karten und Sheets */
+  name: {
+    fontFamily: fonts.displaySemiBold,
+    fontSize: 24,
+    lineHeight: 27,
+    color: colors.ink,
+  },
+  /** Poetische Zeile (Cormorant kursiv) */
+  verse: {
+    fontFamily: fonts.displayItalic,
+    fontSize: 20,
+    lineHeight: 26,
+    color: colors.inkSoft,
+  },
+  /** Bedienelemente: Mono, gesperrt */
+  control: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 12,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: colors.ink,
+  },
+  /** Große Zählzahl (Fortschritt) */
+  numeral: {
+    fontFamily: fonts.displayMedium,
+    fontSize: 64,
+    lineHeight: 64,
+    letterSpacing: -1.5,
+    color: colors.ink,
   },
 } as const satisfies Record<string, TextStyle>;

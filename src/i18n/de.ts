@@ -1,5 +1,9 @@
 /** Zentrale deutsche UI-Texte (CLAUDE.md: keine verstreuten Hardcodes). Tonalität: Website. */
 export const de = {
+  allgemein: {
+    schliessen: 'Schließen',
+    zurueck: 'Zurück',
+  },
   tabs: {
     karte: 'Karte',
     orte: 'Orte',
@@ -13,6 +17,8 @@ export const de = {
     filterErwandert: 'Erwandert',
     statusErwandert: 'Erwandert',
     statusVerschlossen: 'Liegt noch im Nebel',
+    statusKurzNebel: 'Im Nebel',
+    anzahl: (n: number) => `${n} ${n === 1 ? 'Ziel' : 'Ziele'}`,
     leer: 'Keine Orte in dieser Auswahl.',
     laden: 'Die Karte wird entrollt …',
     fehler: 'Die Orte konnten nicht geladen werden.',
@@ -21,8 +27,11 @@ export const de = {
   detail: {
     zurueck: 'Orte',
     erwandertAm: (datum: string) => `Erwandert am ${datum} · in Messing geprägt`,
+    erwandertKurz: (datum: string) => `Erwandert · ${datum}`,
     nochNichtErwandert: 'Noch nicht erwandert — sei vor Ort, um dieses Schild zu prägen.',
     shopTeaser: 'Als Stocknagel bestellen — bald verfügbar',
+    shopTeaserKurz: 'Als Stocknagel bestellen',
+    bald: 'Bald',
     nichtGefunden: 'Dieser Ort liegt noch im Nebel.',
   },
   karte: {
@@ -55,10 +64,22 @@ export const de = {
     mock: 'Dein Standort wirkt simuliert — echte Pfade zählen.',
     fehler: 'Die Prägung ist fehlgeschlagen. Versuch es gleich nochmal.',
     nochmal: 'Nochmal versuchen',
+    hinweis: (radiusM: number) => `Nur vor Ort · im Umkreis von ${radiusM} m`,
+  },
+  praegung: {
+    eyebrow: 'In Messing geprägt',
+    zeile: (datum: string) => `Erwandert am ${datum}`,
+    weiter: 'Weiter',
+    zurSammlung: 'Zur Sammlung',
   },
   onboarding: {
     kicker: 'Aus dem Wörterbuch des Wanderns',
     titel: 'Wanderlust',
+    lautschrift: '/ˈvan·dɐ·lʊst/',
+    wortart: 'Substantiv, feminin',
+    definition:
+      'Die tief empfundene Sehnsucht loszuziehen — Gipfel zu besteigen, Pfaden zu folgen und die Orte zu sammeln, an denen man einmal stand.',
+    defTag: 'Von dir erwandert · in Messing geschlagen',
     schritte: [
       {
         idx: '01 / Besuchen',
@@ -87,9 +108,14 @@ export const de = {
   },
   einstellungen: {
     titel: 'Einstellungen',
+    eyebrow: 'Dein Wanderbuch',
+    emailLabel: 'E-Mail-Adresse',
+    loeschenHinweis: 'Entfernt dein Konto und alle geprägten Schilder endgültig.',
+    version: (v: string) => `Wanderlust · Version ${v}`,
     zurueck: 'Sammlung',
     kontoEyebrow: 'Dein Konto',
-    kontoAnonym: 'Du wanderst anonym. Sichere deine Sammlung mit einer E-Mail-Adresse — sonst geht sie mit dem Gerät verloren.',
+    kontoAnonym:
+      'Du wanderst anonym. Sichere deine Sammlung mit einer E-Mail-Adresse — sonst geht sie mit dem Gerät verloren.',
     kontoMitEmail: (email: string) => `Deine Sammlung ist mit ${email} gesichert.`,
     emailPlatzhalter: 'deine@email.de',
     upgradeCta: 'Sammlung sichern',
@@ -108,23 +134,29 @@ export const de = {
     loeschenFehler: 'Löschen fehlgeschlagen — versuch es gleich nochmal.',
   },
   rechtliches: {
+    titel: 'Rechtliches',
     platzhalterHinweis:
       'PLATZHALTER — wird vor dem öffentlichen Release durch finale Rechtstexte ersetzt.',
-    impressumText:
-      'Wanderlust · Musterstraße 1 · 00000 Musterstadt · hallo@wanderlust.app',
+    impressumText: 'Wanderlust · Musterstraße 1 · 00000 Musterstadt · hallo@wanderlust.app',
     datenschutzText:
       'Wanderlust verarbeitet deinen Standort nur im Moment einer Prägung oder Kartenanzeige (Foreground, on demand). Pro Freischaltung wird genau ein Standort-Snapshot (Position, Genauigkeit, Distanz) zur Missbrauchsprüfung gespeichert. Es findet kein Tracking statt, es werden keine Bewegungsprofile erstellt. Anonyme Konten enthalten keine personenbezogenen Pflichtdaten; eine E-Mail-Adresse wird nur beim freiwilligen Konto-Upgrade verarbeitet. Konto und alle Daten können jederzeit in den Einstellungen gelöscht werden.',
   },
   regionen: {
     weitereZiele: 'Weitere Ziele',
     komplett: 'Komplett — in Messing besiegelt',
+    komplettKurz: 'Komplett',
     siegelRegion: 'Unterregion',
     siegelBand: 'Komplett',
     sammlungEyebrow: 'Abschluss-Marken',
   },
+  vorschau: {
+    kartenhinweis: 'Kartenvorschau · im Browser ohne echte Karte',
+  },
   sammlung: {
     eyebrow: 'Dein Wanderstock',
     title: 'Sammlung',
+    erwandert: 'erwandert',
+    schilder: 'Deine Stockschilder',
     verschlossen: 'Verschlossen',
     nochNicht: 'Noch nicht erwandert',
     laden: 'Der Wanderstock wird poliert …',

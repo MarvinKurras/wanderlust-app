@@ -2267,6 +2267,45 @@ exports[`StockBadge rendert Gr. Arber pixel-stabil 1`] = `
                 r={22}
               />
             </RNSVGGroup>
+            <RNSVGGroup
+              fill={null}
+              opacity={0.75}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4283723900,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeWidth={1.6}
+            >
+              <RNSVGPath
+                d="M58,108 q5,-6 10,0 q5,-6 10,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M84,120 q4,-5 8,0 q4,-5 8,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+            </RNSVGGroup>
             <RNSVGPath
               d="M-12,196 L42,150 L92,188 L142,142 L188,184 L232,150 L232,214 L-12,214 Z"
               fill={
@@ -4123,6 +4162,45 @@ exports[`StockBadge rendert Königsstuhl pixel-stabil 1`] = `
                 r={22}
               />
             </RNSVGGroup>
+            <RNSVGGroup
+              fill={null}
+              opacity={0.75}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4283723900,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeWidth={1.6}
+            >
+              <RNSVGPath
+                d="M58,108 q5,-6 10,0 q5,-6 10,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M84,120 q4,-5 8,0 q4,-5 8,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+            </RNSVGGroup>
             <RNSVGRect
               fill={
                 {
@@ -5204,6 +5282,45 @@ exports[`StockBadge rendert Watzmann pixel-stabil 1`] = `
                   ]
                 }
                 r={22}
+              />
+            </RNSVGGroup>
+            <RNSVGGroup
+              fill={null}
+              opacity={0.75}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4283723900,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeWidth={1.6}
+            >
+              <RNSVGPath
+                d="M58,108 q5,-6 10,0 q5,-6 10,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M84,120 q4,-5 8,0 q4,-5 8,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
               />
             </RNSVGGroup>
             <RNSVGPath
@@ -7065,6 +7182,45 @@ exports[`StockBadge rendert Zugspitze pixel-stabil 1`] = `
                   ]
                 }
                 r={22}
+              />
+            </RNSVGGroup>
+            <RNSVGGroup
+              fill={null}
+              opacity={0.75}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4283723900,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeWidth={1.6}
+            >
+              <RNSVGPath
+                d="M58,108 q5,-6 10,0 q5,-6 10,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M84,120 q4,-5 8,0 q4,-5 8,0"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
               />
             </RNSVGGroup>
             <RNSVGPath

@@ -14,4 +14,6 @@ export const radius = {
   pill: 40,
   /** Bottom Sheet (Website: karte.html .sheet 26px) */
   sheet: 26,
+  /** Schwebende Glas-Flächen (Tab-Leiste, Karussell) */
+  float: 22,
 } as const;

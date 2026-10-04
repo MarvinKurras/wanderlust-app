@@ -1,8 +1,8 @@
-import Feather from '@expo/vector-icons/Feather';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 
 import { StockBadge } from '@/badges';
+import { Glyph } from '@/components/Glyph';
 import { de } from '@/i18n/de';
 import type { Place } from '@/lib/places';
 import { badgeTones, colors, fonts, spacing } from '@/theme';
@@ -33,7 +33,7 @@ export function PlacePin({ place, unlocked }: Props) {
           <Ellipse cx={46} cy={35} rx={46} ry={35} fill={`url(#fog_${place.id})`} />
         </Svg>
         <View style={styles.lock}>
-          <Feather name="lock" size={16} color={colors.inkSoft} />
+          <Glyph name="lock" size={17} color={colors.inkSoft} strokeWidth={1.8} />
         </View>
         <Text style={styles.fogLabel}>{de.karte.fogLabel}</Text>
       </View>

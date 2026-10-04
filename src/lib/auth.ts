@@ -1,3 +1,4 @@
+import { isPreview } from './preview';
 import { supabase } from './supabase';
 
 /**
@@ -6,6 +7,7 @@ import { supabase } from './supabase';
  * E-Mail-Upgrade folgt in AP8).
  */
 export async function ensureSession(): Promise<string> {
+  if (isPreview) return 'preview';
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) {
     throw sessionError;

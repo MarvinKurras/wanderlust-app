@@ -1,9 +1,15 @@
-import type { Region } from 'react-native-maps';
-
 import type { Place } from '@/lib/places';
 
+/** Kartenausschnitt (entspricht `Region` aus react-native-maps, ohne Abhängigkeit). */
+export type MapRegion = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
 /** Fallback: Deutschland-Gesamtansicht (wie die Website-Karte). */
-export const GERMANY_REGION: Region = {
+export const GERMANY_REGION: MapRegion = {
   latitude: 51.1,
   longitude: 10.4,
   latitudeDelta: 9.5,
@@ -15,7 +21,7 @@ export const GERMANY_REGION: Region = {
  * (~2 km) hält dichte Stadt-Unterregionen wie Ladenburg auf Stadt-Niveau,
  * statt auf einen halben Landesausschnitt aufzuziehen.
  */
-export function regionForPlaces(places: Place[]): Region {
+export function regionForPlaces(places: Place[]): MapRegion {
   if (places.length === 0) {
     return GERMANY_REGION;
   }
@@ -39,7 +45,7 @@ export function regionForPlaces(places: Place[]): Region {
  * Skaliert mit dem Freischalt-Radius (A-R3-3): Stadthotspot 150 m ≈ 2 km
  * Ausschnitt, Gipfel 500 m ≈ 8 km — geklemmt auf 0,012–0,08°.
  */
-export function regionForPlace(place: Place): Region {
+export function regionForPlace(place: Place): MapRegion {
   const metersPerDegreeLat = 111320;
   const latDelta = Math.min(
     Math.max((place.unlock_radius_m * 14) / metersPerDegreeLat, 0.012),

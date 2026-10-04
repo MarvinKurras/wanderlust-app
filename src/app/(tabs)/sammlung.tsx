@@ -1,37 +1,50 @@
-import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
-import { StockBadge } from '@/badges';
-import { Eyebrow } from '@/components/Eyebrow';
-import { progressLabel, progressSub } from '@/features/collection/progress';
+import { BadgeArt } from '@/badges';
+import { Atmosphere } from '@/components/atmosphere/Atmosphere';
+import { IconButton } from '@/components/IconButton';
+import { PressableScale } from '@/components/PressableScale';
+import { ProgressBar } from '@/components/ProgressBar';
+import { CompactHeader, LargeTitle, useCollapsingHeader } from '@/components/ScreenChrome';
+import { StateView } from '@/components/StateView';
+import { StatusMark } from '@/components/StatusMark';
+import { useTabBarSpace } from '@/components/TabBar';
+import { progressSub } from '@/features/collection/progress';
 import { RegionBadge } from '@/features/collection/RegionBadge';
 import { regionProgress, regionProgressLabel } from '@/features/collection/regionProgress';
 import { usePlaces, useRefreshPlaces, useRegions, useUnlocks } from '@/features/places/queries';
 import { de } from '@/i18n/de';
 import { formatDateDe } from '@/lib/format';
+import { motionSprings, staggerDelay } from '@/lib/motion';
 import type { Place } from '@/lib/places';
 import type { Unlock } from '@/lib/unlocks';
 import { colors, fonts, spacing, textStyles } from '@/theme';
 
-/** Sammlung — Pine-Welt nach Website `.collection`/`.coll-grid` (A-AP7-1: Grid statt Stock-Szene). */
+const GRID_GAP = spacing.md;
+
+/**
+ * Sammlung — die Vitrine in der Tannen-Nacht (Website `.collection`/`.coll-grid`,
+ * A-AP7-1: Grid statt Stock-Szene). Erwanderte Schilder glänzen und folgen der
+ * Handyneigung; verschlossene liegen im Nachtnebel.
+ */
 export default function SammlungScreen() {
-  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const places = usePlaces();
   const regions = useRegions();
   const unlocks = useUnlocks();
   const refresh = useRefreshPlaces();
+  const tabSpace = useTabBarSpace();
+  const { scrollY, onScroll } = useCollapsingHeader();
   const [refreshing, setRefreshing] = useState(false);
 
   const unlockByPlace = useMemo(() => {
@@ -40,7 +53,18 @@ export default function SammlungScreen() {
     return map;
   }, [unlocks.data]);
 
-  const all = useMemo(() => places.data ?? [], [places.data]);
+  // Erwanderte zuerst (jüngste oben), danach die Orte im Nebel
+  const all = useMemo(() => {
+    const list = [...(places.data ?? [])];
+    return list.sort((a, b) => {
+      const ua = unlockByPlace.get(a.id);
+      const ub = unlockByPlace.get(b.id);
+      if (ua && ub) return ub.unlocked_at.localeCompare(ua.unlocked_at);
+      if (ua) return -1;
+      if (ub) return 1;
+      return 0;
+    });
+  }, [places.data, unlockByPlace]);
   const unlockedCount = all.filter((p) => unlockByPlace.has(p.id)).length;
 
   // Abschluss-Marken: alle Unterregionen mit Zielen (AP-R2)
@@ -60,110 +84,140 @@ export default function SammlungScreen() {
     }
   };
 
-  const renderItem = ({ item }: { item: Place }) => {
+  const cardWidth = (width - spacing.lg * 2 - GRID_GAP) / 2;
+  const badgeWidth = Math.min(150, cardWidth - spacing.lg);
+
+  const settings = (
+    <IconButton
+      glyph="sliders"
+      tone="pine"
+      size={40}
+      accessibilityLabel={de.einstellungen.titel}
+      onPress={() => router.push('/einstellungen')}
+    />
+  );
+
+  const renderCard = (item: Place, index: number) => {
     const unlock = unlockByPlace.get(item.id);
     const unlocked = Boolean(unlock);
     return (
-      <Pressable
-        onPress={() => router.push({ pathname: '/ort/[id]', params: { id: item.id } })}
-        accessibilityRole="button"
-        accessibilityLabel={unlocked ? item.name : de.sammlung.verschlossen}
-        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      <Animated.View
+        key={item.id}
+        entering={FadeInDown.delay(300 + staggerDelay(index, 12))
+          .springify()
+          .damping(motionSprings.sheet.damping)}
+        style={{ width: cardWidth }}
       >
-        <StockBadge
-          name={item.name}
-          region={item.region}
-          elevationM={item.elevation_m}
-          motif={item.badge_motif}
-          shape={item.badge_shape}
-          tone={item.badge_tone}
-          locked={!unlocked}
-          width={140}
-        />
-        <Text style={[styles.cardName, !unlocked && styles.cardNameLocked]}>
-          {unlocked ? item.name : de.sammlung.verschlossen}
-        </Text>
-        <Text style={styles.cardSub}>
-          {unlock ? formatDateDe(unlock.unlocked_at) : de.sammlung.nochNicht}
-        </Text>
-      </Pressable>
+        <PressableScale
+          onPress={() => router.push({ pathname: '/ort/[id]', params: { id: item.id } })}
+          accessibilityRole="button"
+          accessibilityLabel={`${item.name}, ${unlocked ? de.orte.statusErwandert : de.orte.statusVerschlossen}`}
+          tilt={6}
+          style={styles.card}
+        >
+          <BadgeArt place={item} width={badgeWidth} locked={!unlocked} night />
+          <Text style={[styles.cardName, !unlocked && styles.cardNameLocked]} numberOfLines={2}>
+            {item.name}
+          </Text>
+          {unlock ? (
+            <Text style={styles.cardDate}>{formatDateDe(unlock.unlocked_at)}</Text>
+          ) : (
+            <View style={styles.cardMark}>
+              <StatusMark unlocked={false} label={de.orte.statusKurzNebel} tone="pine" size="sm" />
+            </View>
+          )}
+        </PressableScale>
+      </Animated.View>
     );
   };
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + spacing.lg }]}>
-      <View style={styles.headerRow}>
-        <Eyebrow onPine>{de.sammlung.eyebrow}</Eyebrow>
-        <Pressable
-          onPress={() => router.push('/einstellungen')}
-          accessibilityRole="button"
-          accessibilityLabel={de.einstellungen.titel}
-          style={styles.gear}
-        >
-          <Feather name="settings" size={18} color={colors.paperOnPineDim} />
-        </Pressable>
-      </View>
-      <Text style={styles.title}>{de.sammlung.title}</Text>
-
-      <View style={styles.progressRow}>
-        <Text style={styles.progressLabel}>{progressLabel(unlockedCount, all.length)}</Text>
-        <Text style={styles.progressSub}>{progressSub(unlockedCount, all.length)}</Text>
-      </View>
-      <View style={styles.track}>
-        <View
-          style={[
-            styles.bar,
-            { width: `${all.length === 0 ? 0 : (unlockedCount / all.length) * 100}%` },
-          ]}
+    <View style={styles.screen}>
+      <Atmosphere variant="pine" />
+      <Animated.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingBottom: tabSpace + spacing.lg }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.brassLight}
+            colors={[colors.brassDeep]}
+          />
+        }
+      >
+        <LargeTitle
+          eyebrow={de.sammlung.eyebrow}
+          title={de.sammlung.title}
+          scrollY={scrollY}
+          tone="pine"
         />
-      </View>
 
-      {regionRow.length > 0 && (
-        <View style={styles.regionBlock}>
-          <Text style={styles.regionEyebrow}>{de.regionen.sammlungEyebrow}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.regionRow}>
-            {regionRow.map((p) => (
-              <View key={p.regionId} style={styles.regionItem}>
-                <RegionBadge progress={p} width={86} />
-                <Text style={styles.regionLabel}>
-                  {p.complete ? de.regionen.komplett : regionProgressLabel(p)}
-                </Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      )}
+        <Animated.View entering={FadeIn.delay(120)} style={styles.progress}>
+          <View style={styles.counterRow}>
+            <Text style={styles.counter}>{unlockedCount}</Text>
+            <Text style={styles.counterOf}>/ {all.length}</Text>
+            <Text style={styles.counterLabel}>{de.sammlung.erwandert}</Text>
+          </View>
+          <ProgressBar
+            value={all.length ? unlockedCount / all.length : 0}
+            tone="pine"
+            height={4}
+            delay={400}
+          />
+          <Text style={styles.progressSub}>{progressSub(unlockedCount, all.length)}</Text>
+        </Animated.View>
 
-      {places.isPending ? (
-        <View style={styles.center}>
-          <ActivityIndicator color={colors.brassLight} />
-          <Text style={styles.stateText}>{de.sammlung.laden}</Text>
-        </View>
-      ) : places.isError && all.length === 0 ? (
-        <View style={styles.center}>
-          <Text style={styles.stateText}>{de.sammlung.fehler}</Text>
-          <Pressable onPress={() => refresh()} accessibilityRole="button" style={styles.retry}>
-            <Text style={styles.retryText}>{de.orte.nochmal}</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={all}
-          keyExtractor={(p) => p.id}
-          renderItem={renderItem}
-          numColumns={2}
-          columnWrapperStyle={styles.gridRow}
-          contentContainerStyle={styles.grid}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.brassLight}
-              colors={[colors.brassDeep]}
+        {regionRow.length > 0 && (
+          <View style={styles.regionBlock}>
+            <Text style={styles.blockEyebrow}>{de.regionen.sammlungEyebrow}</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.regionRow}
+            >
+              {regionRow.map((p) => (
+                <View
+                  key={p.regionId}
+                  style={styles.regionItem}
+                  accessible
+                  accessibilityLabel={regionProgressLabel(p)}
+                >
+                  <RegionBadge progress={p} width={78} />
+                  <Text style={styles.regionName}>{p.name}</Text>
+                  <Text style={[styles.regionLabel, p.complete && styles.regionDone]}>
+                    {p.complete ? de.regionen.komplettKurz : `${p.unlocked} / ${p.total}`}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        <View style={styles.gridBlock}>
+          <Text style={styles.blockEyebrow}>{de.sammlung.schilder}</Text>
+          {places.isPending ? (
+            <StateView loading message={de.sammlung.laden} tone="pine" />
+          ) : places.isError && all.length === 0 ? (
+            <StateView
+              message={de.sammlung.fehler}
+              actionLabel={de.orte.nochmal}
+              onAction={() => refresh()}
+              tone="pine"
             />
-          }
-        />
-      )}
+          ) : (
+            <View style={styles.grid}>{all.map(renderCard)}</View>
+          )}
+        </View>
+      </Animated.ScrollView>
+      <CompactHeader
+        title={de.sammlung.title}
+        scrollY={scrollY}
+        tone="pine"
+        right={settings}
+        threshold={70}
+      />
     </View>
   );
 }
@@ -172,102 +226,96 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.pine,
+  },
+  progress: {
+    marginTop: spacing.lg,
     paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  gear: {
-    padding: spacing.xs,
-  },
-  title: {
-    ...textStyles.title,
-    color: colors.paperOnPine,
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  progressRow: {
+  counterRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: spacing.md,
+    gap: spacing.sm,
   },
-  progressLabel: {
-    fontFamily: fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1.5,
+  counter: {
+    ...textStyles.numeral,
+    color: colors.brassLight,
+  },
+  counterOf: {
+    fontFamily: fonts.display,
+    fontSize: 30,
+    color: colors.paperOnPineDim,
+  },
+  counterLabel: {
+    marginLeft: 'auto',
+    fontFamily: fonts.monoMedium,
+    fontSize: 11,
+    letterSpacing: 1.6,
     textTransform: 'uppercase',
     color: colors.brassLight,
   },
   progressSub: {
-    flexShrink: 1,
-    fontFamily: fonts.mono,
-    fontSize: 10,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    fontFamily: fonts.displayItalic,
+    fontSize: 17,
     color: colors.leadOnPine,
-    textAlign: 'right',
-  },
-  track: {
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: colors.pineSoft,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-    overflow: 'hidden',
-  },
-  bar: {
-    height: '100%',
-    backgroundColor: colors.brass,
-    borderRadius: 2,
+    marginTop: spacing.xs,
   },
   regionBlock: {
-    marginBottom: spacing.md,
+    marginTop: spacing.xl,
   },
-  regionEyebrow: {
+  blockEyebrow: {
     fontFamily: fonts.mono,
     fontSize: 10,
-    letterSpacing: 1.5,
+    letterSpacing: 1.8,
     textTransform: 'uppercase',
     color: colors.brassLight,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
   regionRow: {
-    flexGrow: 0,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.lg,
   },
   regionItem: {
     alignItems: 'center',
-    marginRight: spacing.lg,
-    maxWidth: 150,
+    width: 96,
   },
-  regionLabel: {
-    marginTop: spacing.xs,
-    fontFamily: fonts.mono,
-    fontSize: 8.5,
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-    color: colors.paperOnPineDim,
+  regionName: {
+    marginTop: spacing.sm,
+    fontFamily: fonts.displaySemiBold,
+    fontSize: 16,
+    color: colors.paperOnPine,
     textAlign: 'center',
   },
-  grid: {
-    paddingBottom: spacing.xl,
-    gap: spacing.lg,
+  regionLabel: {
+    marginTop: 2,
+    fontFamily: fonts.mono,
+    fontSize: 9.5,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: colors.paperOnPineDim,
   },
-  gridRow: {
-    justifyContent: 'space-between',
+  regionDone: {
+    color: colors.brassLight,
+  },
+  gridBlock: {
+    marginTop: spacing.xl,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: GRID_GAP,
+    rowGap: spacing.lg,
+    paddingHorizontal: spacing.lg,
   },
   card: {
-    width: '47%',
     alignItems: 'center',
-  },
-  cardPressed: {
-    opacity: 0.85,
+    paddingVertical: spacing.sm,
   },
   cardName: {
     fontFamily: fonts.displaySemiBold,
-    fontSize: 21,
+    fontSize: 20,
+    lineHeight: 23,
     color: colors.paperOnPine,
     marginTop: spacing.sm,
     textAlign: 'center',
@@ -275,37 +323,15 @@ const styles = StyleSheet.create({
   cardNameLocked: {
     color: colors.paperOnPineDim,
   },
-  cardSub: {
+  cardDate: {
     fontFamily: fonts.mono,
     fontSize: 9.5,
-    letterSpacing: 0.6,
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
-    color: colors.paperOnPineDim,
+    color: colors.brassLight,
     marginTop: spacing.xs,
-    textAlign: 'center',
   },
-  center: {
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingTop: spacing.xxl,
-  },
-  stateText: {
-    ...textStyles.body,
-    color: colors.leadOnPine,
-    textAlign: 'center',
-  },
-  retry: {
-    borderWidth: 1,
-    borderColor: colors.paperOnPine,
-    borderRadius: 40,
-    paddingVertical: 9,
-    paddingHorizontal: spacing.lg,
-  },
-  retryText: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.paperOnPine,
+  cardMark: {
+    marginTop: spacing.xs,
   },
 });

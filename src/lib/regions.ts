@@ -1,3 +1,4 @@
+import { isPreview, previewFetchRegions } from './preview';
 import { supabase } from './supabase';
 
 /** Region oder Unterregion (Tabelle `regions`; parent_id = Elternregion). */
@@ -10,6 +11,7 @@ export type Region = {
 
 /** Lädt alle aktiven Regionen (RLS filtert auf `active`). */
 export async function fetchRegions(): Promise<Region[]> {
+  if (isPreview) return previewFetchRegions();
   const { data, error } = await supabase.from('regions').select('*').order('name');
   if (error) {
     throw error;

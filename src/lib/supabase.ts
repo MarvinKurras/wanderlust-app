@@ -1,8 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+import { isPreview } from './preview';
+
+// Die Web-Vorschau läuft ohne Backend; ihr Client wird nie angesprochen.
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? (isPreview ? 'http://localhost' : '');
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? (isPreview ? 'preview' : '');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(

@@ -1,5 +1,7 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { GlassSurface } from '@/components/Glass';
+import { PressableScale } from '@/components/PressableScale';
 import type { RegionFilterOption } from '@/features/map/regionFilter';
 import { de } from '@/i18n/de';
 import { colors, fonts, radius, spacing } from '@/theme';
@@ -10,7 +12,7 @@ type Props = {
   onSelect: (option: RegionFilterOption) => void;
 };
 
-/** Gebiets-Auswahl oben auf der Karte: „Alle Ziele" · Regionen · „Weitere Ziele". */
+/** Gebiets-Auswahl oben auf der Karte: „Alle Ziele" · Regionen · „Weitere Ziele" — als Glas-Chips. */
 export function RegionRail({ options, selectedKey, onSelect }: Props) {
   return (
     <ScrollView
@@ -22,21 +24,32 @@ export function RegionRail({ options, selectedKey, onSelect }: Props) {
       {options.map((option) => {
         const active = option.key === selectedKey;
         return (
-          <Pressable
+          <PressableScale
             key={option.key}
             onPress={() => onSelect(option)}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
             accessibilityLabel={de.karte.regionLabel(option.title, option.placeCount)}
-            style={[styles.chip, active && styles.chipActive]}
+            scaleTo={0.94}
           >
-            <Text style={[styles.chipText, active && styles.chipTextActive]}>{option.title}</Text>
-            <View style={[styles.count, active && styles.countActive]}>
-              <Text style={[styles.countText, active && styles.countTextActive]}>
-                {option.placeCount}
-              </Text>
-            </View>
-          </Pressable>
+            {active ? (
+              <View style={[styles.chip, styles.chipActive]}>
+                <Text style={[styles.chipText, styles.chipTextActive]}>{option.title}</Text>
+                <View style={[styles.count, styles.countActive]}>
+                  <Text style={[styles.countText, styles.countTextActive]}>
+                    {option.placeCount}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <GlassSurface radius={radius.pill} interactive style={styles.chip}>
+                <Text style={styles.chipText}>{option.title}</Text>
+                <View style={styles.count}>
+                  <Text style={styles.countText}>{option.placeCount}</Text>
+                </View>
+              </GlassSurface>
+            )}
+          </PressableScale>
         );
       })}
     </ScrollView>
@@ -50,24 +63,21 @@ const styles = StyleSheet.create({
   rail: {
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
+    paddingVertical: 2,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.glass,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.paperLine,
-    paddingVertical: 7,
+    height: 40,
     paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
   },
   chipActive: {
     backgroundColor: colors.ink,
-    borderColor: colors.ink,
   },
   chipText: {
-    fontFamily: fonts.mono,
+    fontFamily: fonts.monoMedium,
     fontSize: 11,
     letterSpacing: 1.2,
     textTransform: 'uppercase',

@@ -1,53 +1,69 @@
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
+import { Button } from '@/components/Button';
+import { Glyph } from '@/components/Glyph';
 import { de } from '@/i18n/de';
-import { colors, fonts, radius, spacing } from '@/theme';
+import { colors, fonts, glass, radius, spacing } from '@/theme';
 
 import type { UnlockState } from './useUnlock';
 
 type Props = {
   state: UnlockState;
   onStart: () => void;
+  /** Freischalt-Radius des Ortes — als Hinweis, wie nah man heran muss. */
+  radiusM: number;
 };
 
-/** Prägen-Button + Statusmeldungen des Unlock-Flows (Detail-Screen). */
-export function UnlockSection({ state, onStart }: Props) {
+/**
+ * Der geprägte Messingknopf + Rückmeldungen des Unlock-Flows (§9). Zeigt nur an —
+ * die Entscheidung fällt in der Edge Function.
+ */
+export function UnlockSection({ state, onStart, radiusM }: Props) {
   const busy = state.phase === 'locating' || state.phase === 'submitting';
-
-  if (state.phase === 'unlocked') {
-    return <Text style={styles.success}>{de.unlock.erfolg}</Text>;
-  }
+  const label =
+    state.phase === 'locating'
+      ? de.unlock.locating
+      : state.phase === 'submitting'
+        ? de.unlock.submitting
+        : de.unlock.cta;
 
   return (
     <View style={styles.wrap}>
-      <Pressable
-        onPress={onStart}
-        disabled={busy}
-        accessibilityRole="button"
-        style={[styles.cta, busy && styles.ctaBusy]}
-      >
-        <Text style={styles.ctaText}>
-          {state.phase === 'locating'
-            ? de.unlock.locating
-            : state.phase === 'submitting'
-              ? de.unlock.submitting
-              : de.unlock.cta}
-        </Text>
-      </Pressable>
-
       {state.phase === 'error' && (
-        <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{state.message}</Text>
-          {state.settingsLink ? (
-            <Pressable onPress={() => Linking.openSettings()} accessibilityRole="button">
-              <Text style={styles.link}>{de.unlock.settingsOeffnen}</Text>
-            </Pressable>
-          ) : state.canRetry ? (
-            <Pressable onPress={onStart} accessibilityRole="button">
-              <Text style={styles.link}>{de.unlock.nochmal}</Text>
-            </Pressable>
-          ) : null}
-        </View>
+        <Animated.View
+          entering={FadeInDown.springify()}
+          style={styles.errorBox}
+          accessibilityLiveRegion="polite"
+        >
+          <Glyph name="compass" size={22} color={colors.brassDeep} strokeWidth={1.5} />
+          <View style={styles.errorBody}>
+            <Text style={styles.errorText}>{state.message}</Text>
+            {state.settingsLink ? (
+              <Button
+                label={de.unlock.settingsOeffnen}
+                variant="ghost"
+                onPress={() => Linking.openSettings()}
+                style={styles.errorAction}
+              />
+            ) : null}
+          </View>
+        </Animated.View>
+      )}
+      <Button
+        label={state.phase === 'error' && state.canRetry ? de.unlock.nochmal : label}
+        variant="brass"
+        size="lg"
+        glyph="hammer"
+        fullWidth
+        busy={busy}
+        disabled={state.phase === 'error' && !state.canRetry && !state.settingsLink}
+        onPress={onStart}
+      />
+      {state.phase === 'idle' && (
+        <Animated.Text entering={FadeIn.delay(300)} style={styles.hint}>
+          {de.unlock.hinweis(radiusM)}
+        </Animated.Text>
       )}
     </View>
   );
@@ -55,48 +71,37 @@ export function UnlockSection({ state, onStart }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    marginTop: spacing.lg,
-  },
-  cta: {
-    backgroundColor: colors.ink,
-    borderRadius: radius.pill,
-    paddingVertical: 13,
-    paddingHorizontal: spacing.lg,
-    alignItems: 'center',
-  },
-  ctaBusy: {
-    opacity: 0.7,
-  },
-  ctaText: {
-    fontFamily: fonts.mono,
-    fontSize: 12,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.paper,
-  },
-  success: {
-    marginTop: spacing.lg,
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.brassDeep,
+    gap: spacing.sm,
   },
   errorBox: {
-    marginTop: spacing.md,
-    gap: spacing.sm,
+    flexDirection: 'row',
+    gap: spacing.md,
+    alignItems: 'flex-start',
+    backgroundColor: glass.paperFillStrong,
+    borderRadius: radius.card,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: glass.paperBorder,
+    padding: spacing.md,
+  },
+  errorBody: {
+    flex: 1,
   },
   errorText: {
     fontFamily: fonts.sans,
-    fontSize: 14,
+    fontSize: 14.5,
     lineHeight: 21,
-    color: colors.inkSoft,
+    color: colors.ink,
   },
-  link: {
+  errorAction: {
+    marginTop: spacing.xs,
+    marginLeft: -spacing.md,
+  },
+  hint: {
+    textAlign: 'center',
     fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.8,
+    fontSize: 10,
+    letterSpacing: 1.1,
     textTransform: 'uppercase',
-    color: colors.brassDeep,
+    color: colors.inkSoft,
   },
 });

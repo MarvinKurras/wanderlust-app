@@ -1,22 +1,43 @@
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInRight,
+  FadeOutLeft,
+  FadeOutUp,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { scheduleOnRN } from 'react-native-worklets';
 
+import { Atmosphere } from '@/components/atmosphere/Atmosphere';
+import { Button } from '@/components/Button';
+import { GlassSurface } from '@/components/Glass';
+import { Glyph, type GlyphName } from '@/components/Glyph';
 import { markOnboardingSeen } from '@/features/onboarding/onboardingFlag';
+import { SketchUnderline } from '@/features/onboarding/SketchUnderline';
 import { de } from '@/i18n/de';
+import { tick } from '@/lib/haptics';
 import { colors, fonts, radius, spacing, textStyles } from '@/theme';
 
+/** Website „So funktioniert's": Besuchen · Freischalten · Sammeln (Icons 1:1). */
+const STEP_GLYPHS: GlyphName[] = ['visit', 'emboss', 'stock'];
+/** -1 = Wörterbuch-Eintrag (Hero), 0–2 = Schritte, 3 = Standort-Priming */
+type Step = -1 | 0 | 1 | 2 | 3;
+
 /**
- * Erststart-Onboarding: 3 Schritte aus Website „So funktioniert's"
- * + Permission-Priming (§9/§10) — App bleibt ohne Permission nutzbar.
+ * Erststart (AP8) im Website-Hero (AP-D): Morgenbühne, deren Bergketten sich
+ * selbst skizzieren, darauf der Wörterbuch-Eintrag „Wanderlust". Danach die drei
+ * Schritte und das Permission-Priming (§9/§10) — App bleibt ohne Permission nutzbar.
  */
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
-  const [step, setStep] = useState(0);
-  const steps = de.onboarding.schritte;
-  const isPriming = step === steps.length;
+  const { width } = useWindowDimensions();
+  const [step, setStep] = useState<Step>(-1);
+  const current = step >= 0 && step < 3 ? de.onboarding.schritte[step as 0 | 1 | 2] : null;
 
   const finish = async () => {
     await markOnboardingSeen();
@@ -24,57 +45,146 @@ export default function OnboardingScreen() {
   };
 
   const allowLocation = async () => {
-    await Location.requestForegroundPermissionsAsync();
-    await finish();
+    try {
+      await Location.requestForegroundPermissionsAsync();
+    } finally {
+      await finish();
+    }
   };
 
+  const go = (next: number) => {
+    const clamped = Math.max(-1, Math.min(3, next)) as Step;
+    if (clamped !== step) {
+      tick();
+      setStep(clamped);
+    }
+  };
+
+  // Wischen blättert wie durch ein Wanderbuch
+  const swipe = Gesture.Pan()
+    .activeOffsetX([-24, 24])
+    .onEnd((event) => {
+      if (event.translationX < -60) scheduleOnRN(go, step + 1);
+      else if (event.translationX > 60 && step > 0) scheduleOnRN(go, step - 1);
+    });
+
   return (
-    <View
-      style={[
-        styles.screen,
-        { paddingTop: insets.top + spacing.xxl, paddingBottom: insets.bottom + spacing.xl },
-      ]}
-    >
-      <Text style={styles.kicker}>{de.onboarding.kicker}</Text>
-      <Text style={styles.wordmark}>{de.onboarding.titel}</Text>
+    <GestureDetector gesture={swipe}>
+      <View style={styles.screen}>
+        <Atmosphere variant="dawn" />
 
-      <View style={styles.card}>
-        <Text style={styles.idx}>{isPriming ? de.onboarding.primingIdx : steps[step].idx}</Text>
-        <Text style={styles.stepTitle}>
-          {isPriming ? de.onboarding.primingTitel : steps[step].titel}
-        </Text>
-        <Text style={styles.stepText}>
-          {isPriming ? de.onboarding.primingText : steps[step].text}
-        </Text>
-      </View>
-
-      <View style={styles.dots}>
-        {[...steps, null].map((_, i) => (
-          <View key={i} style={[styles.dot, i === step && styles.dotActive]} />
-        ))}
-      </View>
-
-      {isPriming ? (
-        <View style={styles.actions}>
-          <Pressable onPress={allowLocation} accessibilityRole="button" style={styles.cta}>
-            <Text style={styles.ctaText}>{de.onboarding.primingErlauben}</Text>
-          </Pressable>
-          <Pressable onPress={finish} accessibilityRole="button" style={styles.ghost}>
-            <Text style={styles.ghostText}>{de.onboarding.primingSpaeter}</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <View style={styles.actions}>
-          <Pressable
-            onPress={() => setStep((s) => s + 1)}
-            accessibilityRole="button"
-            style={styles.cta}
+        {step === -1 ? (
+          <Animated.View
+            key="hero"
+            exiting={FadeOutUp.duration(380)}
+            style={[styles.hero, { paddingTop: insets.top + spacing.xxl * 1.6 }]}
           >
-            <Text style={styles.ctaText}>{de.onboarding.weiter}</Text>
-          </Pressable>
+            <Animated.Text entering={FadeInDown.delay(450).duration(1000)} style={styles.kicker}>
+              {de.onboarding.kicker}
+            </Animated.Text>
+            <Animated.Text entering={FadeInDown.delay(650).duration(1100)} style={styles.wordmark}>
+              {de.onboarding.titel}
+            </Animated.Text>
+            <Animated.View entering={FadeIn.delay(900)}>
+              <SketchUnderline width={Math.min(width * 0.7, 300)} />
+            </Animated.View>
+            <Animated.View entering={FadeInDown.delay(1050).duration(1000)} style={styles.phon}>
+              <Text style={styles.phonText}>{de.onboarding.lautschrift}</Text>
+              <View style={styles.phonDot} />
+              <Text style={styles.phonPos}>{de.onboarding.wortart}</Text>
+            </Animated.View>
+            <Animated.Text
+              entering={FadeInDown.delay(1250).duration(1000)}
+              style={styles.definition}
+            >
+              {de.onboarding.definition}
+            </Animated.Text>
+            <Animated.Text entering={FadeInDown.delay(1450).duration(1000)} style={styles.defTag}>
+              {de.onboarding.defTag}
+            </Animated.Text>
+          </Animated.View>
+        ) : (
+          <View style={{ height: insets.top + spacing.xl }} />
+        )}
+
+        <View style={[styles.bottom, { paddingBottom: insets.bottom + spacing.lg }]}>
+          {step === -1 ? (
+            <Animated.View entering={FadeInDown.delay(2100).springify()} style={styles.heroCta}>
+              <Button
+                label={de.onboarding.los}
+                variant="brass"
+                size="lg"
+                fullWidth
+                glyph="arrowRight"
+                onPress={() => go(0)}
+              />
+            </Animated.View>
+          ) : (
+            <GlassSurface radius={28} style={styles.card} intensity={45}>
+              <Animated.View
+                key={step}
+                entering={FadeInRight.springify()}
+                exiting={FadeOutLeft.duration(160)}
+              >
+                {current ? (
+                  <>
+                    <Glyph
+                      name={STEP_GLYPHS[step]}
+                      size={46}
+                      color={colors.brassDeep}
+                      strokeWidth={1.3}
+                    />
+                    <Text style={styles.idx}>{current.idx}</Text>
+                    <Text style={styles.stepTitle}>{current.titel}</Text>
+                    <Text style={styles.stepText}>{current.text}</Text>
+                  </>
+                ) : (
+                  <>
+                    <Glyph name="shield" size={46} color={colors.brassDeep} strokeWidth={1.3} />
+                    <Text style={styles.idx}>{de.onboarding.primingIdx}</Text>
+                    <Text style={styles.stepTitle}>{de.onboarding.primingTitel}</Text>
+                    <Text style={styles.stepText}>{de.onboarding.primingText}</Text>
+                  </>
+                )}
+              </Animated.View>
+
+              <View style={styles.dots}>
+                {[0, 1, 2, 3].map((i) => (
+                  <View key={i} style={[styles.dot, i === step && styles.dotActive]} />
+                ))}
+              </View>
+
+              {step < 3 ? (
+                <Button
+                  label={de.onboarding.weiter}
+                  size="lg"
+                  fullWidth
+                  glyph="arrowRight"
+                  onPress={() => go(step + 1)}
+                />
+              ) : (
+                <View style={styles.primingActions}>
+                  <Button
+                    label={de.onboarding.primingErlauben}
+                    variant="brass"
+                    size="lg"
+                    fullWidth
+                    glyph="locate"
+                    onPress={allowLocation}
+                  />
+                  <Button
+                    label={de.onboarding.primingSpaeter}
+                    variant="ghost"
+                    fullWidth
+                    onPress={finish}
+                  />
+                </View>
+              )}
+            </GlassSurface>
+          )}
         </View>
-      )}
-    </View>
+      </View>
+    </GestureDetector>
   );
 }
 
@@ -82,92 +192,114 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.paper,
+  },
+  hero: {
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
   },
   kicker: {
     fontFamily: fonts.mono,
     fontSize: 11,
-    letterSpacing: 3,
+    letterSpacing: 3.5,
     textTransform: 'uppercase',
     color: colors.inkSoft,
     textAlign: 'center',
+    marginBottom: spacing.md,
   },
   wordmark: {
-    fontFamily: fonts.display,
-    fontSize: 56,
-    lineHeight: 58,
+    ...textStyles.hero,
+    fontSize: 72,
+    lineHeight: 72,
+    textAlign: 'center',
+  },
+  phon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.md,
+  },
+  phonText: {
+    fontFamily: fonts.mono,
+    fontSize: 13,
+    letterSpacing: 0.5,
+    color: colors.inkSoft,
+  },
+  phonDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.brassDeep,
+  },
+  phonPos: {
+    fontFamily: fonts.displayItalic,
+    fontSize: 17,
+    color: colors.inkSoft,
+  },
+  definition: {
+    ...textStyles.verse,
+    fontSize: 21,
+    lineHeight: 31,
     color: colors.ink,
     textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-  card: {
-    flex: 1,
-    justifyContent: 'center',
     maxWidth: 360,
-    alignSelf: 'center',
+    marginTop: spacing.lg,
   },
-  idx: {
+  defTag: {
     fontFamily: fonts.mono,
-    fontSize: 12,
+    fontSize: 10.5,
     letterSpacing: 2,
     textTransform: 'uppercase',
     color: colors.brassDeep,
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.paperLine,
-    marginBottom: spacing.lg,
+    textAlign: 'center',
+    marginTop: spacing.lg,
+  },
+  bottom: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: spacing.md,
+  },
+  heroCta: {
+    paddingHorizontal: spacing.sm,
+  },
+  card: {
+    padding: spacing.lg,
+    borderRadius: 28,
+  },
+  idx: {
+    fontFamily: fonts.mono,
+    fontSize: 11,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    color: colors.brassDeep,
+    marginTop: spacing.md,
   },
   stepTitle: {
     fontFamily: fonts.displayMedium,
-    fontSize: 32,
+    fontSize: 34,
+    lineHeight: 38,
     color: colors.ink,
-    marginBottom: spacing.md,
+    marginTop: spacing.xs,
   },
   stepText: {
     ...textStyles.body,
+    marginTop: spacing.sm,
   },
   dots: {
     flexDirection: 'row',
-    justifyContent: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.lg,
+    marginVertical: spacing.lg,
   },
   dot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: radius.pill,
     backgroundColor: colors.paperLine,
   },
   dotActive: {
+    width: 22,
     backgroundColor: colors.brassDeep,
   },
-  actions: {
-    gap: spacing.md,
-    alignItems: 'center',
-  },
-  cta: {
-    backgroundColor: colors.ink,
-    borderRadius: radius.pill,
-    paddingVertical: 13,
-    paddingHorizontal: spacing.xl,
-    minWidth: 220,
-    alignItems: 'center',
-  },
-  ctaText: {
-    fontFamily: fonts.mono,
-    fontSize: 12,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.paper,
-  },
-  ghost: {
-    paddingVertical: spacing.sm,
-  },
-  ghostText: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.inkSoft,
+  primingActions: {
+    gap: spacing.xs,
   },
 });

@@ -1,21 +1,25 @@
-import Feather from '@expo/vector-icons/Feather';
 import { useEffect, useRef } from 'react';
-import {
-  FlatList,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  type SharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
-import { StockBadge } from '@/badges';
+import { BadgeArt } from '@/badges';
+import { GlassSurface } from '@/components/Glass';
+import { Glyph } from '@/components/Glyph';
+import { PressableScale } from '@/components/PressableScale';
+import { StatusMark } from '@/components/StatusMark';
 import { de } from '@/i18n/de';
+import { tick } from '@/lib/haptics';
 import { formatDistance } from '@/lib/geo';
 import type { Place } from '@/lib/places';
-import { colors, fonts, radius, spacing } from '@/theme';
+import { colors, fonts, radius, shadows, spacing } from '@/theme';
 
 type Props = {
   places: Place[];
@@ -29,11 +33,12 @@ type Props = {
   onOpen: (place: Place) => void;
 };
 
-const GAP = spacing.sm;
+const GAP = spacing.sm + 2;
 
 /**
- * Einrastendes Ziel-Karussell über der Tab-Bar: Wischen fokussiert den Ort
- * auf der Karte, Pin-Taps scrollen das Karussell mit (AP-R3).
+ * Einrastendes Ziel-Karussell über der Tab-Leiste (AP-R3): Wischen fokussiert
+ * den Ort auf der Karte, Pin-Taps scrollen mit. Die mittlere Karte steht vorn,
+ * die Nachbarn treten zurück (Tiefe aus der Scrollposition, UI-Thread).
  * Namen sind auch verschlossen lesbar (A-R3-1) — der Nebel bleibt Status.
  */
 export function PlaceCarousel({
@@ -45,11 +50,12 @@ export function PlaceCarousel({
   onOpen,
 }: Props) {
   const { width } = useWindowDimensions();
-  const cardWidth = Math.min(width - spacing.xl * 2, 340);
+  const cardWidth = Math.min(width - spacing.xl * 2 - spacing.md, 330);
+  const interval = cardWidth + GAP;
   const sidePadding = (width - cardWidth) / 2;
-  const listRef = useRef<FlatList<Place>>(null);
-  // Zuletzt per Swipe gemeldeter Index — verhindert Scroll-Schleifen, wenn
-  // die eigene Meldung als selectedId zurückkommt.
+  const listRef = useRef<Animated.FlatList<Place>>(null);
+  const scrollX = useSharedValue(0);
+  // Zuletzt per Swipe gemeldeter Index — verhindert Scroll-Schleifen.
   const reportedIndex = useRef(-1);
 
   const selectedIndex = selectedId ? places.findIndex((p) => p.id === selectedId) : -1;
@@ -67,79 +73,126 @@ export function PlaceCarousel({
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [places]);
 
-  const onMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / (cardWidth + GAP));
+  const report = (index: number) => {
     const place = places[Math.min(Math.max(index, 0), places.length - 1)];
     if (place && index !== reportedIndex.current) {
       reportedIndex.current = index;
+      tick();
       onFocus(place);
     }
   };
 
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+    onMomentumEnd: (event) => {
+      scheduleOnRN(report, Math.round(event.contentOffset.x / interval));
+    },
+  });
+
   return (
-    <FlatList
+    <Animated.FlatList
       ref={listRef}
       data={places}
       horizontal
       showsHorizontalScrollIndicator={false}
       keyExtractor={(p) => p.id}
       style={styles.listWrap}
-      contentContainerStyle={{ gap: GAP, paddingHorizontal: sidePadding }}
-      snapToInterval={cardWidth + GAP}
-      decelerationRate="fast"
-      onMomentumScrollEnd={onMomentumEnd}
-      getItemLayout={(_, index) => ({
-        length: cardWidth + GAP,
-        offset: (cardWidth + GAP) * index,
-        index,
-      })}
-      renderItem={({ item: place }) => {
-        const unlocked = unlockedIds.has(place.id);
-        const active = place.id === selectedId;
-        const distance = distancesM?.get(place.id);
-        return (
-          <Pressable
-            onPress={() => onOpen(place)}
-            accessibilityRole="button"
-            accessibilityLabel={de.karte.karussellZiel(place.name)}
-            style={[styles.card, { width: cardWidth }, active && styles.cardActive]}
-          >
-            <View style={[styles.medal, !unlocked && styles.medalLocked]}>
-              {unlocked ? (
-                <StockBadge
-                  name={place.name}
-                  region={place.region}
-                  elevationM={place.elevation_m}
-                  motif={place.badge_motif}
-                  shape={place.badge_shape}
-                  tone={place.badge_tone}
-                  width={38}
-                />
-              ) : (
-                <Feather name="lock" size={16} color={colors.inkSoft} />
-              )}
-            </View>
-            <View style={styles.info}>
-              <Text style={[styles.name, !unlocked && styles.nameLocked]} numberOfLines={1}>
-                {place.name}
-              </Text>
-              <Text style={styles.meta} numberOfLines={1}>
-                {distance != null
-                  ? `${de.karte.entfernt(formatDistance(distance))} · ${place.region.split('·')[0].trim()}`
-                  : `${place.elevation_m} m · ${place.region.split('·')[0].trim()}`}
-              </Text>
-              <View style={styles.statusRow}>
-                <View style={[styles.pip, unlocked ? styles.pipDone : styles.pipLocked]} />
-                <Text style={[styles.status, unlocked && styles.statusDone]}>
-                  {unlocked ? de.orte.statusErwandert : de.karte.chipNebel}
-                </Text>
-              </View>
-            </View>
-            <Feather name="chevron-right" size={16} color={colors.inkSoft} style={styles.chevron} />
-          </Pressable>
-        );
+      contentContainerStyle={{
+        gap: GAP,
+        paddingHorizontal: sidePadding,
+        paddingVertical: spacing.sm,
       }}
+      snapToInterval={interval}
+      decelerationRate="fast"
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+      getItemLayout={(_, index) => ({ length: interval, offset: interval * index, index })}
+      renderItem={({ item, index }) => (
+        <CarouselCard
+          place={item}
+          index={index}
+          interval={interval}
+          width={cardWidth}
+          scrollX={scrollX}
+          unlocked={unlockedIds.has(item.id)}
+          active={item.id === selectedId}
+          distanceM={distancesM?.get(item.id)}
+          onOpen={onOpen}
+        />
+      )}
     />
+  );
+}
+
+function CarouselCard({
+  place,
+  index,
+  interval,
+  width,
+  scrollX,
+  unlocked,
+  active,
+  distanceM,
+  onOpen,
+}: {
+  place: Place;
+  index: number;
+  interval: number;
+  width: number;
+  scrollX: SharedValue<number>;
+  unlocked: boolean;
+  active: boolean;
+  distanceM: number | undefined;
+  onOpen: (place: Place) => void;
+}) {
+  const depth = useAnimatedStyle(() => {
+    const distance = Math.abs(scrollX.value / interval - index);
+    return {
+      opacity: interpolate(distance, [0, 1, 2], [1, 0.72, 0.5], Extrapolation.CLAMP),
+      transform: [{ scale: interpolate(distance, [0, 1], [1, 0.92], Extrapolation.CLAMP) }],
+    };
+  });
+  const region = place.region.split('·')[0].trim();
+
+  return (
+    <Animated.View style={[{ width }, depth]}>
+      <PressableScale
+        onPress={() => onOpen(place)}
+        accessibilityRole="button"
+        accessibilityLabel={de.karte.karussellZiel(place.name)}
+        tilt={4}
+      >
+        <GlassSurface
+          radius={radius.float}
+          style={[styles.card, active && styles.cardActive]}
+          intensity={40}
+        >
+          <BadgeArt place={place} width={46} locked={!unlocked} sheen={false} />
+          <View style={styles.info}>
+            <Text style={[styles.name, !unlocked && styles.nameLocked]} numberOfLines={1}>
+              {place.name}
+            </Text>
+            <Text style={styles.meta} numberOfLines={1}>
+              {distanceM != null
+                ? de.karte.entfernt(formatDistance(distanceM))
+                : `${place.elevation_m} m`}
+              {'  ·  '}
+              {region}
+            </Text>
+            <View style={styles.status}>
+              <StatusMark
+                unlocked={unlocked}
+                label={unlocked ? de.orte.statusErwandert : de.karte.chipNebel}
+                size="sm"
+              />
+            </View>
+          </View>
+          <Glyph name="chevronRight" size={18} color={colors.inkSoft} style={styles.chevron} />
+        </GlassSurface>
+      </PressableScale>
+    </Animated.View>
   );
 }
 
@@ -151,31 +204,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.glass,
-    borderRadius: radius.card,
-    borderWidth: 1,
-    borderColor: colors.paperLine,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
+    boxShadow: shadows.float,
   },
   cardActive: {
-    borderColor: colors.brassDeep,
-  },
-  medal: {
-    width: 40,
-    alignItems: 'center',
-  },
-  medalLocked: {
-    backgroundColor: colors.lockedMedalBg,
-    borderRadius: radius.chip,
-    paddingVertical: spacing.sm,
+    borderColor: colors.brass,
+    borderWidth: 1.5,
   },
   info: {
     flex: 1,
   },
   name: {
     fontFamily: fonts.displaySemiBold,
-    fontSize: 18,
+    fontSize: 21,
+    lineHeight: 24,
     color: colors.ink,
   },
   nameLocked: {
@@ -185,37 +229,13 @@ const styles = StyleSheet.create({
     marginTop: 1,
     fontFamily: fonts.mono,
     fontSize: 9.5,
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
     color: colors.brassDeep,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: 3,
-  },
-  pip: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  pipDone: {
-    backgroundColor: colors.brass,
-  },
-  pipLocked: {
-    backgroundColor: colors.lockedGray,
   },
   status: {
-    fontFamily: fonts.mono,
-    fontSize: 8.5,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.inkSoft,
-  },
-  statusDone: {
-    color: colors.brassDeep,
+    marginTop: 4,
   },
   chevron: {
-    opacity: 0.55,
+    opacity: 0.5,
   },
 });

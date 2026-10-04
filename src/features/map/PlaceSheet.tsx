@@ -1,140 +1,90 @@
-import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { StockBadge } from '@/badges';
+import { BadgeArt } from '@/badges';
+import { BottomSheet } from '@/components/BottomSheet';
+import { Button } from '@/components/Button';
+import { StatusMark } from '@/components/StatusMark';
 import { openDirections } from '@/features/map/directions';
 import { de } from '@/i18n/de';
 import { formatCoords, formatDateDe } from '@/lib/format';
 import { formatDistance } from '@/lib/geo';
 import type { Place } from '@/lib/places';
 import type { Unlock } from '@/lib/unlocks';
-import { colors, fonts, radius, spacing, textStyles } from '@/theme';
+import { colors, fonts, spacing, textStyles } from '@/theme';
 
 type Props = {
-  place: Place;
+  place: Place | null;
+  visible: boolean;
   unlock: Unlock | undefined;
   /** Luftlinie vom eigenen Standort (m); null ohne Standortfreigabe. */
   distanceM: number | null;
   onClose: () => void;
 };
 
-/** Bottom Sheet eines Ortes auf der Karte (karte.html `.sheet`). */
-export function PlaceSheet({ place, unlock, distanceM, onClose }: Props) {
-  const insets = useSafeAreaInsets();
+/** Bottom Sheet eines Ortes auf der Karte (karte.html `.sheet`) — wischbar, Pergament. */
+export function PlaceSheet({ place, visible, unlock, distanceM, onClose }: Props) {
   const unlocked = Boolean(unlock);
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Schließen" />
-      <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
-        <View style={styles.grabber} />
-        <View style={styles.row}>
-          <View>
-            <StockBadge
-              name={place.name}
-              region={place.region}
-              elevationM={place.elevation_m}
-              motif={place.badge_motif}
-              shape={place.badge_shape}
-              tone={place.badge_tone}
-              locked={!unlocked}
-              width={96}
-            />
-            {/* Schloss-Overlay im Locked-Zustand (karte.html .sh-art.locked .foglabel) */}
-            {!unlocked && (
-              <View style={styles.fogLabel}>
-                <Feather name="lock" size={12} color={colors.inkSoft} />
-                <Text style={styles.fogLabelText}>{de.karte.chipVerschlossen}</Text>
-              </View>
-            )}
-          </View>
-          <View style={styles.info}>
-            <Text style={styles.eyebrow}>
-              {place.region} · {formatCoords(place.lat, place.lng)}
-            </Text>
-            <Text style={styles.name}>{place.name}</Text>
-            <View style={styles.metaRow}>
-              <Text style={styles.meta}>{place.elevation_m} m</Text>
-              <View style={styles.dot} />
-              <Text style={styles.meta}>{place.type}</Text>
-              {distanceM != null && (
-                <>
-                  <View style={styles.dot} />
-                  <Text style={styles.metaDistance}>
-                    {de.karte.entfernt(formatDistance(distanceM))}
-                  </Text>
-                </>
-              )}
-            </View>
-            <View style={styles.statusRow}>
-              <View style={[styles.pip, unlocked ? styles.pipDone : styles.pipLocked]} />
-              <Text style={[styles.status, unlocked && styles.statusDone]} numberOfLines={2}>
-                {unlock
-                  ? de.detail.erwandertAm(formatDateDe(unlock.unlocked_at))
-                  : de.karte.sheetVerschlossen}
+    <BottomSheet visible={visible && place != null} onClose={onClose}>
+      {place && (
+        <View>
+          <View style={styles.row}>
+            <BadgeArt place={place} width={100} locked={!unlocked} />
+            <View style={styles.info}>
+              <Text style={styles.eyebrow} numberOfLines={2}>
+                {place.region} · {formatCoords(place.lat, place.lng)}
               </Text>
+              <Text style={styles.name}>{place.name}</Text>
+              <Text style={styles.meta}>
+                <Text style={styles.elevation}>{place.elevation_m} m</Text>
+                {' · '}
+                {place.type}
+              </Text>
+              {distanceM != null && (
+                <Text style={styles.distance}>{de.karte.entfernt(formatDistance(distanceM))}</Text>
+              )}
+              <View style={styles.status}>
+                <StatusMark
+                  unlocked={unlocked}
+                  label={
+                    unlock
+                      ? de.detail.erwandertKurz(formatDateDe(unlock.unlocked_at))
+                      : de.karte.sheetVerschlossen
+                  }
+                />
+              </View>
             </View>
           </View>
+          <View style={styles.ctaRow}>
+            <Button
+              label={de.karte.route}
+              variant="outline"
+              glyph="route"
+              onPress={() => void openDirections(place)}
+              accessibilityLabel={de.karte.routeLabel(place.name)}
+            />
+            <Button
+              label={de.karte.sheetDetails}
+              glyph="arrowRight"
+              style={styles.cta}
+              onPress={() => {
+                onClose();
+                router.push({ pathname: '/ort/[id]', params: { id: place.id } });
+              }}
+            />
+          </View>
         </View>
-        <View style={styles.ctaRow}>
-          <Pressable
-            onPress={() => void openDirections(place)}
-            accessibilityRole="button"
-            accessibilityLabel={de.karte.routeLabel(place.name)}
-            style={styles.route}
-          >
-            <Feather name="navigation" size={14} color={colors.ink} />
-            <Text style={styles.routeText}>{de.karte.route}</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              onClose();
-              router.push({ pathname: '/ort/[id]', params: { id: place.id } });
-            }}
-            accessibilityRole="button"
-            style={styles.cta}
-          >
-            <Text style={styles.ctaText}>{de.karte.sheetDetails}</Text>
-          </Pressable>
-        </View>
-      </View>
-    </View>
+      )}
+    </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: colors.scrim,
-  },
-  sheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: colors.paper,
-    borderTopLeftRadius: radius.sheet,
-    borderTopRightRadius: radius.sheet,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  grabber: {
-    alignSelf: 'center',
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.paperLine,
-    marginBottom: spacing.md,
-  },
   row: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: spacing.md + 2,
     alignItems: 'center',
   },
   info: {
@@ -142,121 +92,44 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     ...textStyles.eyebrow,
-    fontSize: 10,
-    letterSpacing: 1.2,
+    fontSize: 9.5,
+    letterSpacing: 1.3,
   },
   name: {
     fontFamily: fonts.displaySemiBold,
-    fontSize: 28,
+    fontSize: 30,
+    lineHeight: 33,
     color: colors.ink,
     marginTop: spacing.xs,
   },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
+  meta: {
+    fontFamily: fonts.sans,
+    fontSize: 13.5,
+    color: colors.inkSoft,
+    marginTop: 2,
+  },
+  elevation: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 11,
+    letterSpacing: 0.8,
+    color: colors.brassDeep,
+  },
+  distance: {
+    fontFamily: fonts.mono,
+    fontSize: 11,
+    letterSpacing: 0.6,
+    color: colors.brassDeep,
     marginTop: spacing.xs,
   },
-  meta: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.5,
-    color: colors.inkSoft,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.brass,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  pip: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  pipDone: {
-    backgroundColor: colors.brass,
-  },
-  pipLocked: {
-    backgroundColor: colors.lockedGray,
-  },
   status: {
-    flex: 1,
-    fontFamily: fonts.mono,
-    fontSize: 10,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: colors.inkSoft,
-  },
-  statusDone: {
-    color: colors.brassDeep,
-  },
-  fogLabel: {
-    position: 'absolute',
-    top: '50%',
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.glass,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-  },
-  fogLabelText: {
-    fontFamily: fonts.mono,
-    fontSize: 9,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: colors.inkSoft,
-  },
-  metaDistance: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.5,
-    color: colors.brassDeep,
+    marginTop: spacing.sm,
   },
   ctaRow: {
     flexDirection: 'row',
     gap: spacing.sm,
     marginTop: spacing.lg,
   },
-  route: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    borderWidth: 1,
-    borderColor: colors.ink,
-    borderRadius: radius.pill,
-    paddingVertical: 12,
-    paddingHorizontal: spacing.lg,
-  },
-  routeText: {
-    fontFamily: fonts.mono,
-    fontSize: 12,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.ink,
-  },
   cta: {
     flex: 1,
-    backgroundColor: colors.ink,
-    borderRadius: radius.pill,
-    paddingVertical: 13,
-    alignItems: 'center',
-  },
-  ctaText: {
-    fontFamily: fonts.mono,
-    fontSize: 12,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: colors.paper,
   },
 });

@@ -27,6 +27,14 @@ const Sun = ({ cc }: { cc: CC }) => (
   </G>
 );
 
+/** Zwei Vögel am Himmel (Website-Redesign `wanderlust@37ab2db`: peak, twin, cliff). */
+const Birds = ({ cc }: { cc: CC }) => (
+  <G stroke={cc('#54707c')} strokeWidth={1.6} fill="none" strokeLinecap="round" opacity={0.75}>
+    <Path d="M58,108 q5,-6 10,0 q5,-6 10,0" />
+    <Path d="M84,120 q4,-5 8,0 q4,-5 8,0" />
+  </G>
+);
+
 const Far = ({ cc }: { cc: CC }) => (
   <Path
     d="M-12,196 L42,150 L92,188 L142,142 L188,184 L232,150 L232,214 L-12,214 Z"
@@ -35,10 +43,7 @@ const Far = ({ cc }: { cc: CC }) => (
 );
 
 const Mid = ({ cc }: { cc: CC }) => (
-  <Path
-    d="M-12,214 L52,164 L112,204 L170,154 L232,198 L232,222 L-12,222 Z"
-    fill={cc('#7aa085')}
-  />
+  <Path d="M-12,214 L52,164 L112,204 L170,154 L232,198 L232,222 L-12,222 Z" fill={cc('#7aa085')} />
 );
 
 const Ground = ({ cc }: { cc: CC }) => (
@@ -69,6 +74,7 @@ export function Scenery({ kind, id, cc }: Props) {
         <G>
           <Sky id={id} />
           <Sun cc={cc} />
+          <Birds cc={cc} />
           <Far cc={cc} />
           <Mid cc={cc} />
           <Path d="M30,216 L110,112 L192,216 Z" fill={cc('#3f6b53')} />
@@ -83,6 +89,7 @@ export function Scenery({ kind, id, cc }: Props) {
         <G>
           <Sky id={id} />
           <Sun cc={cc} />
+          <Birds cc={cc} />
           <Far cc={cc} />
           <Mid cc={cc} />
           <Path d="M22,216 L84,124 L142,216 Z" fill={cc('#436f56')} />
@@ -119,6 +126,7 @@ export function Scenery({ kind, id, cc }: Props) {
         <G>
           <Sky id={id} />
           <Sun cc={cc} />
+          <Birds cc={cc} />
           <Rect x={-12} y={172} width={244} height={94} fill={`url(#water_${id})`} />
           <G opacity={0.5} stroke={cc('#eaf3f4')} strokeWidth={2} strokeLinecap="round">
             <Path d="M-10,200 h44" />

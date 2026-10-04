@@ -1,4 +1,5 @@
 import {
+  Cormorant_300Light,
   Cormorant_400Regular,
   Cormorant_400Regular_Italic,
   Cormorant_500Medium,
@@ -20,11 +21,12 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { useFonts } from 'expo-font';
 import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { hasSeenOnboarding } from '@/features/onboarding/onboardingFlag';
-
+import { TiltProvider } from '@/lib/tilt';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -43,6 +45,7 @@ const persister = createAsyncStoragePersister({ storage: AsyncStorage });
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
+    Cormorant_300Light,
     Cormorant_400Regular,
     Cormorant_400Regular_Italic,
     Cormorant_500Medium,
@@ -76,23 +79,30 @@ export default function RootLayout() {
   }
 
   return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister, maxAge: CACHE_MAX_AGE_MS }}
-    >
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.paper },
-        }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="ort/[id]" />
-        <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
-        <Stack.Screen name="einstellungen" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="rechtliches" options={{ presentation: 'modal' }} />
-      </Stack>
-    </PersistQueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <TiltProvider>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister, maxAge: CACHE_MAX_AGE_MS }}
+        >
+          <StatusBar style="dark" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.paper },
+            }}
+          >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="ort/[id]" />
+            <Stack.Screen
+              name="onboarding"
+              options={{ gestureEnabled: false, animation: 'fade' }}
+            />
+            <Stack.Screen name="einstellungen" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="rechtliches" options={{ presentation: 'modal' }} />
+          </Stack>
+        </PersistQueryClientProvider>
+      </TiltProvider>
+    </GestureHandlerRootView>
   );
 }
