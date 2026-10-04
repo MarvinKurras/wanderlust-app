@@ -44,7 +44,8 @@ const queryClient = new QueryClient({
 const persister = createAsyncStoragePersister({ storage: AsyncStorage });
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  // Fehler beim Laden nicht blockieren lassen (Expo-Empfehlung): dann gilt die Fallback-Schrift.
+  const [fontsLoaded, fontError] = useFonts({
     Cormorant_300Light,
     Cormorant_400Regular,
     Cormorant_400Regular_Italic,
@@ -69,12 +70,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (fontsLoaded && onboardingChecked) {
+    if ((fontsLoaded || fontError) && onboardingChecked) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, onboardingChecked]);
+  }, [fontsLoaded, fontError, onboardingChecked]);
 
-  if (!fontsLoaded || !onboardingChecked) {
+  if ((!fontsLoaded && !fontError) || !onboardingChecked) {
     return null;
   }
 
